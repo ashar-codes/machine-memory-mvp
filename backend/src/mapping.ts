@@ -9,6 +9,13 @@ import type { LlmClient } from './llm.js';
 import { fieldsFor, heuristicMapping, normalizeKey } from './tabular.js';
 
 const MAX_SAMPLE_ROWS = 5;
+/**
+ * A column mapping is an interactive step: the user is watching a spinner. The provider retries
+ * transport failures for up to a few minutes, which is right for offline ingestion and wrong here,
+ * so the suggestion is raced against a short deadline and the deterministic mapping is used if it
+ * loses. The import is never blocked by a slow model.
+ */
+export const SUGGESTION_TIMEOUT_MS = 12_000;
 const MAX_SAMPLE_CHARS = 120;
 
 const SUGGESTION_INSTRUCTIONS = `You map spreadsheet columns onto a fixed set of internal fields for a wind turbine maintenance system.
@@ -89,15 +96,19 @@ export async function proposeMapping(
       rows.slice(0, MAX_SAMPLE_ROWS).map((row) => (row[column] ?? '').slice(0, MAX_SAMPLE_CHARS)).filter(Boolean),
     ]));
     try {
-      const suggestion = await llm.structured(SUGGESTION_INSTRUCTIONS, {
-        allowedFields: unusedFields.map((field) => ({ name: field.field, description: field.description })),
-        columns: undecided.map((column) => ({ name: column, sampleValues: samples[column] })),
-      }, SUGGESTION_SCHEMA as unknown as Record<string, unknown>);
+      const suggestion = await Promise.race([
+        llm.structured(SUGGESTION_INSTRUCTIONS, {
+          allowedFields: unusedFields.map((field) => ({ name: field.field, description: field.description })),
+          columns: undecided.map((column) => ({ name: column, sampleValues: samples[column] })),
+        }, SUGGESTION_SCHEMA as unknown as Record<string, unknown>),
+        new Promise<null>((resolve) => setTimeout(() => resolve(null), SUGGESTION_TIMEOUT_MS).unref?.()),
+      ]);
+      if (suggestion === null) notes.push('Gemini did not respond in time, so only exact and known-synonym column matches were applied. Map the rest yourself below.');
       const validated = validateSuggestion(suggestion, undecided, importType, heuristic.values());
       for (const [column, field] of validated) aiAccepted.set(column, field);
       if (aiAccepted.size) { source = 'ai'; notes.push(`Gemini suggested ${aiAccepted.size} column mapping(s). Review before importing.`); }
     } catch {
-      notes.push('Gemini was unavailable, so only exact and known-synonym column matches were applied.');
+      notes.push('Gemini was unavailable, so only exact and known-synonym column matches were applied. Map the rest yourself below.');
     }
   } else if (!llm?.structured && undecided.length) {
     notes.push('No model is configured, so only exact and known-synonym column matches were applied.');

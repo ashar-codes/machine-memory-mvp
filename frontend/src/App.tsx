@@ -4,9 +4,21 @@ import type {
   Intent, InvestigateResponse, ListResponse, ResolutionRequest, ResolutionResponse, TimelineItem,
 } from '@machine-memory/shared';
 import { failureText, get, post } from './api';
+import { CopilotView } from './copilot';
+import { DataHub } from './datahub';
+import { FleetDashboard } from './fleet';
 import { AnswerCard, InvestigationPanel, ResolutionDrawer } from './investigation';
+import { KnowledgeBase } from './knowledge';
 import { AssetHeader, AssetRail, EvidencePanel, TimelinePanel } from './panels';
+import { ScenarioLab } from './scenario';
 import { Empty, Failure, Loading } from './ui';
+
+const VIEWS = ['fleet', 'memory', 'copilot', 'data', 'knowledge', 'scenario'] as const;
+type View = typeof VIEWS[number];
+const VIEW_LABELS: Record<View, string> = {
+  fleet: 'Fleet', memory: 'Machine Memory', copilot: 'AI Copilot',
+  data: 'Data Hub', knowledge: 'Knowledge Base', scenario: 'Scenario Lab',
+};
 
 export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -33,6 +45,7 @@ export default function App() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [savedNotice, setSavedNotice] = useState<{ id: string; summary: string } | null>(null);
 
+  const [view, setView] = useState<View>('memory');
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const evidenceRefs = useRef(new Map<string, HTMLLIElement>());
   const registerRef = useCallback((id: string, node: HTMLLIElement | null) => {
@@ -168,17 +181,52 @@ export default function App() {
         </div>
       </header>
 
-      <div className="workspace">
-        <AssetRail
-          assets={assets}
-          selected={selected}
-          onSelect={chooseAsset}
-          loading={assetsLoading}
-          error={assetsError}
-          onRetry={() => setReload((value) => value + 1)}
-        />
+      <nav className="mainnav" aria-label="Sections">
+        {VIEWS.map((item) => (
+          <button key={item} type="button" className={`navlink ${view === item ? 'active' : ''}`}
+            aria-current={view === item ? 'page' : undefined} onClick={() => setView(item)}>
+            {VIEW_LABELS[item]}
+          </button>
+        ))}
+      </nav>
+
+      {/* The grid keeps three fixed tracks, so a view without the rail and evidence panel must
+          collapse to a single full-width track rather than rendering inside the rail's column. */}
+      <div className={`workspace${view === 'memory' || view === 'copilot' ? '' : ' full'}`}>
+        {(view === 'memory' || view === 'copilot') && (
+          <AssetRail
+            assets={assets}
+            selected={selected}
+            onSelect={chooseAsset}
+            loading={assetsLoading}
+            error={assetsError}
+            onRetry={() => setReload((value) => value + 1)}
+          />
+        )}
 
         <main className="column centre">
+          {view === 'fleet' && (
+            <FleetDashboard onOpenAsset={(assetCode) => { chooseAsset(assetCode); setView('memory'); }} />
+          )}
+          {view === 'copilot' && (
+            <CopilotView assetCode={asset?.assetCode ?? null} eventCode={event?.eventCode ?? null} onEvidence={setEvidence} />
+          )}
+          {view === 'data' && (
+            <DataHub onImported={(report) => {
+              setReload((value) => value + 1);
+              setDetailReload((value) => value + 1);
+              if (report.assetsTouched.length) chooseAsset(report.assetsTouched[0]);
+            }} />
+          )}
+          {view === 'knowledge' && <KnowledgeBase onIndexed={() => setReload((value) => value + 1)} />}
+          {view === 'scenario' && (
+            <ScenarioLab
+              assets={assets}
+              onAssetCreated={(created) => { setReload((value) => value + 1); chooseAsset(created.assetCode); }}
+              onEventCreated={(assetCode) => { setReload((value) => value + 1); chooseAsset(assetCode); setDetailReload((value) => value + 1); }}
+            />
+          )}
+          {view === 'memory' && <>
           {health?.llm !== 'configured_unverified' && databaseState === 'connected' && (
             <p className="notice">
               No model key is configured. Investigations still run: evidence is retrieved from the
@@ -241,9 +289,12 @@ export default function App() {
               </p>
             </>
           )}
+          </>}
         </main>
 
-        <EvidencePanel evidence={evidence} highlighted={highlighted} registerRef={registerRef} />
+        {(view === 'memory' || view === 'copilot') && (
+          <EvidencePanel evidence={evidence} highlighted={highlighted} registerRef={registerRef} />
+        )}
       </div>
 
       {drawerOpen && asset && event?.eventCode && (
