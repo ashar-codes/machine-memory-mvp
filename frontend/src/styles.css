@@ -180,7 +180,10 @@ time, .num, .code { font-variant-numeric: tabular-nums; }
   padding: 8px 12px; font-size: 13px; text-align: left; color: var(--text);
 }
 .probe:hover:enabled { background: #fff; border-color: var(--steel); }
-.probe[aria-pressed="true"] { background: var(--blue); border-color: var(--blue); color: #fff; }
+/* Hover must not outrank the pressed state: it repainted the background white while the
+   pressed rule kept the text white, so the active probe's label disappeared under the cursor. */
+.probe[aria-pressed="true"],
+.probe[aria-pressed="true"]:hover:enabled { background: var(--blue); border-color: var(--blue); color: #fff; }
 .probe:disabled { opacity: 0.5; cursor: default; }
 
 .ask { display: flex; gap: 8px; margin-top: 12px; }

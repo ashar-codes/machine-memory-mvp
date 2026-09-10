@@ -6,10 +6,10 @@ This repository contains a university demonstration, not confidential operationa
 
 What changed at this checkpoint, stated precisely:
 
-- **One real public file is now in the repository.** `data/raw/Penmanshiel_WT_static.csv` was downloaded from Zenodo record 16807304 and its MD5 matches the checksum Zenodo publishes for that file. It holds 14 genuine turbine identities with coordinates and ratings. It contains no SCADA signals and no events.
+- **One real public file is now in the repository.** `data/raw/Penmanshiel_WT_static.csv` was downloaded from Zenodo record 16807304 and its MD5 matches the checksum Zenodo publishes for that file (`c4cd4191234c1a67a391fe5d2978256b`). The file is published with CRLF line endings, and a repository-wide `*.csv text eol=lf` rule was silently rewriting them on checkout, which broke that byte-exact match; the file is now marked `binary` in `.gitattributes` so Git preserves the published bytes. It holds 14 genuine turbine identities with coordinates and ratings. It contains no SCADA signals and no events.
 - **No public event history exists anywhere in this project.** The bulk SCADA archives were not downloaded. No public fault, incident or repair row has been created, and none was invented to compensate.
-- **The public importer has not been run against a database.** `npm run data:penmanshiel` is implemented and its parsing is tested against the real file, but no live database was reachable in this session, so no `public_data` row exists yet.
-- **Three public reference manifests are prepared but not ingested.** The OSHA lockout/tagout page, 29 CFR 1910.269 hazardous-energy provisions and NREL/TP-5000-80195 were each read from their publishers and paraphrased into reviewed manifests under `data/knowledge/`. Embedding and insertion require an OpenAI key and a database; neither was available. Until `npm run rag:ingest:corpus` succeeds, the semantic corpus is empty and the application says so in the interface.
+- **The public importer still has not been run against a database.** `npm run data:penmanshiel` is implemented and its parsing is tested against the real file, and the database is now reachable, but the import has not been executed. No `public_data` row exists yet, so the 14 real Penmanshiel turbine identities are absent from the workspace and only the three synthetic assets appear.
+- **Three public reference manifests are now ingested.** The OSHA lockout/tagout page, 29 CFR 1910.269 hazardous-energy provisions and NREL/TP-5000-80195 were each read from their publishers and paraphrased into reviewed manifests under `data/knowledge/`, then embedded with `gemini-embedding-001` and inserted transactionally: 3 documents, 21 chunks, every chunk carrying a non-null 1536-dimension unit-length vector and `record_origin = public_reference`. Ingestion is idempotent by content identity, so re-running reports `already_ingested` rather than duplicating.
 
 ## Mandatory origins
 
@@ -45,3 +45,13 @@ Do not map every low-power SCADA row to a fault. Do not treat every event as a d
 The committed JSON knowledge fixture is synthetic and unverified. It tests ingestion shape only. Real technical and safety references require reviewed source text, applicability metadata and ingestion checks before being usable evidence. OSHA is a US regulator; material must not be presented as the applicable legal procedure for a Pakistan/UK site. General safety guidance is not an asset-specific OEM procedure or permission to operate machinery.
 
 See [source manifest](docs/SOURCE_MANIFEST.md) and [Data/RAG handoff](docs/DATA_RAG_HANDOFF.md).
+
+## What leaves this machine
+
+Ingestion and question answering send content to Google's Gemini API over the free tier. Exactly three categories of content are involved, and it is worth being blunt about which is which:
+
+- **Real and public.** Reviewed OSHA and NREL excerpts (embedded once at ingestion) and Penmanshiel turbine identity fields. These are already published material.
+- **Synthetic.** The Demonstration Wind Farm history, WT-07, `PITCH-HYD-214`, its work orders, technician note and resolution records. Fictional throughout, and labelled `synthetic_demo` in the evidence bundle the model receives.
+- **User demo.** Resolution text a technician types into the running application, labelled `user_demo`.
+
+No confidential Zephyr data and no E-SET production data exist in this project, so neither can be sent. Free-tier provider terms are not equivalent to commercial terms; see SECURITY.md. This arrangement is acceptable *because* the corpus is public and fictional, and that reasoning does not carry over to real plant data.

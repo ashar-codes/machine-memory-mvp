@@ -35,14 +35,14 @@ The Penmanshiel import adds a **separate site** with `PEN-` asset codes. It carr
 
 ## Add the reference corpus
 
-Put an OpenAI key in `.env` as `OPENAI_API_KEY`, then:
+Create a Gemini API key in Google AI Studio and put it in `.env` as `GEMINI_API_KEY`, then:
 
 ```bash
 npm run rag:ingest:corpus -- --dry-run   # validate all manifests, no embeddings, no writes
-npm run rag:ingest:corpus                # embed and insert; costs embedding API usage
+npm run rag:ingest:corpus                # embed and insert; uses Gemini free-tier embedding quota
 ```
 
-This ingests three reviewed public references: OSHA's wind-energy lockout/tagout page, hazardous-energy provisions of 29 CFR 1910.269, and NREL/TP-5000-80195 on drivetrain reliability. Each is stored as an attributed paraphrase with its source URL and authority class. Reruns are idempotent by content identity. The CLI only reads local reviewed JSON: it never fetches a URL, and the HTTP ingestion route is permanently disabled.
+This ingests three reviewed public references (3 documents, 21 chunks, verified present in the database): OSHA's wind-energy lockout/tagout page, hazardous-energy provisions of 29 CFR 1910.269, and NREL/TP-5000-80195 on drivetrain reliability. Each is stored as an attributed paraphrase with its source URL and authority class. Reruns are idempotent by content identity. The CLI only reads local reviewed JSON: it never fetches a URL, and the HTTP ingestion route is permanently disabled.
 
 Without a key the application still works. Investigations retrieve structured evidence from SQL and answer deterministically from it; only semantic ranking and synthesis are unavailable, and the interface says so.
 
@@ -90,7 +90,7 @@ Questions that would need a verified procedure or numeric limit return `INSUFFIC
 | `backend/src/synthesis.ts` | Evidence bundle, model instructions, strict parsing, deterministic fallback |
 | `backend/src/investigate.ts` | Pipeline orchestration and safety gates |
 | `backend/src/rag.ts` | Safety detection, evidence scoring, citation validation |
-| `backend/src/llm.ts` | The only module that calls OpenAI |
+| `backend/src/llm.ts` | The only module that calls Gemini |
 | `frontend/src/` | Investigation workspace: asset rail, investigation panel, timeline, evidence panel |
 | `supabase/` | 12-table schema with pgvector(1536), RLS, and the synthetic seed |
 | `scripts/data/` | Seed and the Penmanshiel public importer |

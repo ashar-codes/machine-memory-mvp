@@ -4,8 +4,8 @@ import { fileURLToPath } from 'node:url';
 export const envPath = fileURLToPath(new URL('../../.env', import.meta.url));
 dotenv.config({ path: envPath, quiet: true });
 
-export const DEFAULT_MODEL = 'gpt-5.6-terra';
-export const DEFAULT_EMBEDDING_MODEL = 'text-embedding-3-small';
+export const DEFAULT_MODEL = 'gemini-3.6-flash';
+export const DEFAULT_EMBEDDING_MODEL = 'gemini-embedding-001';
 // Fixed by the migration's vector(1536) column. Changing it requires a migration and re-embedding.
 export const EMBEDDING_DIMENSIONS = 1536;
 
@@ -20,11 +20,11 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   return {
     host, port,
     databaseUrl: env.DATABASE_URL,
-    llmConfigured: Boolean(env.OPENAI_API_KEY),
+    llmConfigured: Boolean(env.GEMINI_API_KEY),
     // Secrets stay in this object and never reach the browser or an error response.
-    openaiApiKey: env.OPENAI_API_KEY,
-    model: env.OPENAI_MODEL?.trim() || DEFAULT_MODEL,
-    embeddingModel: env.EMBEDDING_MODEL?.trim() || DEFAULT_EMBEDDING_MODEL,
+    geminiApiKey: env.GEMINI_API_KEY,
+    model: env.GEMINI_MODEL?.trim() || DEFAULT_MODEL,
+    embeddingModel: env.GEMINI_EMBEDDING_MODEL?.trim() || DEFAULT_EMBEDDING_MODEL,
     embeddingDimensions: EMBEDDING_DIMENSIONS,
   };
 }

@@ -43,13 +43,13 @@ Each UTF-8 JSON file contains exactly one document, not an array:
 
 Suggested validation ceilings for the implementation: one file up to 2 MiB, at most 200 chunks, each chunk at most 8,000 characters; reject oversize input before embedding. Any final enforced limits belong in script help and API contract where applicable.
 
-Map camelCase inputs into `documents` snake_case fields. Keep `assetType`, `manufacturer`, `model` in document metadata and propagate applicability into chunk metadata as needed by the frozen schema/RPC. Each chunk must reference its actual document ID. Use `text-embedding-3-small` default **1,536 dimensions**, verify returned lengths and finite numbers; never seed random/zero vectors as if semantic embeddings.
+Map camelCase inputs into `documents` snake_case fields. Keep `assetType`, `manufacturer`, `model` in document metadata and propagate applicability into chunk metadata as needed by the frozen schema/RPC. Each chunk must reference its actual document ID. Use `gemini-embedding-001` with an explicitly requested `outputDimensionality` of **1,536**, renormalize the truncated vector to unit length, verify returned lengths and finite numbers; never seed random/zero vectors as if semantic embeddings.
 
 Authority assignment is a trusted offline curation task, not a privilege granted to anonymous callers. Synthetic/user demo content must be `UNVERIFIED` or `HISTORICAL`, never OEM/REGULATOR/RESEARCH authority. A `SAFETY_REFERENCE` label alone does not authorize procedural guidance. Review source provenance and domain, text fidelity, publication scope and applicability before public-reference ingestion.
 
 ## Next implementation sequence
 
-1. Validate local JSON with Zod, enforce provenance and ceilings, then embed in bounded batches. Keep OpenAI/Supabase credentials on the backend/CLI only. Do not log keys or full sensitive content.
+1. Validate local JSON with Zod, enforce provenance and ceilings, then embed in bounded batches. Keep Gemini/Supabase credentials on the backend/CLI only. Do not log keys or full sensitive content.
 2. Insert document and chunks transactionally through a reviewed DB function or SQL transaction; failed embedding/insertion must not leave a document presented as searchable. Design reruns to be idempotent via stable content/source identity; coordinate a schema change if needed rather than inventing an untracked upsert key.
 3. Fetch the tiny public static file and bounded event subset only if access permits. Freeze actual CSV mapping after inspecting headers, not from guesses. Verify duplicate handling and counts.
 4. Ingest reviewed public references only after their contents are acquired. Preserve verbatim excerpts or clearly marked paraphrases with correct pages/sections, source links, licensing and applicability. No OEM manual is currently available.

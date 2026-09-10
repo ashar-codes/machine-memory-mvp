@@ -1,6 +1,6 @@
 # Local knowledge input
 
-`synthetic-note.example.json` demonstrates one document in the frozen local ingestion format. It can exercise validation/embedding when the database and OpenAI credentials are configured, but cannot provide authoritative safety or OEM evidence.
+`synthetic-note.example.json` demonstrates one document in the frozen local ingestion format. It can exercise validation/embedding when the database and Gemini credentials are configured, but cannot provide authoritative safety or OEM evidence.
 
 Use `npm run rag:ingest -- --file data/knowledge/synthetic-note.example.json` from the repository root after setup. Review the root command implementation/status before assuming successful ingestion. Each JSON file is a single document with presegmented chunks. A source URL is provenance metadata, not an instruction to fetch it.
 

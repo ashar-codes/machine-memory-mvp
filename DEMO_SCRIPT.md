@@ -6,7 +6,7 @@
 npm run dev
 ```
 
-Confirm both status lamps in the header. Database should read connected. If no OpenAI key is set, the workspace shows a notice saying answers are assembled deterministically from retrieved evidence — that is a legitimate mode to present, not a failure, and it is worth saying so out loud rather than hiding it.
+Confirm both status lamps in the header. Database should read connected. If no Gemini key is set, the workspace shows a notice saying answers are assembled deterministically from retrieved evidence — that is a legitimate mode to present, not a failure, and it is worth saying so out loud rather than hiding it.
 
 Select **WT-07** before anyone is watching so the first thing on screen is a turbine with an open fault.
 

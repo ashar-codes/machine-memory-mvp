@@ -25,7 +25,7 @@ Public document origins require an HTTPS source URL. Synthetic/user documents ma
 
 ## Retrieval
 
-Embedding storage is `extensions.vector(1536)` for text-embedding-3-small default output. Embeddings remain nullable until actual API ingestion succeeds; fake vectors are prohibited. Prefer explicit operators/casts with direct pg SQL:
+Embedding storage is `extensions.vector(1536)`, matching gemini-embedding-001 requested at `outputDimensionality` 1536 and renormalized to unit length. Embeddings remain nullable until actual API ingestion succeeds; fake vectors are prohibited. Prefer explicit operators/casts with direct pg SQL:
 
 ```sql
 select c.id, c.content, d.title,

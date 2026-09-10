@@ -6,7 +6,7 @@ Machine Memory: An Asset-Conditioned Retrieval-Augmented Generation (RAG) System
 
 ## Current architecture
 
-npm workspaces, React/Vite/TypeScript, Express/TypeScript/Zod, Supabase PostgreSQL with pgvector1536, backend-owned `pg` SQL. OpenAI runtime contract gpt-5.6-terra via Responses API; offline embeddings text-embedding-3-small. Generic asset model with fictional wind-turbine seed. No Docker, microservices, LangChain or machine-control APIs.
+npm workspaces, React/Vite/TypeScript, Express/TypeScript/Zod, Supabase PostgreSQL with pgvector1536, backend-owned `pg` SQL. Gemini runtime contract gemini-3.6-flash via the Interactions API; offline embeddings gemini-embedding-001 at 1536 dimensions. Generic asset model with fictional wind-turbine seed. No Docker, microservices, LangChain or machine-control APIs.
 
 ## Authoritative contracts
 
@@ -39,7 +39,7 @@ Not done, and not to be described otherwise: no public SCADA or event history ex
 
 Target: intent → developer-written structured SQL/counts → asset/metadata-filtered vectors → evidence fusion/authority → deterministic safety/strength → Responses synthesis → schema/citation/grounding validation. Counting remains SQL-only; evidence provenance and applicability survive all stages.
 
-Implemented: intent-specific structured retrieval for all seven frozen intents with SQL-computed recurrence counts, occurrence timestamps and bounded change windows; pgvector cosine search combined with PostgreSQL keyword ranking; deterministic evidence fusion where authority outranks similarity; backend-assigned evidence strength; grounded synthesis through the Responses API over a normalized evidence bundle; strict model-output parsing with bounded repair; citation validation with a deterministic fallback answer; and a two-stage safety gate (pre-retrieval refusal for prohibited requests, post-retrieval insufficiency when no authoritative reference was retrieved).
+Implemented: intent-specific structured retrieval for all seven frozen intents with SQL-computed recurrence counts, occurrence timestamps and bounded change windows; pgvector cosine search combined with PostgreSQL keyword ranking; deterministic evidence fusion where authority outranks similarity; backend-assigned evidence strength; grounded synthesis through the Gemini Interactions API over a normalized evidence bundle; strict model-output parsing with bounded repair; citation validation with a deterministic fallback answer; and a two-stage safety gate (pre-retrieval refusal for prohibited requests, post-retrieval insufficiency when no authoritative reference was retrieved).
 
 `INVESTIGATION_NOT_IMPLEMENTED` is retired. With no database configured, investigate returns 503 `DATABASE_NOT_CONFIGURED` rather than a fabricated answer.
 
@@ -57,9 +57,9 @@ Exactly one, documented as Amendment 1.1 in docs/API_CONTRACT.md: `HealthRespons
 
 ## Remaining work
 
-Operator, before the demonstration: provision a dedicated Supabase project, apply the migration, run `npm run db:seed`, run `npm run data:penmanshiel`, add an OpenAI key, run `npm run rag:ingest:corpus`, then walk DEMO_SCRIPT.md end to end. Until the corpus is ingested, technical-guidance and safety questions correctly return INSUFFICIENT.
+Operator, before the demonstration: the dedicated Supabase project is provisioned, the migration applied, `npm run db:seed` committed and `npm run rag:ingest:corpus` completed against a live Gemini key. What remains optional is `npm run data:penmanshiel`, which has still not been run against this database, so the 14 real `PEN-` turbine identities are not present and only the three synthetic assets appear in the asset rail.
 
-Verification still owed: `npm ci`, lint, typecheck, build and the full vitest run in an environment with registry access; live SQL execution of the retrieval queries; a real Responses API call; and browser interaction QA of the workspace. None of these were possible in this session.
+Verification still owed: the public SCADA event import, and a re-run sweep for resolutions whose semantic indexing failed while the provider was unreachable. Everything else in this list has now been executed live: `npm ci`, lint, typecheck, build, the full vitest run, SQL execution of the retrieval queries against Supabase, real Gemini embedding and synthesis calls, and browser interaction QA of the workspace.
 
 Deferred by choice: automatic conflict detection in evidence scoring (see docs/EVIDENCE_STRENGTH.md); a retry sweep for resolutions whose semantic indexing failed; public SCADA event import; HNSW indexing, which the corpus is far too small to justify.
 
@@ -79,7 +79,7 @@ Deferred by choice: automatic conflict detection in evidence scoring (see docs/E
 | npm audit | Zero reported vulnerabilities after dependency updates; this is not proof of all security properties |
 | SQL static review |12 tables/provenance/RLS/dimension/FK/transaction framing checked; live behavior unverified |
 
-Known limitations: no configured DATABASE_URL/OpenAI key, no applied migration, no acquired public reference corpus, no complete hybrid retrieval/synthesis, no semantic resolution indexing, no public hosting/authentication, and no browser-based visual interaction QA. Node/network sandbox sessions are transient; delivered dev commands are for the user's VS Code environment. Existing local HTTP tests use real servers and no external services. The first-phase gate is complete; live product acceptance remains open.
+Known limitations: the Penmanshiel public importer has not been run against this database; the network path to the Gemini API on this machine drops connections intermittently, so both the backend and the ingester carry bounded retries and the backend still degrades to keyword-only ranking if every attempt fails; there is no public hosting or authentication. Node/network sandbox sessions are transient; delivered dev commands are for the user's VS Code environment. Existing local HTTP tests use real servers and no external services. The first-phase gate is complete; live product acceptance remains open.
 
 ## Latest checkpoint — 2026-09-10, completion phase
 
@@ -97,8 +97,8 @@ This session had **no network access from the build environment**: the npm regis
 | `tests/integration/ingestion.test.ts` | **Not executed** — needs zod. Extended with cases covering the three new public manifests. |
 | Public file acquisition | **Verified.** `Penmanshiel_WT_static.csv` downloaded and its MD5 matched Zenodo's published checksum byte for byte. |
 | Knowledge manifest validation | Structurally validated against the frozen ingestion schema by an independent check: key sets, enum members, provenance rules, chunk counts and size ceilings all pass. Not yet validated by Zod itself. |
-| Live database | **Never reached.** No migration, seed, import or query has run against PostgreSQL. |
-| Live OpenAI | **Never called.** No embedding and no synthesis request was made. `gpt-5.6-terra` and `text-embedding-3-small` remain configuration contracts, not verified access. |
-| Browser QA | **Not performed.** The workspace has not been rendered in a browser. |
+| Live database | **Reached and verified.** Migration applied, seed committed, corpus ingested, retrieval queries executed against Supabase over verified TLS. 12 tables, RLS enabled on all 12, pgvector 0.8.2. |
+| Live Gemini | **Called and verified.** 21 document chunks embedded with `gemini-embedding-001` at 1536 dimensions, and grounded synthesis executed with `gemini-3.6-flash` through the Interactions API. Note that the documented free-tier `gemini-2.5-flash` returns 404 `no longer available to new users`; `gemini-3.6-flash` is the replacement its own error message names. |
+| Browser QA | **Performed.** The workspace was rendered in Chrome against the live backend: asset rail, WT-07 header, PITCH-HYD-214 event card, probe buttons, investigation result with strength badge, evidence panel with provenance badges, and the timeline carrying the newly logged `user_demo` resolution. One CSS defect was found and fixed (an active probe button's label turned white-on-white under the cursor). |
 
 Read the offline test row precisely: it is real execution of the real test files, and it genuinely exercises retrieval scope, safety refusal, citation repair, strength capping and degraded-synthesis behaviour. It is not a substitute for `npm run test`, and it cannot catch a TypeScript compile error or a malformed SQL string.

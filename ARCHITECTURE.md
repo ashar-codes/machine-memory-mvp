@@ -4,13 +4,13 @@ Machine Memory: An Asset-Conditioned Retrieval-Augmented Generation (RAG) System
 
 ## Scope and stack
 
-First phase establishes a production-shaped **local university MVP foundation**, not production readiness. npm workspaces: React/Vite/TypeScript frontend, Express/TypeScript/Zod backend, type-only shared package. Supabase PostgreSQL + pgvector supplies persistent structured history and semantic evidence. Node `pg` uses parameterized SQL; no browser Supabase client. OpenAI Responses API is the designated synthesis provider (`gpt-5.6-terra`); `text-embedding-3-small` with1536 dimensions is fixed for ingestion. No orchestration framework, autonomous agents, container requirement or machine-control integrations.
+First phase establishes a production-shaped **local university MVP foundation**, not production readiness. npm workspaces: React/Vite/TypeScript frontend, Express/TypeScript/Zod backend, type-only shared package. Supabase PostgreSQL + pgvector supplies persistent structured history and semantic evidence. Node `pg` uses parameterized SQL; no browser Supabase client. The Google Gemini API is the designated synthesis provider (`gemini-3.6-flash` through the Interactions API); `gemini-embedding-001` truncated and renormalized to 1536 dimensions is fixed for ingestion. No orchestration framework, autonomous agents, container requirement or machine-control integrations.
 
 The asset is the memory unit; schema supports future asset types. Demo uses a fictional wind farm. Penmanshiel may supply bounded public metadata/events later, without misrepresenting fictional maintenance as real history.
 
 ## Boundaries
 
-Browser → backend → PostgreSQL. Backend → OpenAI for embeddings/synthesis only when configured and implemented. CLI ingestion → OpenAI embeddings → transactional PostgreSQL document/chunk insertion. Credentials stay server-side. Keep query/retrieval services in backend; data parsing and offline ingestion under scripts. Shared package contains wire types/constants only, no database/LLM implementation.
+Browser → backend → PostgreSQL. Backend → Gemini for embeddings/synthesis only when configured. CLI ingestion → Gemini embeddings → transactional PostgreSQL document/chunk insertion. Credentials stay server-side. Keep query/retrieval services in backend; data parsing and offline ingestion under scripts. Shared package contains wire types/constants only, no database/LLM implementation.
 
 ## Hybrid pipeline (implemented)
 
@@ -21,7 +21,7 @@ Implemented across `backend/src/retrieval.ts`, `evidence.ts`, `synthesis.ts`, `l
 3. Embed question once; filter document/chunk metadata by asset type, manufacturer and model before ranking1536-dimensional cosine distance. Exact current-asset narratives and compatible cross-asset narratives remain distinguishable. Null metadata means unspecified, not approved for every model. Do not use a fault-code string alone to equate different OEMs.
 4. Fuse/deduplicate evidence using stable typed IDs such as `event:<uuid>`, `resolution:<uuid>`, `chunk:<uuid>`, `aggregate:<scope-hash>`. Preserve SQL facts as canonical; do not replace counts with truncated top-k results.
 5. Authority: applicable OEM documentation for model-specific technical instructions; regulator for general safety; research for background; historical work orders/resolutions for reported past actions; user/synthetic assertions never elevate to technical authority. Conflicts produce uncertainty and block unsafe recommendations.
-6. Run deterministic strength and safety gates. Pass only bounded evidence + fixed instructions to Responses API with `store:false`, no tools and JSON schema output. Retrieved documents are untrusted data; embedded instructions cannot change policy. Never execute returned SQL/code or let LLM select arbitrary tools.
+6. Run deterministic strength and safety gates. Pass only bounded evidence + fixed instructions to the Gemini Interactions API with `store:false`, no tools and a JSON `response_format` schema. Retrieved documents are untrusted data; embedded instructions cannot change policy. Never execute returned SQL/code or let LLM select arbitrary tools.
 7. Validate answer structure and every citation ID. Citation existence is necessary, **not proof a claim is supported**: check factual grounding, numeric values against authoritative excerpts, and reject uncited operational recommendations. Backend overwrites model confidence/safety fields. On failures, return insufficient evidence or sanitized provider error; no invented fallback facts.
 
 ### Deviations from the original design
@@ -36,7 +36,7 @@ Resolution POST validates → locks/resolves asset in transaction → inserts us
 
 Semantic indexing then runs as a separate best-effort step in `backend/src/memoryIndex.ts`, **after** the response has been sent. It embeds the resolution narrative and writes a `user_demo` document and chunk. Three properties matter: it cannot roll back the committed resolution; a failure is logged and nothing else; and success is never reported to the client, because the frozen status enum would then be claiming completion for work that may still be in flight. A retry sweep for previously failed indexing is not implemented and is recorded as open.
 
-This is why the demonstration loop works even with no OpenAI key at all: structured retrieval finds the new resolution on the very next question, because it was committed to SQL, not because it was embedded.
+This is why the demonstration loop works even with no Gemini key at all: structured retrieval finds the new resolution on the very next question, because it was committed to SQL, not because it was embedded.
 
 ## Integration interfaces
 
@@ -44,4 +44,4 @@ Wire contracts: docs/API_CONTRACT.md + packages/shared/src/index.ts. Schema: sup
 
 ## Official model references
 
-The requested model is documented with Responses support: https://developers.openai.com/api/docs/models/gpt-5.6-terra . Default embedding dimensions are documented at https://developers.openai.com/api/docs/guides/embeddings . Account access and live API calls remain unverified. No fine-tuning is required: RAG indexes evidence; it does not retrain model weights.
+Model selection was settled against the live API, not only the documentation: the documented free-tier `gemini-2.5-flash` returns 404 `no longer available to new users` and its error names `gemini-3.6-flash` as the replacement, which is what this project uses (https://ai.google.dev/gemini-api/docs/models).  `gemini-embedding-001` supports an explicitly requested `outputDimensionality` of 1536 (https://ai.google.dev/gemini-api/docs/embeddings). Google documents that `gemini-embedding-001` output is unit length only at its native 3072 dimensions, so truncated vectors are renormalized before they are stored or compared. No fine-tuning is required: RAG indexes evidence; it does not retrain model weights.

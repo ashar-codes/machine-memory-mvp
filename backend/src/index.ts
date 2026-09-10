@@ -4,7 +4,7 @@ import { createPool } from './db.js';
 import { createLlm } from './llm.js';
 const config = readConfig();
 const pool = createPool(config.databaseUrl);
-const llm = createLlm({ apiKey: config.openaiApiKey, model: config.model, embeddingModel: config.embeddingModel, embeddingDimensions: config.embeddingDimensions });
+const llm = createLlm({ apiKey: config.geminiApiKey, model: config.model, embeddingModel: config.embeddingModel, embeddingDimensions: config.embeddingDimensions });
 const server = createApp({pool,llmConfigured:config.llmConfigured,llm,embeddingModel:config.embeddingModel}).listen(config.port,config.host,() => {
   console.log(`Machine Memory listening on http://${config.host}:${config.port}`);
   console.log(`Database ${pool ? 'configured' : 'not configured'} · model synthesis ${llm ? 'configured' : 'not configured'}`);

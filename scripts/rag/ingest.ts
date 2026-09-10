@@ -2,11 +2,11 @@ import { open } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { parseArgs } from 'node:util';
-import OpenAI from 'openai';
 import { openDatabase, rootPath } from '../db.js';
+import { createGeminiEmbedCall, embedDocumentChunks, EmbeddingError } from './gemini.js';
 import {
   documentIdentity, EMBEDDING_DIMENSIONS, EMBEDDING_MODEL, MAX_FILE_BYTES,
-  validateEmbedding, validateManifest,
+  validateManifest,
 } from './manifest.js';
 
 class SafeIngestionError extends Error {}
@@ -64,20 +64,17 @@ export async function main(args = process.argv.slice(2)): Promise<void> {
       console.log(JSON.stringify({ status: 'already_ingested', documentId: identity.id }));
       return;
     }
-    if (!process.env.OPENAI_API_KEY) throw new SafeIngestionError('Set OPENAI_API_KEY before live ingestion.');
-    const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY, timeout: 60_000, maxRetries: 2 });
-    const embeddings: number[][] = [];
-    for (let start = 0; start < document.chunks.length; start += 16) {
-      const batch = document.chunks.slice(start, start + 16);
-      const response = await openai.embeddings.create({ model: EMBEDDING_MODEL,
-        input: batch.map((chunk) => chunk.content), dimensions: EMBEDDING_DIMENSIONS,
-        encoding_format: 'float' });
-      const ordered = [...response.data].sort((a, b) => a.index - b.index);
-      if (ordered.length !== batch.length || ordered.some((item, index) =>
-        item.index !== index || !validateEmbedding(item.embedding))) {
-        throw new SafeIngestionError('Embedding response failed dimension/index validation; nothing saved.');
-      }
-      embeddings.push(...ordered.map((item) => item.embedding));
+    if (!process.env.GEMINI_API_KEY) throw new SafeIngestionError('Set GEMINI_API_KEY before live ingestion.');
+    const embedCall = createGeminiEmbedCall(process.env.GEMINI_API_KEY, EMBEDDING_MODEL);
+    let embeddings: number[][];
+    try {
+      embeddings = await embedDocumentChunks(document.chunks.map((chunk) => chunk.content), embedCall);
+    } catch (error) {
+      throw new SafeIngestionError(error instanceof EmbeddingError ? error.message
+        : 'Embedding failed; nothing saved.');
+    }
+    if (embeddings.length !== document.chunks.length) {
+      throw new SafeIngestionError('Embedding count does not match chunk count; nothing saved.');
     }
     // All network embedding work finishes before holding a DB transaction/lock.
     await db.query('begin');
