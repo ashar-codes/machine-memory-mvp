@@ -30,7 +30,8 @@ export interface IngestRequest {manifestPath:string}
 export interface IngestResponse {status:'disabled';message:string}
 
 // ---- v1.2 dynamic Machine Memory. Additive: no existing shape above changed. ----
-export const IMPORT_TYPES = ['EVENT_LOG','MAINTENANCE_HISTORY','WORK_ORDERS','TECHNICIAN_NOTES','SCADA_SAMPLE'] as const;
+// Committable structured imports. SCADA is deliberately absent: see docs/DYNAMIC_INGESTION.md.
+export const IMPORT_TYPES = ['EVENT_LOG','MAINTENANCE_HISTORY','WORK_ORDERS','TECHNICIAN_NOTES'] as const;
 export type ImportType = typeof IMPORT_TYPES[number];
 export type MappingStatus = 'HIGH_MATCH' | 'SUGGESTED' | 'NEEDS_REVIEW' | 'UNMAPPED';
 export interface FieldSpec {field:string; label:string; required:boolean; description:string}

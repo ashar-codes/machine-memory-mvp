@@ -11,6 +11,13 @@ import type { LlmClient } from './llm.js';
 import { indexResolution } from './memoryIndex.js';
 import { safetyAnswer } from './rag.js';
 import type { Queryable } from './retrieval.js';
+import { runAssetCopilot, runFleetCopilot } from './copilot.js';
+import { createDynamicRoutes, copilotBody, RouteError } from './routes.js';
+import { ImportError } from './imports.js';
+import { KnowledgeError } from './knowledge.js';
+import { TabularError } from './tabular.js';
+import { UploadError } from './uploads.js';
+import type { Table } from './tabular.js';
 
 const code = z.string().trim().min(1).max(64).regex(/^[A-Za-z0-9_-]+$/);
 const eventCode = z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/);
@@ -54,11 +61,13 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     next();
   });
   app.post('/api/admin/ingest', (_req,_res,next) => next(new ApiError(404,'INGEST_DISABLED','HTTP ingestion is disabled. Use the trusted CLI workflow.')));
-  app.use(['/api/investigate','/api/resolutions'], (req,_res,next) => {
+  app.use(['/api/investigate','/api/resolutions','/api/copilot','/api/assets','/api/events','/api/import/commit'], (req,_res,next) => {
     if (req.method === 'POST' && !req.is('application/json')) return next(new ApiError(415,'UNSUPPORTED_MEDIA_TYPE','POST requests must use application/json.'));
     next();
   });
-  app.use(express.json({ limit: '32kb', strict: true }));
+  // Upload routes parse their own multipart bodies; the JSON parser must not consume them.
+  app.use((req,res,next) => req.path.startsWith('/api/import/preview') || req.path.startsWith('/api/knowledge/upload')
+    ? next() : express.json({ limit: '32kb', strict: true })(req,res,next));
   app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false, handler: (_req,_res,next) => next(new ApiError(429,'RATE_LIMITED','Too many requests.')) }));
   const aiLimit = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false, handler: (_req,_res,next) => next(new ApiError(429,'RATE_LIMITED','Too many investigation requests.')) });
   const db = () => { if (!pool) throw new ApiError(503,'DATABASE_NOT_CONFIGURED','Configure DATABASE_URL and apply the schema and seed.'); return pool; };
@@ -66,6 +75,9 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   const queryable = (client: pg.Pool | pg.PoolClient): Queryable => ({
     query: async (text, values) => client.query(text, values ?? []),
   });
+  // Parsed uploads are held between preview and commit only, bounded and TTL-expired in routes.ts.
+  const previews = new Map<string, { table: Table; importType: string; filename: string; expiresAt: number }>();
+  const dynamicRoutes = createDynamicRoutes({ pool, llm, embeddingModel, embeddingDimensions: EMBEDDING_DIMENSIONS, queryable, previews });
   async function findAsset(assetCode: string) {
     const result = await db().query(`SELECT ${assetFields} FROM public.assets WHERE asset_code=$1`, [assetCode]);
     if (!result.rows[0]) throw new ApiError(404,'ASSET_NOT_FOUND','Asset not found.');
@@ -170,11 +182,50 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
       })();
     }
   });
+  app.post('/api/copilot', aiLimit, express.json({ limit: '64kb', strict: true }), async (req,res) => {
+    empty.parse(req.query);
+    const input = copilotBody.parse(req.body);
+    if (!pool) {
+      // Without a database the only honest answers are the deterministic safety ones.
+      const safe = input.scope === 'asset' && input.assetCode
+        ? safetyAnswer({ assetCode: input.assetCode, intent: 'GENERAL', question: input.question })
+        : null;
+      if (safe) { res.json({ ...safe, scope: input.scope, assetCode: input.assetCode ?? null, plan: null, structuredFacts: {} }); return; }
+      throw new ApiError(503,'DATABASE_NOT_CONFIGURED','Configure DATABASE_URL and apply the schema and seed.');
+    }
+    const deps = { db: queryable(pool), llm, onDegraded: (stage: 'embedding'|'synthesis'|'validation') => console.warn(`Copilot degraded at stage: ${stage}.`) };
+    if (input.scope === 'fleet') { res.json(await runFleetCopilot(input.question, deps)); return; }
+    if (!input.assetCode) throw new ApiError(400,'VALIDATION_ERROR','An asset must be selected for asset-scope questions.');
+    const outcome = await runAssetCopilot({ assetCode: input.assetCode, eventCode: input.eventCode, question: input.question, history: input.history }, deps);
+    if ('status' in outcome) throw new ApiError(404,'ASSET_NOT_FOUND','Asset not found.');
+    res.json(outcome);
+  });
+  app.get('/api/assets/:assetCode/memory-status', async (req,res) => {
+    empty.parse(req.query);
+    const asset = await findAsset(code.parse(req.params.assetCode));
+    // Drives the empty-state prompt for a newly onboarded turbine.
+    const counts = await db().query(`select
+      (select count(*)::int from public.asset_events where asset_id=$1) as events,
+      (select count(*)::int from public.maintenance_events where asset_id=$1) as maintenance,
+      (select count(*)::int from public.work_orders where asset_id=$1) as work_orders,
+      (select count(*)::int from public.technician_notes where asset_id=$1) as notes,
+      (select count(*)::int from public.resolutions where asset_id=$1) as resolutions`, [asset.id]);
+    const row = counts.rows[0];
+    const total = Number(row.events)+Number(row.maintenance)+Number(row.work_orders)+Number(row.notes)+Number(row.resolutions);
+    res.json({ assetCode: asset.asset_code, empty: total === 0, counts: camelRow(row) });
+  });
+  app.use(dynamicRoutes);
   app.use((_req,_res,next) => next(new ApiError(404,'NOT_FOUND','Route not found.')));
   const errorHandler: ErrorRequestHandler = (error,_req,res,_next) => {
     let status = 500, code = 'INTERNAL_ERROR', message = 'The request could not be completed.';
     if (error instanceof z.ZodError) { status=400;code='VALIDATION_ERROR';message='Request fields are invalid or unsupported.'; }
-    else if (error instanceof ApiError) { status=error.status;code=error.code;message=error.message; }
+    else if (error instanceof ApiError || error instanceof RouteError) { status=error.status;code=error.code;message=error.message; }
+    // These carry a rule description, never uploaded file contents, so they are safe to return.
+    else if (error instanceof UploadError) { status=400;code='UPLOAD_REJECTED';message=error.message; }
+    else if (error instanceof TabularError) { status=400;code='FILE_UNREADABLE';message=error.message; }
+    else if (error instanceof ImportError) { status=400;code='IMPORT_FAILED';message=error.message; }
+    else if (error instanceof KnowledgeError) { status=400;code='DOCUMENT_UNREADABLE';message=error.message; }
+    else if (error?.code === 'LIMIT_FILE_SIZE') { status=413;code='PAYLOAD_TOO_LARGE';message='The uploaded file exceeds the size limit.'; }
     else if (error?.type === 'entity.too.large') { status=413;code='PAYLOAD_TOO_LARGE';message='Request body exceeds 32 KB.'; }
     else if (error?.type === 'entity.parse.failed') { status=400;code='INVALID_JSON';message='Invalid JSON body.'; }
     else if (['ECONNREFUSED','ENOTFOUND','ETIMEDOUT','ECONNRESET','57P01','08006'].includes(error?.code)) { status=503;code='DATABASE_UNAVAILABLE';message='Database is unavailable.'; }
