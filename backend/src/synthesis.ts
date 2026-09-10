@@ -213,6 +213,21 @@ export function deterministicAnswer(result: RetrievalResult, evidence: Evidence[
   }
 
   if (!findings.length) {
+    // A dataset can record that something happened without recording what was done about it. The
+    // real Penmanshiel public data is exactly that: genuine operational events, no work orders and
+    // no repair narratives. Saying "no records were retrieved" would wrongly imply the event
+    // itself is unknown, so the two cases are reported differently.
+    const priorOccurrences = result.occurrences?.previousCount ?? 0;
+    if (priorOccurrences > 0) {
+      return {
+        summary: `${code} has ${priorOccurrences} recorded previous occurrence${priorOccurrences === 1 ? '' : 's'} on ${asset}, but no verified maintenance resolution is present for it in the current data.`,
+        findings: [],
+        uncertainties: [
+          'Previous operational occurrences are available, but this data source contains no work order, root cause or repair record for them. Absence of a recorded resolution does not mean no work was carried out.',
+          ...result.notes,
+        ],
+      };
+    }
     return {
       summary: `No supporting records were retrieved for ${code} on ${asset}.`,
       findings: [],

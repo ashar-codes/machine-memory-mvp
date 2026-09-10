@@ -32,9 +32,12 @@ export function classifyIntent(question: string): Intent {
   if (/\b(solved|resolved|fix(ed)?|repair\w*|resolution|root cause)\b/.test(text)) return 'PREVIOUS_RESOLUTION';
   if (/\b(previous\w*|before|recur\w*|happened|history|again|past)\b/.test(text)) return 'HISTORY';
   if (/\b(other turbine|fleet|similar|compare|elsewhere|another asset)\b/.test(text)) return 'SIMILAR_INCIDENTS';
+  // Technical guidance is checked before recent changes: a question naming references, standards
+  // or documentation is asking for guidance even when it also mentions maintenance, and the bare
+  // word "maintenance" is far too weak a signal to outrank that.
+  if (/\b(manual\w*|document\w*|reference\w*|guidance|standard\w*|spec|technical)/.test(text)) return 'TECHNICAL_GUIDANCE';
   // Stems must not be closed with \b: "changed" and "recently" would never match.
   if (/\b(chang\w*|recent\w*|last \d+ days|before the fault|maintenance)/.test(text)) return 'RECENT_CHANGES';
-  if (/\b(manual|document|reference|guidance|standard|spec|technical)\b/.test(text)) return 'TECHNICAL_GUIDANCE';
   return 'GENERAL';
 }
 

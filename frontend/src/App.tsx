@@ -10,6 +10,7 @@ import { FleetDashboard } from './fleet';
 import { AnswerCard, InvestigationPanel, ResolutionDrawer } from './investigation';
 import { KnowledgeBase } from './knowledge';
 import { AssetHeader, AssetRail, EvidencePanel, TimelinePanel } from './panels';
+import { EventSummaryPanel } from './publicdata';
 import { ScadaSimulator } from './scada';
 import { ScenarioLab } from './scenario';
 import { Empty, Failure, Loading } from './ui';
@@ -287,6 +288,7 @@ export default function App() {
                   onCite={jumpToEvidence}
                 />
               </div>
+              <EventSummaryPanel assetCode={asset.assetCode} reload={detailReload} />
               <TimelinePanel
                 items={timeline}
                 loading={false}

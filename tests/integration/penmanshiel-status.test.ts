@@ -2,6 +2,8 @@
 // no database, no network, no provider.
 import { readFileSync, readdirSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
+import { deterministicAnswer } from '../../backend/src/synthesis.js';
+import type { RetrievalResult } from '../../backend/src/retrieval.js';
 import {
   assetCodeFor, eventCodeFor, mapSeverity, parseHeader, parseStatusCsv, parseUtcTimestamp,
   PenmanshielStatusError, SOURCE_STATUSES, sourceTurbineNumber, STATUS_SOURCE,
@@ -208,5 +210,33 @@ describe('source format guards', () => {
     expect(header.turbine).toMatch(/^Penmanshiel \d{2}$/);
     expect(sourceTurbineNumber(header.turbine)).toMatch(/^\d{2}$/);
     expect(sourceTurbineNumber('nothing here')).toBeNull();
+  });
+});
+
+describe('honest absence of maintenance data', () => {
+  const result = (previousCount: number): RetrievalResult => ({
+    intent: 'PREVIOUS_RESOLUTION',
+    asset: { id: 'a', assetCode: 'PEN-T01', assetType: 'wind_turbine', manufacturer: 'Senvion', model: 'MM82', status: 'operational', siteId: 's', recordOrigin: 'public_data' },
+    event: null, eventCode: 'PEN-5000', anchorAt: '2023-02-27T00:00:00.000Z',
+    occurrences: { previousCount, totalIncludingSelected: previousCount + 1, firstAt: '2023-01-01T04:20:33.000Z', lastAt: '2023-02-20T00:00:00.000Z', byOrigin: { public_data: previousCount } as never },
+    recentWindow: null, fleetAssetCodes: [], evidence: [], notes: [],
+  } as unknown as RetrievalResult);
+
+  it('reports occurrences without a resolution as exactly that', () => {
+    // The published Penmanshiel data has genuine events and no work orders. Saying "no records
+    // were retrieved" would wrongly imply the event itself is unknown.
+    const answer = deterministicAnswer(result(2), [], []);
+    expect(answer.summary).toMatch(/2 recorded previous occurrences on PEN-T01/);
+    expect(answer.summary).toMatch(/no verified maintenance resolution is present/i);
+    expect(answer.uncertainties[0]).toMatch(/no work order, root cause or repair record/i);
+    // Nothing is invented to fill the gap.
+    expect(answer.findings).toEqual([]);
+    expect(JSON.stringify(answer)).not.toMatch(/root cause was|resolved by|repaired by/i);
+  });
+
+  it('still says nothing was retrieved when the asset genuinely has no such event', () => {
+    const answer = deterministicAnswer(result(0), [], []);
+    expect(answer.summary).toMatch(/No supporting records were retrieved/);
+    expect(answer.summary).not.toMatch(/resolution/i);
   });
 });

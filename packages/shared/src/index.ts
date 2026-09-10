@@ -8,7 +8,8 @@ export type RecordOrigin = typeof RECORD_ORIGINS[number];
 export type EvidenceStrength = 'HIGH' | 'MODERATE' | 'INSUFFICIENT';
 export type SafetyStatus = 'NORMAL' | 'REFUSED' | 'INSUFFICIENT';
 export type AuthorityClass = 'OEM' | 'REGULATOR' | 'RESEARCH' | 'HISTORICAL' | 'UNVERIFIED';
-export interface Asset {id:string; siteId:string; assetCode:string; assetType:string; manufacturer:string|null; model:string|null; serialNumber:string|null; status:string; metadata:Record<string,unknown>; recordOrigin:RecordOrigin; createdAt:string}
+// v1.4 (additive): `siteName` lets the interface name the real site a turbine belongs to.
+export interface Asset {id:string; siteId:string; siteName?:string; assetCode:string; assetType:string; manufacturer:string|null; model:string|null; serialNumber:string|null; status:string; metadata:Record<string,unknown>; recordOrigin:RecordOrigin; createdAt:string}
 export interface AssetEvent {id:string; assetId:string; eventCode:string; title:string; subsystem:string|null; severity:string; occurredAt:string; clearedAt:string|null; description:string|null; recordOrigin:RecordOrigin}
 export interface Incident {id:string; assetId:string; eventCode:string|null; symptoms:string; rootCause:string|null; resolutionSummary:string|null; openedAt:string; closedAt:string|null; recordOrigin:RecordOrigin}
 export interface TimelineItem {id:string; kind:'EVENT'|'MAINTENANCE'|'NOTE'|'RESOLUTION'; title:string; description:string; timestamp:string; recordOrigin:RecordOrigin}
@@ -88,4 +89,21 @@ export interface ScadaScenario {id:string; name:string; summary:string; steps:nu
 export interface ScadaStatus {connected:boolean; simulated:true; source:string; running:boolean; scenarios:ScadaScenario[]; recentEvents:ScadaEventPayload[]}
 export interface StartSimulationRequest {scenarioId:string; assetCode:string; speed?:'1x'|'fast'}
 export interface StartSimulationResponse {runId:string; scenarioId:string; assetCode:string; status:'started'}
+
+// ---- v1.4 public operational-data summary. Additive; nothing above changed. ----
+export interface EventCodeCount {eventCode:string; message:string|null; occurrences:number}
+export interface SourceEventRow {
+  id:string; occurredAt:string; clearedAt:string|null; eventCode:string; sourceCode:string|null;
+  title:string; severity:string; sourceStatus:string|null; duration:string|null;
+  iecCategory:string|null; recordOrigin:RecordOrigin;
+}
+/** Every field is computed from imported rows. Nothing here is estimated. */
+export interface AssetEventSummary {
+  assetCode:string; recordOrigin:RecordOrigin; source:string|null; sourceTurbine:string|null;
+  totalEvents:number; distinctEventCodes:number;
+  firstEventAt:string|null; lastEventAt:string|null;
+  topEventCodes:EventCodeCount[];
+  hasMaintenanceRecords:boolean;
+  recentEvents:SourceEventRow[];
+}
 

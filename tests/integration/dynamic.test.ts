@@ -427,6 +427,10 @@ describe('copilot context handling', () => {
     expect(classifyIntent('Compare with other turbines')).toBe('SIMILAR_INCIDENTS');
     expect(classifyIntent('What changed recently?')).toBe('RECENT_CHANGES');
     expect(classifyIntent('Show the technical reference')).toBe('TECHNICAL_GUIDANCE');
+    // "technical references" outranks a passing mention of maintenance.
+    expect(classifyIntent('What published technical references apply to drivetrain reliability and maintenance?')).toBe('TECHNICAL_GUIDANCE');
+    // ...but a plain maintenance question still routes to the change window.
+    expect(classifyIntent('What maintenance was carried out?')).toBe('RECENT_CHANGES');
   });
 
   it('bounds conversation history in both length and size', () => {

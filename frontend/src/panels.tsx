@@ -38,9 +38,12 @@ export function AssetRail({ assets, selected, onSelect, loading, error, onRetry 
       {[...sites.entries()].map(([key, group]) => (
         <section className="site-group" key={key}>
           <div className="site-name">
-            <span>{group[0].recordOrigin === 'public_data' ? 'Public wind farm'
-              : group[0].recordOrigin === 'user_import' ? 'Onboarded turbines'
-              : 'Demonstration wind farm'}</span>
+            {/* The real site name, so a public farm is identifiable and not just "public". */}
+            <span>{group[0].siteName
+              ?? (group[0].recordOrigin === 'public_data' ? 'Public wind farm'
+                : group[0].recordOrigin === 'user_import' ? 'Onboarded turbines'
+                : 'Demonstration wind farm')}</span>
+            <Origin value={group[0].recordOrigin} />
             <em>{group.length}</em>
           </div>
           <ul>

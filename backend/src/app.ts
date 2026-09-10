@@ -33,7 +33,8 @@ class ApiError extends Error { constructor(public status: number, public code: s
 function camelRow(row: Record<string, unknown>): Record<string, unknown> {
   return Object.fromEntries(Object.entries(row).map(([key,value]) => [key.replace(/_([a-z])/g, (_, c: string) => c.toUpperCase()), value]));
 }
-const assetFields = 'id, site_id, asset_code, asset_type, manufacturer, model, serial_number, status, metadata, record_origin, created_at';
+const assetFields = 'a.id, a.site_id, a.asset_code, a.asset_type, a.manufacturer, a.model, a.serial_number, a.status, a.metadata, a.record_origin, a.created_at, s.name AS site_name';
+const assetFrom = 'public.assets a JOIN public.sites s ON s.id = a.site_id';
 const eventFields = 'id, asset_id, event_code, title, subsystem, severity, occurred_at, cleared_at, description, record_origin';
 const incidentFields = 'id, asset_id, event_code, symptoms, root_cause, resolution_summary, opened_at, closed_at, record_origin';
 
@@ -109,7 +110,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     },
   });
   async function findAsset(assetCode: string) {
-    const result = await db().query(`SELECT ${assetFields} FROM public.assets WHERE asset_code=$1`, [assetCode]);
+    const result = await db().query(`SELECT ${assetFields} FROM ${assetFrom} WHERE a.asset_code=$1`, [assetCode]);
     if (!result.rows[0]) throw new ApiError(404,'ASSET_NOT_FOUND','Asset not found.');
     return result.rows[0] as Record<string, unknown> & {id:string};
   }
@@ -122,7 +123,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   });
   app.get('/api/assets', async (req,res) => {
     const {limit,offset} = page.parse(req.query);
-    const result = await db().query(`SELECT ${assetFields} FROM public.assets ORDER BY asset_code,id LIMIT $1 OFFSET $2`, [limit+1,offset]);
+    const result = await db().query(`SELECT ${assetFields} FROM ${assetFrom} ORDER BY a.asset_code,a.id LIMIT $1 OFFSET $2`, [limit+1,offset]);
     res.json({ items: result.rows.slice(0,limit).map(camelRow), limit,offset,hasMore:result.rows.length>limit });
   });
   app.get('/api/assets/:assetCode', async (req,res) => {

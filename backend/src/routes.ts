@@ -7,7 +7,7 @@ import type { Router } from 'express';
 import express from 'express';
 import { z } from 'zod';
 import type pg from 'pg';
-import type { ImportPreview, ImportReport, KnowledgeUploadReport } from '@machine-memory/shared';
+import type { AssetEventSummary, ImportPreview, ImportReport, KnowledgeUploadReport } from '@machine-memory/shared';
 import { runAssetCopilot, runFleetCopilot } from './copilot.js';
 import { fleetSummary, recurringFaults } from './fleet.js';
 import { recordEvent } from './events.js';
@@ -301,6 +301,70 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     if (outcome === 'not_found') throw new RouteError(404, 'SOURCE_NOT_FOUND', 'Knowledge source not found.');
     if (outcome === 'protected') throw new RouteError(403, 'SOURCE_PROTECTED', 'Reviewed public and foundation sources cannot be deleted from the interface.');
     res.json({ status: 'deleted' });
+  });
+
+  /**
+   * Database-backed facts about an asset's recorded events. Used to describe imported public
+   * operational data honestly: every number is a count over rows that were actually imported,
+   * and `hasMaintenanceRecords` says plainly whether any resolution data exists at all.
+   */
+  router.get('/api/assets/:assetCode/event-summary', async (req, res) => {
+    const code = assetCode.parse(req.params.assetCode);
+    const asset = await q().query('select id, asset_code, record_origin from public.assets where asset_code = $1', [code]);
+    if (!asset.rows[0]) throw new RouteError(404, 'ASSET_NOT_FOUND', 'Asset not found.');
+    const assetId = asset.rows[0].id as string;
+
+    const totals = await q().query(
+      `select count(*)::int total, count(distinct event_code)::int codes,
+              min(occurred_at) first_at, max(occurred_at) last_at,
+              max(event_source) source, max(source_metadata->>'sourceTurbine') source_turbine
+         from public.asset_events where asset_id = $1`, [assetId]);
+    const top = await q().query(
+      `select event_code, max(source_metadata->>'sourceMessage') message, count(*)::int occurrences
+         from public.asset_events where asset_id = $1
+        group by event_code order by count(*) desc, event_code limit 8`, [assetId]);
+    const recent = await q().query(
+      `select id, occurred_at, cleared_at, event_code, title, severity, record_origin,
+              source_metadata->>'sourceCode' source_code,
+              source_metadata->>'sourceStatus' source_status,
+              source_metadata->>'durationText' duration,
+              source_metadata->>'iecCategory' iec_category
+         from public.asset_events where asset_id = $1
+        order by occurred_at desc, id desc limit 25`, [assetId]);
+    const maintenance = await q().query(
+      `select (select count(*)::int from public.resolutions where asset_id = $1)
+            + (select count(*)::int from public.work_orders where asset_id = $1)
+            + (select count(*)::int from public.maintenance_events where asset_id = $1) as n`, [assetId]);
+
+    const row = totals.rows[0];
+    const summary: AssetEventSummary = {
+      assetCode: String(asset.rows[0].asset_code),
+      recordOrigin: asset.rows[0].record_origin as AssetEventSummary['recordOrigin'],
+      source: (row.source as string | null) ?? null,
+      sourceTurbine: (row.source_turbine as string | null) ?? null,
+      totalEvents: Number(row.total), distinctEventCodes: Number(row.codes),
+      firstEventAt: row.first_at ? new Date(row.first_at as string).toISOString() : null,
+      lastEventAt: row.last_at ? new Date(row.last_at as string).toISOString() : null,
+      topEventCodes: top.rows.map((item) => ({
+        eventCode: String(item.event_code),
+        message: (item.message as string | null) ?? null,
+        occurrences: Number(item.occurrences),
+      })),
+      hasMaintenanceRecords: Number(maintenance.rows[0].n) > 0,
+      recentEvents: recent.rows.map((item) => ({
+        id: String(item.id),
+        occurredAt: new Date(item.occurred_at as string).toISOString(),
+        clearedAt: item.cleared_at ? new Date(item.cleared_at as string).toISOString() : null,
+        eventCode: String(item.event_code),
+        sourceCode: (item.source_code as string | null) ?? null,
+        title: String(item.title), severity: String(item.severity),
+        sourceStatus: (item.source_status as string | null) ?? null,
+        duration: (item.duration as string | null) ?? null,
+        iecCategory: (item.iec_category as string | null) ?? null,
+        recordOrigin: item.record_origin as AssetEventSummary['recordOrigin'],
+      })),
+    };
+    res.json(summary);
   });
 
   router.get('/api/fleet/summary', async (_req, res) => { res.json(await fleetSummary(q())); });
