@@ -2,6 +2,7 @@
 // no database handle, no SQL, no tools. Its output is parsed, repaired or discarded here.
 import type { Answer, Evidence } from '@machine-memory/shared';
 import type { RawEvidence, RetrievalResult } from './retrieval.js';
+import { detectUnsafeRequest, requiresOperationalAuthorization } from './rag.js';
 
 const MAX_SUMMARY = 1200;
 const MAX_DETAIL = 1200;
@@ -26,7 +27,9 @@ Absolute rules:
   energized equipment. Do not provide partial instructions for such work.
 - State uncertainty plainly. Do not express confidence as a percentage or probability.
 - Counts, timestamps and date windows in the structured facts were computed by the backend in SQL.
-  Reuse them verbatim; do not recount, re-derive or adjust them.
+  The backend renders these separately. Do not generate numbers, dates, asset IDs, event codes,
+  machine values, diagnoses or recorded repair outcomes. Supply qualitative evidence context only.
+  Do not infer a machine condition or authorize an action. The backend constructs the summary.
 
 Return ONLY a JSON object, with no code fences and no commentary, in exactly this shape:
 {"summary": string, "findings": [{"title": string, "detail": string, "citationIds": [string]}], "uncertainties": [string]}
@@ -88,6 +91,55 @@ function clean(value: unknown, max: number): string {
 }
 
 export type DraftAnswer = Pick<Answer, 'summary' | 'findings' | 'uncertainties'>;
+
+// Only evidence-level language belongs in generated commentary. Unknown domain terms/names
+// are not silently treated as qualitative: the exact recorded account is rendered separately.
+const COMMENTARY_WORDS = new Set(`a an the and or but rather than with without from to for of in on
+  by as at this that these those it its they their them is are was were be been being do does did
+  not no cannot can could should would will must might only also however therefore because
+  evidence record records recorded source sources history historical reference references research
+  documentation context information available availability missing absent absence limited limitation
+  limitations incomplete completeness uncertain uncertainty uncertainties unverified reviewed review
+  synthetic demonstration demo simulation simulated user entered imported public provenance
+  describe describes describing provide provides support supports supporting establish establishes
+  indicate indicates indication suggest suggests consistent inconsistent conflict conflicting
+  separate distinction distinguish authorization authorize authorizes authorized approval approved
+  procedure procedures procedural instruction instructions work perform current present condition conditions
+  interpretation caution cautious qualified personnel additional further independent verification
+  validation required needed necessary relevant relevance applicability general specific qualitative
+  summary observation observations finding findings recorded logged versus basis scope alone
+  corroboration corroborate inconclusive conclusive sufficient insufficient verified confirm
+  confirms confirmed determine determines determining document documents documented between
+  understand understanding compare comparison explain explanation contextually`.split(/\s+/));
+
+/**
+ * Free generation is limited to qualitative evidence context, not operational facts. Numeric
+ * facts (even correct ones), identities, dates, machine diagnoses/outcomes and instructions go
+ * through deterministic rendering instead. This conservative English filter is deliberately
+ * lossy; it is not general semantic entailment verification or a source-approval mechanism.
+ */
+export function isQualitativeCommentary(value: string): boolean {
+  const text = value.normalize('NFKC');
+  if (!/^[A-Za-z\s.,;:!?()'’“”"-]+$/.test(text)
+    || (text.toLowerCase().match(/[a-z]+/g) ?? []).some((word) => !COMMENTARY_WORDS.has(word))) return false;
+  // Permission/provenance assertions are not model-owned either. Only these explicit
+  // non-authorization disclaimers may use approval language in generated commentary.
+  const permissionText = text.replace(/\b(?:not an approved procedure|do not authorize work|rather than authorization to perform work)\b/gi, '');
+  if (/\b(?:authoriz\w*|approv\w*)\b/i.test(permissionText)
+    || /\bno\s+(?:supporting\s+)?(?:records?|evidence|history)\b/i.test(text)) return false;
+  return /\b(evidence|records?|sources?|history|historical|references?|research|documentation)\b/i.test(text)
+    && !detectUnsafeRequest(text) && !requiresOperationalAuthorization(text);
+}
+
+/** Summary/exact facts are backend-owned; only bounded qualitative findings may be added. */
+export function groundModelAnswer(draft: DraftAnswer, facts: DraftAnswer): DraftAnswer {
+  const qualitative = draft.findings.filter((finding) => isQualitativeCommentary(`${finding.title}. ${finding.detail}`));
+  return {
+    summary: facts.summary,
+    findings: [...facts.findings.slice(0, MAX_FINDINGS - 2), ...qualitative.slice(0, 2)],
+    uncertainties: [...facts.uncertainties, ...draft.uncertainties.filter(isQualitativeCommentary)].slice(0, 8),
+  };
+}
 
 /**
  * Strict parse with bounded deterministic repair.
@@ -166,14 +218,14 @@ export function deterministicAnswer(result: RetrievalResult, evidence: Evidence[
   const resolutionIds = cite((item) => item.kind === 'RESOLUTION' || item.kind === 'WORK_ORDER');
 
   if (result.occurrences && historyIds.length) {
-    const { previousCount, firstAt, lastAt } = result.occurrences;
+    const { previousCount, totalIncludingSelected, firstAt, lastAt } = result.occurrences;
     parts.push(previousCount > 0
       ? `${code} has ${previousCount} recorded previous occurrence${previousCount === 1 ? '' : 's'} on ${asset} before the selected event.`
       : `No previous occurrence of ${code} is recorded on ${asset} before the selected event.`);
     if (previousCount > 0) {
       findings.push({
         title: 'Recurrence on this asset',
-        detail: `The database records ${previousCount} earlier occurrence${previousCount === 1 ? '' : 's'} of ${code} on ${asset}, between ${formatDate(firstAt)} and ${formatDate(lastAt)}. This count was computed in SQL and excludes the selected occurrence.`,
+        detail: `The database records ${previousCount} earlier occurrence${previousCount === 1 ? '' : 's'} of ${code} on ${asset}, between ${formatDate(firstAt)} and ${formatDate(lastAt)}; ${totalIncludingSelected} total including the selected occurrence. This count was computed in SQL and excludes the selected occurrence from the previous count.`,
         citationIds: historyIds.slice(0, 6),
       });
     }
@@ -181,7 +233,7 @@ export function deterministicAnswer(result: RetrievalResult, evidence: Evidence[
   if (resolutionIds.length) {
     findings.push({
       title: 'Previously recorded maintenance outcome',
-      detail: `${resolutionIds.length} maintenance record${resolutionIds.length === 1 ? '' : 's'} (work orders or logged resolutions) exist for ${code} on ${asset}. They describe what was previously recorded, not an approved current procedure.`,
+      detail: `${resolutionIds.length} retrieved maintenance record${resolutionIds.length === 1 ? '' : 's'} (work orders or logged resolutions) are shown for ${code} on ${asset}. This is a retrieved sample, not a total count. They describe what was previously recorded, not an approved current procedure.`,
       citationIds: resolutionIds.slice(0, 6),
     });
     if (!parts.length) parts.push(`Recorded maintenance outcomes exist for ${code} on ${asset}.`);
@@ -210,6 +262,23 @@ export function deterministicAnswer(result: RetrievalResult, evidence: Evidence[
       detail: 'Reviewed public technical or regulatory references applicable to this asset type were retrieved. They are general published material and are not specific to this turbine or its manufacturer unless stated in the excerpt.',
       citationIds: referenceIds.slice(0, 6),
     });
+  }
+
+  // Values are copied from retrieved rows, never paraphrased by generation. Label excerpts as
+  // recorded accounts, not diagnoses or instructions. Evidence remains available in the pane
+  // if an unsafe/unverified procedural passage cannot be displayed as an answer finding.
+  const recorded = evidence.map((item, index) => ({ item, raw: raw[index] })).filter(({ raw }) => raw
+    && (['RESOLUTION', 'WORK_ORDER'].includes(raw.kind) || raw.role === 'RECENT_CHANGE'));
+  for (const { item, raw: source } of recorded.slice(0, 3)) {
+    const account = source.recordedAccount;
+    const recordedText = account ? [account.rootCause && `Recorded cause: ${account.rootCause}`,
+      account.outcome && `Recorded outcome: ${account.outcome}`, account.component && `Component: ${account.component}`,
+      account.downtimeMinutes !== null && `Downtime: ${account.downtimeMinutes} min`].filter(Boolean).join(' — ') : item.excerpt;
+    if (detectUnsafeRequest(recordedText) || requiresOperationalAuthorization(recordedText)) continue;
+    const excerpt = recordedText.replace(/\b(?:EV|EVIDENCE)[-\u2010-\u2015 ]\d+\b/gi, '[unverified reference omitted]');
+    findings.push({ title: 'Recorded account — not an approved procedure',
+      detail: `${item.assetCode ?? asset} · ${formatDate(item.timestamp)} · ${item.recordOrigin}: “${excerpt}”`,
+      citationIds: [item.id] });
   }
 
   if (!findings.length) {

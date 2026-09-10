@@ -35,6 +35,8 @@ export interface RawEvidence {
   applicability: { assetType: string | null; manufacturer: string | null; model: string | null };
   /** Document identity for knowledge chunks, so fusion can limit how many one source contributes. */
   sourceKey?: string;
+  /** Typed stored outcome fields, separate from free-text notes and model narration. */
+  recordedAccount?: { rootCause: string | null; outcome: string | null; component: string | null; downtimeMinutes: number | null };
   /** True only for reviewed public references that may be quoted as guidance, never for demo history. */
   procedural: boolean;
 }
@@ -241,6 +243,7 @@ async function assetMaintenanceHistory(
     })),
     ...workOrders.rows.map((row) => ({
       ...base, kind: 'WORK_ORDER' as const, role: 'SAME_ASSET_HISTORY' as const,
+      recordedAccount: { rootCause: nullableText(row.root_cause), outcome: nullableText(row.resolution), component: null, downtimeMinutes: null },
       title: `Work order — ${text(row.summary)}`,
       excerpt: excerpt(nullableText(row.root_cause) && `Recorded cause: ${text(row.root_cause)}`,
         nullableText(row.resolution) && `Recorded work: ${text(row.resolution)}`, `Status ${text(row.status)}`),
@@ -249,6 +252,8 @@ async function assetMaintenanceHistory(
     })),
     ...resolutions.rows.map((row) => ({
       ...base, kind: 'RESOLUTION' as const, role: 'SAME_ASSET_HISTORY' as const,
+      recordedAccount: { rootCause: nullableText(row.root_cause), outcome: nullableText(row.resolution_summary),
+        component: nullableText(row.component), downtimeMinutes: count(row.downtime_minutes) },
       title: `Logged resolution — ${text(row.event_code)}`,
       excerpt: excerpt(`Recorded cause: ${text(row.root_cause)}`, `Recorded outcome: ${text(row.resolution_summary)}`,
         text(row.component) && `Component: ${text(row.component)}`,

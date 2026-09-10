@@ -17,7 +17,7 @@ import {
   loadAsset, retrieveEvidence,
   type Queryable, type RawEvidence, type RetrievalResult,
 } from './retrieval.js';
-import { buildBundle, deterministicAnswer, parseModelAnswer, type DraftAnswer } from './synthesis.js';
+import { buildBundle, deterministicAnswer, groundModelAnswer, parseModelAnswer, type DraftAnswer } from './synthesis.js';
 
 export interface InvestigateDeps {
   db: Queryable;
@@ -49,7 +49,7 @@ async function draft(
     const parsed = parseModelAnswer(output, evidence);
     if (!parsed) { deps.onDegraded?.('validation'); return fallback(); }
     deps.onGeneration?.(trace.provider ?? 'gemini');
-    return parsed;
+    return groundModelAnswer(parsed, deterministicAnswer(result, evidence, raw));
   } catch {
     // Provider failure must not destroy an investigation that already has retrieved evidence.
     deps.onDegraded?.('synthesis');

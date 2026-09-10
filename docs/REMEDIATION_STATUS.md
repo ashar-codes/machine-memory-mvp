@@ -18,7 +18,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | Phase / finding | Status | Root cause / next work |
 |---|---|---|
 | A / P1-02 | VERIFIED | Generic reference authority was confused with operational authorization. Operational requests now fail closed; expanded action families refuse before DB/provider calls. |
-| A / P1-03 | NOT_STARTED | Valid citation membership does not constrain exact claims; unchecked summary. |
+| A / P1-03 | VERIFIED | ID membership previously admitted invented facts. Summaries/exact facts now deterministic; typed recorded outcomes copied from retrieval; generated evidence-context text conservatively constrained. |
 | B / P2-01 | NOT_STARTED | Generic HISTORY precedes specific change intent; fixed window. |
 | B / P2-02 | NOT_STARTED | No stale-request/context identity protection. |
 | B / P2-06 | NOT_STARTED | UTC text interpreted as local datetime; regex calendar validation. |
@@ -51,7 +51,31 @@ Archive-only commit left a clean tree before creating remediation branch.
 - Live: `node --import tsx scripts/verify/safety.ts` passed 7 real loopback HTTP probes,
   including asset/fleet Copilot. No database writes or paid generation required.
 - Gates: lint/typecheck/build/diff check PASS; full suite **12 files / 306 tests PASS**.
-- Checkpoint: `fix: fail closed for unsupported operational guidance` (hash recorded next checkpoint).
+- Checkpoint: `7216363` — `fix: fail closed for unsupported operational guidance`.
+
+### A2 — exact-claim grounding
+
+- Files: `backend/src/{synthesis,investigate,copilot,retrieval}.ts`, updated failover/SCADA
+  expected-answer assertions; new `tests/integration/remediation-grounding.test.ts` and
+  `scripts/verify/grounding.ts`.
+- Reproduced before fix: all 16 initial cases failed, including real citation + invented
+  count/date/pressure/asset/cause, summary-only attack and Fleet answer bypass.
+- Tests added: 20 cases. Existing provider selection and citation checks preserved.
+- Exact counts/dates and summaries are rendered from retrieved facts, not generation.
+  Stored outcome/component/downtime fields are typed separately from free-text notes.
+  Qualitative generation has a conservative evidence-context vocabulary; unsupported domain
+  terms, numbers, identities and permission claims are discarded. This is deliberately lossy,
+  NOT general natural-language entailment validation. Do not casually widen this boundary.
+- Live: read-only PostgreSQL + injected hostile provider passed 5 wrong-valid-ID cases,
+  exact WT-07 total 3 / prior 2, stored resolution and downtime checks. All 13 protected-table
+  fingerprints unchanged; all 14 public tables RLS enabled; no public/anon/authenticated grants
+  or public policies. No schema/data mutation. `node --import tsx scripts/verify/grounding.ts`.
+- Live HTTP: real Groq fallback returned WT-07 SQL counts and recorded outcomes with resolved
+  citations. Gemini generation success is still not established (quota failure, fallback retained).
+- Gates: lint/typecheck/build/diff check PASS; full suite **13 files / 326 tests PASS**.
+  `npm audit --json`: zero vulnerabilities. `.env` ignored/untracked; secret-pattern scan found
+  only existing dummy DB-URI test fixture and literal frontend setup label DATABASE_URL.
+- Checkpoint: `fix: constrain generated operational facts` (hash recorded next checkpoint).
 
 No migrations added/applied, no live DB writes.
 Unit tests must not call paid providers. Live verification must be separate and preserve

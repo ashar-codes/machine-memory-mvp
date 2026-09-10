@@ -19,6 +19,7 @@ import {
 import { DEFAULT_RECURRENCE_MINIMUM, DEFAULT_WINDOW_DAYS, FLEET_OPERATIONS, runPlan, validatePlan } from './fleet.js';
 import type { GenerationProvider, GenerationTrace } from './provider.js';
 import type { Queryable } from './retrieval.js';
+import { isQualitativeCommentary } from './synthesis.js';
 
 export const MAX_HISTORY_MESSAGES = 6;
 export const MAX_HISTORY_CHARS = 600;
@@ -115,6 +116,8 @@ Absolute rules:
 - Recurrence is a counting rule, not a diagnosis, and co-occurrence after maintenance is ordering,
   not causation. Do not claim a cause.
 - Never give a procedure, a numeric limit or a safety instruction.
+- Supply qualitative evidence context only. The backend renders exact row facts and summary;
+  do not generate numbers, dates, asset identities, diagnoses or recorded outcomes.
 - Return only JSON: {"summary":string,"findings":[{"title":string,"detail":string}],"uncertainties":[string]}`;
 
 const FLEET_SCHEMA = {
@@ -184,12 +187,12 @@ export async function runFleetCopilot(question: string, deps: CopilotDeps): Prom
           const detail = typeof item.detail === 'string' ? item.detail.trim().slice(0, 1200) : '';
           // Fleet findings cite computed rows rather than evidence records, so citationIds is
           // deliberately empty and validateCitations is not applied to this scope.
-          return title && detail ? [{ title, detail, citationIds: [] }] : [];
+          return title && detail && isQualitativeCommentary(`${title}. ${detail}`) ? [{ title, detail, citationIds: [] }] : [];
         }) : [];
         const uncertainties = Array.isArray(body?.uncertainties)
-          ? body.uncertainties.filter((item): item is string => typeof item === 'string').map((item) => item.trim().slice(0, 600)).filter(Boolean).slice(0, 6)
+          ? body.uncertainties.filter((item): item is string => typeof item === 'string').map((item) => item.trim().slice(0, 600)).filter(isQualitativeCommentary).slice(0, 6)
           : [];
-        answer = { ...answer, summary, findings: findings.length ? findings : answer.findings, uncertainties: [...answer.uncertainties, ...uncertainties].slice(0, 6) };
+        answer = { ...answer, findings: [...answer.findings.slice(0, 6), ...findings.slice(0, 2)], uncertainties: [...answer.uncertainties, ...uncertainties].slice(0, 6) };
         generation.provider = trace.provider ?? 'gemini';
         deps.onGeneration?.(generation.provider);
       } else {
