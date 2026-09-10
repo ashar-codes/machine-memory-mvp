@@ -7,8 +7,17 @@ import type { RecordOrigin } from '@machine-memory/shared';
 import { refreshAssetStatus } from './imports.js';
 import type { Queryable } from './retrieval.js';
 
-export const EVENT_FIELDS =
-  'id, asset_id, event_code, title, subsystem, severity, occurred_at, cleared_at, description, record_origin, event_source, external_event_id';
+const EVENT_COLUMNS = ['id','asset_id','event_code','title','subsystem','severity','occurred_at','cleared_at','description','record_origin','event_source','external_event_id'] as const;
+
+export const EVENT_FIELDS = EVENT_COLUMNS.join(', ');
+
+/**
+ * The same column list qualified with a table alias. A join against `assets` makes bare `id`
+ * ambiguous, so any query that joins must use this rather than EVENT_FIELDS.
+ */
+export function eventFields(alias: string): string {
+  return EVENT_COLUMNS.map((column) => `${alias}.${column}`).join(', ');
+}
 
 export interface RecordEventInput {
   assetCode: string;
@@ -44,7 +53,9 @@ export async function recordEvent(db: Queryable, input: RecordEventInput): Promi
 
   const values = [
     assetId, input.eventCode, input.title, input.subsystem ?? null, input.severity,
-    input.occurredAt, input.clearedAt ?? null, input.description ?? null, input.recordOrigin,
+    // asset_events.description is NOT NULL in the schema, and the normalized boundary makes
+    // description optional, so an adapter event without one must land as empty text, not null.
+    input.occurredAt, input.clearedAt ?? null, input.description ?? '', input.recordOrigin,
     input.source ?? null, input.externalEventId ?? null,
   ];
   const inserted = await db.query(

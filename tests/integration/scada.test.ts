@@ -141,6 +141,19 @@ describe('event persistence', () => {
     expect(insert?.sql).toMatch(/do nothing/);
   });
 
+  it('stores an absent description as empty text, since the column is NOT NULL', async () => {
+    // The normalized boundary makes description optional; the schema does not allow null.
+    const db = fakeDb();
+    await recordEvent(db, {
+      assetCode: 'WT-10', eventCode: 'X-1', title: 'No description', severity: 'critical',
+      occurredAt: validEvent.occurredAt, recordOrigin: 'simulation',
+      source: SIMULATOR_SOURCE, externalEventId: 'no-desc:1',
+    });
+    const insert = db.calls.find((call) => call.sql.includes('insert into public.asset_events'));
+    expect(insert?.values).toContain('');
+    expect(insert?.values.filter((value) => value === null)).toHaveLength(2); // subsystem + cleared_at
+  });
+
   it('lets a manual event through with no source identity, so it is never deduplicated', async () => {
     const db = fakeDb();
     await recordEvent(db, {

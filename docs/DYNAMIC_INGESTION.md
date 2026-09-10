@@ -1,19 +1,12 @@
 
 
-## Generation providers
+## Operational events
 
-Generation fails over; embeddings do not.
+A fourth way in, alongside manual entry, CSV import and document upload: a normalized read-only
+event boundary. Machine Memory has no live SCADA connection; a simulator ships in its place.
 
-| Role | Provider | Notes |
-| --- | --- | --- |
-| Embeddings | Gemini `gemini-embedding-001` **only** | No failover, ever. See below. |
-| Generation, primary | Gemini `gemini-3.6-flash` | |
-| Generation, secondary | Groq `openai/gpt-oss-120b` | Text only. Strict JSON schema for synthesis. |
-| Generation, last resort | Deterministic | Grounded answer assembled from retrieved evidence. |
+Events arrive through `recordEvent()` — the same function manual entry uses — carry
+`record_origin = 'simulation'`, and are deduplicated by `(source, externalEventId)`. Signal
+snapshots shown beside an alarm are display-only and never become evidence.
 
-Embeddings are deliberately excluded from failover. Vectors from two different embedding models are
-not interchangeable merely because they have the same number of dimensions: they occupy different
-spaces, so a Groq vector compared against the stored `gemini-embedding-001` corpus would return
-plausible-looking, confidently wrong neighbours — with no error to notice. If Gemini embedding is
-unavailable, retrieval falls back to keyword ranking and says so, which is honest; silently mixing
-vector spaces would not be.
+See `docs/SCADA_INTEGRATION.md`.

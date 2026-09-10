@@ -10,13 +10,14 @@ import { FleetDashboard } from './fleet';
 import { AnswerCard, InvestigationPanel, ResolutionDrawer } from './investigation';
 import { KnowledgeBase } from './knowledge';
 import { AssetHeader, AssetRail, EvidencePanel, TimelinePanel } from './panels';
+import { ScadaSimulator } from './scada';
 import { ScenarioLab } from './scenario';
 import { Empty, Failure, Loading } from './ui';
 
-const VIEWS = ['fleet', 'memory', 'copilot', 'data', 'knowledge', 'scenario'] as const;
+const VIEWS = ['fleet', 'memory', 'copilot', 'scada', 'data', 'knowledge', 'scenario'] as const;
 type View = typeof VIEWS[number];
 const VIEW_LABELS: Record<View, string> = {
-  fleet: 'Fleet', memory: 'Machine Memory', copilot: 'AI Copilot',
+  fleet: 'Fleet', memory: 'Machine Memory', copilot: 'AI Copilot', scada: 'SCADA Simulator',
   data: 'Data Hub', knowledge: 'Knowledge Base', scenario: 'Scenario Lab',
 };
 
@@ -217,6 +218,18 @@ export default function App() {
               setDetailReload((value) => value + 1);
               if (report.assetsTouched.length) chooseAsset(report.assetsTouched[0]);
             }} />
+          )}
+          {view === 'scada' && (
+            <ScadaSimulator
+              assets={assets}
+              onFault={(faultAsset) => {
+                // The fault is already recorded; refresh so the rail, status and timeline agree.
+                setReload((value) => value + 1);
+                chooseAsset(faultAsset);
+                setDetailReload((value) => value + 1);
+              }}
+              onInvestigate={(faultAsset) => { chooseAsset(faultAsset); setView('memory'); setDetailReload((value) => value + 1); }}
+            />
           )}
           {view === 'knowledge' && <KnowledgeBase onIndexed={() => setReload((value) => value + 1)} />}
           {view === 'scenario' && (

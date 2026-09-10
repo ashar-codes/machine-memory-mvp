@@ -23,5 +23,11 @@ export function createPool(connectionString?: string, caPath = process.env.DATAB
   const pool = new pg.Pool({ connectionString: url.toString(), ssl: local ? false : { rejectUnauthorized: true, ...(ca ? { ca } : {}) }, max: 5, connectionTimeoutMillis: 5000, idleTimeoutMillis: 30000, statement_timeout: 10000 });
   // pg emits idle-client errors outside requests; handle without exposing connection details.
   pool.on('error', () => console.error('Idle database connection failed.'));
+  // A client that is *checked out* emits 'error' on itself, not on the pool. With no listener,
+  // Node rethrows it and the process dies — which is exactly what a dropped TLS socket did during
+  // a live simulator run. The pool still discards the broken client; this only stops the crash.
+  pool.on('connect', (client) => {
+    client.on('error', () => console.error('Database connection dropped; the pooled client was discarded.'));
+  });
   return pool;
 }

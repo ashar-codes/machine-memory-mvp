@@ -9,7 +9,7 @@ import { randomUUID } from 'node:crypto';
 import type pg from 'pg';
 import { z } from 'zod';
 import type { ScadaEventPayload, ScadaStatus } from '@machine-memory/shared';
-import { recordEvent, EVENT_FIELDS } from './events.js';
+import { recordEvent, eventFields } from './events.js';
 import type { LlmClient } from './llm.js';
 import type { Queryable } from './retrieval.js';
 import { normalizedScadaEventSchema, SCENARIOS, SIMULATOR_SOURCE, findScenario, type NormalizedScadaEvent } from './scada.js';
@@ -108,7 +108,7 @@ export function createScadaRoutes(deps: ScadaDeps): Router {
     let recentEvents: ScadaEventPayload[] = [];
     if (deps.pool) {
       const result = await deps.pool.query(
-        `select ${EVENT_FIELDS}, a.asset_code from public.asset_events e
+        `select ${eventFields('e')}, a.asset_code from public.asset_events e
            join public.assets a on a.id = e.asset_id
           where e.event_source = $1 order by e.occurred_at desc, e.id desc limit 20`, [SIMULATOR_SOURCE]);
       recentEvents = result.rows.map((row) => ({
@@ -165,7 +165,9 @@ export function createScadaRoutes(deps: ScadaDeps): Router {
     res.status(202).json({ runId, scenarioId: scenario.id, assetCode: input.assetCode, status: 'started' });
   });
 
-  router.post('/api/scada/stop', express.json({ limit: '1kb', strict: true }), (_req, res) => {
+  // Named for what it stops: the simulation run. In an industrial context a bare "stop" endpoint
+  // reads like a turbine command, and no endpoint here commands anything.
+  router.post('/api/scada/simulation/stop', express.json({ limit: '1kb', strict: true }), (_req, res) => {
     adapter.stop();
     deps.hub.publish({ type: 'run', payload: { runId: '', scenarioId: '', assetCode: '', status: 'stopped' } });
     res.json({ status: 'stopped' });

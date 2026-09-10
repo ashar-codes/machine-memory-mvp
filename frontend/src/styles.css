@@ -496,3 +496,33 @@ time, .num, .code { font-variant-numeric: tabular-nums; }
 .uncertainties ul { margin: 4px 0 0 16px; padding: 0; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 .evidence-note { margin: 0; font-size: 12px; color: var(--text-muted); }
 .prompt-row { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+
+/* ---- SCADA simulator feed ---- */
+.sim-badge {
+  font-size: 10px; letter-spacing: 0.1em; padding: 2px 7px;
+  border: 1px solid var(--amber); color: var(--amber); background: var(--amber-soft);
+}
+.panel-head .lamp { margin-right: 7px; }
+.button-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+.fault-banner { border-color: var(--red); border-left-width: 3px; }
+.fault-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; margin-bottom: 10px; }
+.fault-grid span { display: block; font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); }
+.fault-grid strong, .fault-grid code { font-size: 15px; }
+.signal-list { list-style: none; margin: 6px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 6px; }
+.signal-list li { display: flex; justify-content: space-between; gap: 10px; border: 1px solid var(--rule); padding: 6px 9px; background: #fff; font-size: 12px; }
+.signal-list span { color: var(--text-muted); }
+.feed { max-height: 340px; overflow-y: auto; border: 1px solid var(--rule); background: #fff; }
+.feed-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.feed-table th {
+  position: sticky; top: 0; background: var(--paper-panel); text-align: left; padding: 6px 10px;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 1px solid var(--rule);
+}
+.feed-table td { padding: 6px 10px; border-bottom: 1px solid var(--rule); vertical-align: middle; }
+.feed-table td.mono { font-family: var(--mono); font-size: 12px; }
+.feed-table .muted { color: var(--steel-light); font-size: 12px; }
+.feed-table tr.sev-critical { background: var(--red-soft); }
+.feed-table tr.sev-warning { background: var(--amber-soft); }
+/* A single restrained pulse marks a newly arrived row; no looping animation. */
+@keyframes feed-in { from { background-color: var(--blue-soft); } to { background-color: transparent; } }
+.feed-table tbody tr:first-child { animation: feed-in 900ms ease-out; }
+@media (prefers-reduced-motion: reduce) { .feed-table tbody tr:first-child { animation: none; } }

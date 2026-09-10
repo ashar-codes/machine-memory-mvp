@@ -121,7 +121,11 @@ export const SCENARIOS: Scenario[] = [
   {
     id: 'gearbox_temperature',
     name: 'Gearbox temperature fault',
-    summary: 'Normal telemetry, an elevated gearbox oil temperature warning, then a critical GBX-TEMP-301 alarm.',
+    // Raises GEAR-TMP-402 deliberately: that is the code the demonstration event log in
+    // data/demo/wt10_events.csv already contains, so a simulated fault on WT-10 lands on a machine
+    // that has real imported history and an indexed technical document to retrieve. Pairing a
+    // scenario with a code the asset has never seen makes an honest but pointless demonstration.
+    summary: 'Normal telemetry, an elevated gearbox oil temperature warning, then a critical GEAR-TMP-402 alarm. Pairs with the WT-10 demonstration import.',
     steps: [
       { afterSeconds: 0, kind: 'telemetry', title: 'Normal operation', severity: 'info',
         signalSnapshot: [
@@ -138,7 +142,7 @@ export const SCENARIOS: Scenario[] = [
         ] },
       { afterSeconds: 9, kind: 'telemetry', title: 'Temperature still rising', severity: 'info',
         signalSnapshot: [{ label: 'Gearbox oil temperature', value: 84, unit: '°C' }] },
-      { afterSeconds: 13, kind: 'event', eventCode: 'GBX-TEMP-301', title: 'Gearbox oil temperature high',
+      { afterSeconds: 13, kind: 'event', eventCode: 'GEAR-TMP-402', title: 'Gearbox oil temperature high',
         subsystem: 'Gearbox', severity: 'critical',
         description: 'Simulated demonstration alarm raised by the SCADA simulator. Fictional demonstration code, not a manufacturer fault definition.',
         signalSnapshot: [

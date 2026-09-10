@@ -38,7 +38,10 @@ export interface TelemetryRow {
   signalSnapshot: { label: string; value: number; unit: string }[];
 }
 
-const sleep = (ms: number) => new Promise<void>((resolve) => { const t = setTimeout(resolve, ms); t.unref?.(); });
+// Deliberately NOT unref'd. An unref'd timer tells Node not to stay alive for it, but a pending
+// scenario step is real work: with unref the run silently stalled between steps whenever nothing
+// else happened to be holding the event loop open.
+const sleep = (ms: number) => new Promise<void>((resolve) => { setTimeout(resolve, ms); });
 
 /**
  * `now` and `wait` are injected so tests can run a whole scenario instantly and deterministically
