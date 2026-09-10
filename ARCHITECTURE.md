@@ -45,3 +45,24 @@ Wire contracts: docs/API_CONTRACT.md + packages/shared/src/index.ts. Schema: sup
 ## Official model references
 
 Model selection was settled against the live API, not only the documentation: the documented free-tier `gemini-2.5-flash` returns 404 `no longer available to new users` and its error names `gemini-3.6-flash` as the replacement, which is what this project uses (https://ai.google.dev/gemini-api/docs/models).  `gemini-embedding-001` supports an explicitly requested `outputDimensionality` of 1536 (https://ai.google.dev/gemini-api/docs/embeddings). Google documents that `gemini-embedding-001` output is unit length only at its native 3072 dimensions, so truncated vectors are renormalized before they are stored or compared. No fine-tuning is required: RAG indexes evidence; it does not retrain model weights.
+
+## Dynamic ingestion layer (v2)
+
+Additive. The retrieval, evidence, safety and synthesis modules are unchanged in shape; the new
+modules feed the same tables and the same pipeline.
+
+```
+Data Hub CSV ─→ tabular.ts (parse) ─→ mapping.ts (deterministic + Gemini suggestion, allowlisted)
+                                   ─→ imports.ts (validate rows, transactional insert) ─→ SQL retrieval
+Document ────→ uploads.ts (validate) ─→ knowledge.ts (chunk, embed) ─→ pgvector ─→ semantic retrieval
+Copilot ─────→ copilot.ts ─→ asset: existing investigate() unchanged
+                          ─→ fleet: validatePlan → fleet.ts parameterized SQL
+```
+
+The asset copilot is a thin layer: it classifies intent deterministically, resolves a bounded
+follow-up textually, and calls the same `investigate()` the workspace uses. It adds no retrieval
+path and no safety exception.
+
+Evidence fusion gained a per-document cap so one large corpus cannot occupy every evidence slot and
+hide a smaller, more specific source. Authority still outranks similarity in ordering, and
+`procedural` still gates what may be quoted as guidance.

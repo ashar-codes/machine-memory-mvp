@@ -24,3 +24,34 @@ This prototype uses Google Gemini through a Google AI Studio free-tier API key. 
 - Free-tier terms differ from paid/commercial terms, including with respect to whether submitted content may be used to improve Google's products and how long it is retained. This configuration is chosen for a university prototype on public and fictional data. **It must not be assumed appropriate for confidential or commercial deployment.**
 - Any production version needs its own commercial agreement, data-processing and privacy review, retention decision and residency decision before real plant data is submitted to any model provider. That review has not been done and is not implied by anything in this repository.
 - The provider is a synthesis layer only. It receives an evidence bundle, never a database handle, never SQL, and no tools. Safety refusal, evidence strength and citation validity are decided by the backend before and after the model runs, so provider-side filtering is never the control that matters here.
+
+## Dynamic ingestion (v2)
+
+Users can now onboard turbines, import history and index technical documents at runtime. The
+boundaries that make that safe:
+
+- **Uploads never touch disk.** Files are parsed in memory, so there is no temporary file and no
+  user-influenced path. Filenames are reduced to a display-only basename and used for provenance
+  only. Extension, magic bytes and size are all validated; a mismatch is refused with a message
+  describing the rule, never the file's contents. No shell execution, no model-chosen destinations.
+- **Spreadsheet formulas are never evaluated.** Cells beginning `=`, `+`, `-` or `@` are stored
+  prefixed so they cannot become live formulas if the data is re-exported.
+- **The model cannot reach the database.** Column-mapping suggestions are validated against a frozen
+  per-import-type field allowlist; a suggestion naming a table, a column outside that list, or SQL
+  is discarded. The user confirms the mapping, and a hand-edited mapping from the browser passes
+  through the same gate. Fleet questions select one of five predefined operations with bounded
+  parameters, which backend code maps to parameterized SQL. No LLM-generated SQL is ever executed.
+- **Uploaded knowledge is evidence, not authority.** `user_import` documents are stored UNVERIFIED,
+  a database CHECK prevents them claiming REGULATOR or RESEARCH standing, and `procedural` still
+  requires a public origin. An uploaded file is cited, but can never satisfy the
+  authoritative-reference gate or license a procedure, numeric limit or isolation sequence.
+- **Injected faults stay visibly injected.** Scenario Lab events carry `simulation` provenance in
+  the database and are labelled wherever they appear. They are never presented as real telemetry.
+- **Conversation cannot loosen safety.** Copilot history is bounded to 6 turns and 600 characters
+  each; a resolved follow-up is re-scanned by the same deterministic guard, so context can add
+  meaning but never authority.
+- New tables (`data_sources`, `import_batches`) are RLS-enabled with no anon/authenticated grants,
+  matching the foundation tables. The backend remains the only privileged path.
+
+Unchanged: loopback-only binding, no authentication, no production mode. This remains a university
+prototype and is not authorized for shared deployment.

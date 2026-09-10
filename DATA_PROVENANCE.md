@@ -55,3 +55,28 @@ Ingestion and question answering send content to Google's Gemini API over the fr
 - **User demo.** Resolution text a technician types into the running application, labelled `user_demo`.
 
 No confidential Zephyr data and no E-SET production data exist in this project, so neither can be sent. Free-tier provider terms are not equivalent to commercial terms; see SECURITY.md. This arrangement is acceptable *because* the corpus is public and fictional, and that reasoning does not carry over to real plant data.
+
+## Dynamic data (v2)
+
+Two origins were added for runtime ingestion. Neither is ever treated as reviewed public reference.
+
+| Origin | What it is |
+| --- | --- |
+| `user_import` | Turbines, history and documents loaded through the Data Hub |
+| `simulation` | A fault deliberately injected in Scenario Lab for demonstration |
+
+The existing distinction is unchanged and still holds:
+
+- **Real and public.** Penmanshiel turbine metadata (byte-verified against Zenodo), OSHA lockout/
+  tagout and 29 CFR 1910.269, NREL/TP-5000-80195.
+- **Synthetic.** Demonstration Wind Farm, WT-07 and its `PITCH-HYD-214` history, the demo work
+  order, technician note and maintenance records.
+- **User demo.** Resolutions entered through the application.
+- **User import.** Anything a user uploads — including the demonstration `WT-10` turbine, its
+  gearbox event log and maintenance history, and any technical document indexed at runtime. These
+  are fictional demonstration files authored for the demo, not operational records.
+- **Simulation.** Faults injected in Scenario Lab.
+
+An uploaded document is stored UNVERIFIED and can never act as procedural authority, however
+authoritative its title sounds. Synthetic WT-07 history is never presented as genuine Penmanshiel
+or Zephyr history, and imported demonstration data is never presented as either.

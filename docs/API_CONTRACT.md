@@ -63,3 +63,33 @@ Timeline includes the new record immediately after commit; vector embedding is e
 ## Ingest boundary
 
 Reserved future input type `{manifestPath:string}` is not accepted by HTTP in v1. `POST /api/admin/ingest` always404. Local `npm run rag:ingest -- --file <reviewed-json> [--dry-run]` follows docs/DATA_RAG_HANDOFF.md. No URL fetching, file upload or filesystem path access from a network request.
+
+## Amendment 2.0 (2026-09-10) — dynamic Machine Memory
+
+Additive. Every route and shape above is unchanged; `RecordOrigin` gained two members.
+
+`RecordOrigin` now also includes `user_import` (loaded through the Data Hub) and `simulation` (a
+fault injected in Scenario Lab). Clients that switch exhaustively on origin must handle both.
+
+| Route | Success body | Notes |
+| --- | --- | --- |
+| POST /api/assets | `{asset:Asset}`, 201 | Server sets `user_import` origin. 409 `ASSET_EXISTS` on a duplicate code. |
+| POST /api/events | `{event:AssetEvent}`, 201 | `simulation:boolean` required. True stores `simulation` origin, false stores `user_demo`. Recomputes asset status. |
+| GET /api/assets/:assetCode/memory-status | `{assetCode,empty,counts}` | Drives the empty-state prompt for a newly onboarded turbine. |
+| POST /api/import/preview | `ImportPreview` | multipart/form-data: `file` + `importType`. Parses, stores a `data_sources` row, proposes a mapping. Nothing is written to history. |
+| POST /api/import/commit | `ImportReport`, 201 | Validates the confirmed mapping against the allowlist, then imports transactionally. 410 `PREVIEW_EXPIRED` after 30 minutes. |
+| POST /api/knowledge/upload | `KnowledgeUploadReport`, 201 | multipart/form-data. Chunks, embeds and indexes. Stored UNVERIFIED with `user_import` origin. |
+| GET /api/knowledge | `ListResponse<KnowledgeSource>` | Paginated catalogue. |
+| GET /api/knowledge/:id | `KnowledgeDetail` | Metadata plus bounded chunk previews. |
+| DELETE /api/knowledge/:id | `{status:'deleted'}` | 403 `SOURCE_PROTECTED` for public and synthetic sources. |
+| POST /api/copilot | `CopilotResponse` | `scope:'asset'\|'fleet'`. Asset scope requires `assetCode` and reuses the investigate pipeline unchanged; `history` is bounded to 6 turns server-side. Fleet scope returns a `plan` naming the predefined operation that ran. |
+| GET /api/fleet/summary | `FleetSummary` | Live counts only. |
+| GET /api/fleet/recurring-faults | `{items:RecurringFault[]}` | Optional `minimumOccurrences` (2–10) and `days` (1–3650). |
+
+New error codes: `ASSET_EXISTS` 409, `UPLOAD_REJECTED` 400, `FILE_UNREADABLE` 400, `IMPORT_FAILED`
+400, `INVALID_MAPPING` 400, `IMPORT_TYPE_MISMATCH` 400, `PREVIEW_EXPIRED` 410, `SOURCE_PROTECTED`
+403, `SOURCE_NOT_FOUND` 404, `DOCUMENT_UNREADABLE` 400, `PDF_UNREADABLE` 400.
+
+Upload routes accept multipart/form-data; every other POST remains JSON only. Fleet-scope answers
+carry findings with empty `citationIds`, because they cite computed rows rather than evidence
+records; asset-scope answers keep the existing citation-validation guarantee.

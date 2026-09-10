@@ -35,3 +35,18 @@ npm run rag:ingest:corpus                # embeds and inserts; requires OPENAI_A
 Each file still passes through the same single-document trust boundary as `npm run rag:ingest -- --file <path>`: Zod validation, provenance and authority checks, size ceilings, dimension validation and a transactional insert keyed by content identity, so reruns do not duplicate. Only after that command reports `"status":"ingested"` may this manifest's local status be changed to ingested.
 
 Excluded on purpose: proprietary or leaked OEM manuals, Senvion service documentation, confidential plant records, and any source that could not be read directly from its publisher.
+
+## Runtime-added sources (v2)
+
+The Data Hub and Knowledge Base add sources at runtime. Each gets a `data_sources` row recording
+its display name, type, original filename, SHA-256, byte size, origin and status, and each
+structured import gets an `import_batches` row recording the confirmed mapping, row counts and a
+bounded rejection sample.
+
+Runtime sources are always `user_import` (or `simulation` when explicitly marked). They are never
+listed as reviewed public references, and the Knowledge Base refuses to delete the reviewed public
+and synthetic foundation sources.
+
+Demonstration files authored for the dynamic demo — the WT-10 gearbox event log, its maintenance
+history, and the fictional gearbox thermal management reference — are fictional. They are not OEM
+documentation and not operational records.

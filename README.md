@@ -91,6 +91,10 @@ Questions that would need a verified procedure or numeric limit return `INSUFFIC
 | `backend/src/investigate.ts` | Pipeline orchestration and safety gates |
 | `backend/src/rag.ts` | Safety detection, evidence scoring, citation validation |
 | `backend/src/llm.ts` | The only module that calls Gemini |
+| `backend/src/routes.ts` | Asset/event creation, imports, knowledge upload, fleet queries |
+| `backend/src/tabular.ts`, `mapping.ts`, `imports.ts` | CSV parsing, AI column mapping, transactional import |
+| `backend/src/knowledge.ts` | Document chunking, embedding and the knowledge catalogue |
+| `backend/src/copilot.ts`, `fleet.ts` | Asset and fleet copilot, predefined fleet queries |
 | `frontend/src/` | Investigation workspace: asset rail, investigation panel, timeline, evidence panel |
 | `supabase/` | 12-table schema with pgvector(1536), RLS, and the synthetic seed |
 | `scripts/data/` | Seed and the Penmanshiel public importer |
@@ -102,3 +106,31 @@ Questions that would need a verified procedure or numeric limit return `INSUFFIC
 ## Reading order
 
 `PROJECT_CONTEXT.md` for status, `ARCHITECTURE.md` for design, `docs/API_CONTRACT.md` for the wire contract, `SECURITY.md` before changing anything security-relevant, `DEMO_SCRIPT.md` to present it.
+
+## Dynamic Machine Memory
+
+Beyond the seeded demonstration, the application can learn a machine it has never seen.
+
+| Section | What it does |
+| --- | --- |
+| **Fleet** | Live counts, recurring faults, recent machine memory |
+| **Machine Memory** | The WT-07 investigation workspace |
+| **AI Copilot** | Asset-scoped and fleet-scoped questions in plain language |
+| **Data Hub** | Import event logs, maintenance, work orders and notes from CSV |
+| **Knowledge Base** | Every indexed source, and upload of new technical documents |
+| **Scenario Lab** | Onboard a turbine, inject a fault |
+
+The short version of the flow: add a turbine, upload its event history as CSV, let Gemini propose
+the column mapping, confirm it, and the turbine's recurrence is computable immediately. Upload a
+technical document and it is chunked, embedded and citable on the next question — with no restart
+and no retraining.
+
+Two rules hold throughout, and they are what make this safe rather than merely impressive:
+
+- **The model never writes SQL and never touches the database.** It suggests column mappings and
+  picks from five predefined fleet queries; every suggestion is validated against a frozen
+  allowlist before anything runs.
+- **Anyone can add knowledge; nobody can add authority.** Uploaded documents are cited as evidence
+  but are stored UNVERIFIED and can never license a procedure or a numeric limit.
+
+`docs/DYNAMIC_INGESTION.md` has the field contracts, limits, provenance rules and security model.
