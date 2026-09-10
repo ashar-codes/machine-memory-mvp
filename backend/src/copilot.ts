@@ -26,10 +26,13 @@ export const MAX_HISTORY_CHARS = 600;
 export function classifyIntent(question: string): Intent {
   const text = question.toLowerCase();
   if (/\b(bypass|isolat|lockout|tagout|energiz|voltage|torque|protection|interlock|safe)/.test(text)) return 'SAFETY';
-  if (/\b(previous|before|recur|happened|history|again|past)\b/.test(text)) return 'HISTORY';
-  if (/\b(solved|resolved|fix(ed)?|repair|resolution|root cause)\b/.test(text)) return 'PREVIOUS_RESOLUTION';
+  // Resolution wins over history: "solved previously" is a question about the fix, not the count.
+  // Order matters here, so both patterns are checked in this sequence deliberately.
+  if (/\b(solved|resolved|fix(ed)?|repair\w*|resolution|root cause)\b/.test(text)) return 'PREVIOUS_RESOLUTION';
+  if (/\b(previous\w*|before|recur\w*|happened|history|again|past)\b/.test(text)) return 'HISTORY';
   if (/\b(other turbine|fleet|similar|compare|elsewhere|another asset)\b/.test(text)) return 'SIMILAR_INCIDENTS';
-  if (/\b(chang|recent|last \d+ days|before the fault|90 days|maintenance)\b/.test(text)) return 'RECENT_CHANGES';
+  // Stems must not be closed with \b: "changed" and "recently" would never match.
+  if (/\b(chang\w*|recent\w*|last \d+ days|before the fault|maintenance)/.test(text)) return 'RECENT_CHANGES';
   if (/\b(manual|document|reference|guidance|standard|spec|technical)\b/.test(text)) return 'TECHNICAL_GUIDANCE';
   return 'GENERAL';
 }

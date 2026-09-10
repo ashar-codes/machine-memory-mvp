@@ -148,9 +148,9 @@ const SYNONYMS: Record<string, string[]> = {
   title: ['title', 'alarmtext', 'eventtext', 'alarmdescription', 'eventname', 'alarmname', 'faultname', 'name', 'message'],
   subsystem: ['subsystem', 'system', 'component group', 'componentgroup', 'assembly', 'category', 'subassembly'],
   severity: ['severity', 'priority', 'level', 'criticality', 'alarmlevel'],
-  occurred_at: ['occurredat', 'timestamp', 'datetime', 'date', 'starttime', 'startdate', 'eventtime', 'time', 'raisedat', 'begin', 'from', 'datedone', 'workdate', 'servicedate', 'performedon', 'performedat'],
-  cleared_at: ['clearedat', 'endtime', 'enddate', 'resolvedat', 'closedat', 'reset', 'until', 'to'],
-  description: ['description', 'detail', 'details', 'comment', 'comments', 'remark', 'remarks', 'observedsymptoms', 'symptoms', 'notes'],
+  occurred_at: ['occurredat', 'timestamp', 'datetime', 'date', 'starttime', 'startdate', 'eventtime', 'time', 'raisedat', 'raised', 'begin', 'from', 'datedone', 'workdate', 'servicedate', 'performedon', 'performedat'],
+  cleared_at: ['clearedat', 'endtime', 'enddate', 'resolvedat', 'closedat', 'reset', 'cleared', 'until', 'to'],
+  description: ['description', 'detail', 'details', 'comment', 'comments', 'remark', 'remarks', 'observedsymptoms', 'symptoms', 'observed', 'notes'],
   event_type: ['eventtype', 'maintenancetype', 'worktype', 'activity', 'activitytype', 'type', 'action', 'workperformed', 'workdone', 'maintenanceaction', 'jobtype', 'servicetype'],
   component: ['component', 'part', 'partname', 'componentname', 'item', 'subcomponent', 'parttouched', 'componenttouched', 'assembly', 'equipment'],
   summary: ['summary', 'worksummary', 'workordersummary', 'subject', 'task', 'workdescription'],
@@ -209,8 +209,15 @@ export function parseTimestamp(value: string): string | null {
     const date = new Date(Date.UTC(Number(year), month - 1, day, Number(hour), Number(minute), Number(second)));
     return Number.isNaN(date.valueOf()) ? null : date.toISOString();
   }
-  const normalized = /^\d{4}-\d{2}-\d{2}[ ]\d{2}:\d{2}/.test(text) ? text.replace(' ', 'T') : text;
-  const parsed = new Date(/^\d{4}-\d{2}-\d{2}$/.test(normalized) ? `${normalized}T00:00:00Z` : normalized);
+  // A maintenance export rarely carries a timezone. `new Date('2026-06-14T09:12')` would read it
+  // as server-local time and silently shift every imported row by the host's offset, so a value
+  // with no explicit zone is treated as UTC — stated in docs/DYNAMIC_INGESTION.md, not guessed.
+  let normalized = /^\d{4}-\d{2}-\d{2}[ ]\d{2}:\d{2}/.test(text) ? text.replace(' ', 'T') : text;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) normalized = `${normalized}T00:00:00Z`;
+  else if (/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(normalized) && !/(Z|[+-]\d{2}:?\d{2})$/i.test(normalized)) {
+    normalized = `${normalized}Z`;
+  }
+  const parsed = new Date(normalized);
   if (Number.isNaN(parsed.valueOf())) return null;
   const year = parsed.getUTCFullYear();
   return year < 1970 || year > 2100 ? null : parsed.toISOString();
