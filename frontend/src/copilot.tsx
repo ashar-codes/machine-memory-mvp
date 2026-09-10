@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Answer, CopilotMessage, CopilotResponse, Evidence } from '@machine-memory/shared';
 import { failureText, post } from './api';
 import { Empty } from './ui';
@@ -33,14 +33,30 @@ export function CopilotView({ assetCode, eventCode, onEvidence }: {
   const [draft, setDraft] = useState('');
   const [running, setRunning] = useState(false);
   const endRef = useRef<HTMLDivElement>(null);
+  const activeRequest = useRef<AbortController | null>(null);
+
+  useEffect(() => () => { activeRequest.current?.abort(); }, []);
+
+  const chooseScope = (next: 'asset' | 'fleet') => {
+    activeRequest.current?.abort();
+    activeRequest.current = null;
+    setScope(next);
+    setTurns([]);
+    setDraft('');
+    setRunning(false);
+    onEvidence([]);
+  };
 
   const effectiveScope = scope === 'asset' && !assetCode ? 'fleet' : scope;
 
   const ask = async (question: string) => {
     const trimmed = question.trim();
-    if (!trimmed || running) return;
+    if (!trimmed || activeRequest.current) return;
+    const controller = new AbortController();
+    activeRequest.current = controller;
     setDraft('');
     setRunning(true);
+    onEvidence([]);
     const index = turns.length;
     setTurns((current) => [...current, { question: trimmed, response: null, error: '' }]);
     // Only completed turns become history, and the backend trims it again to a bounded window.
@@ -53,15 +69,20 @@ export function CopilotView({ assetCode, eventCode, onEvidence }: {
         ...(effectiveScope === 'asset' ? { assetCode, ...(eventCode ? { eventCode } : {}) } : {}),
         question: trimmed,
         ...(history.length ? { history: history.slice(-6) } : {}),
-      });
+      }, controller.signal);
+      if (controller.signal.aborted) return;
       setTurns((current) => current.map((turn, position) => position === index ? { ...turn, response } : turn));
-      if (response.evidence.length) onEvidence(response.evidence);
+      onEvidence(response.evidence);
     } catch (cause) {
+      if (controller.signal.aborted) return;
       const text = failureText(cause) || 'The copilot request could not be completed.';
       setTurns((current) => current.map((turn, position) => position === index ? { ...turn, error: text } : turn));
     } finally {
-      setRunning(false);
-      requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }));
+      if (!controller.signal.aborted) {
+        activeRequest.current = null;
+        setRunning(false);
+        requestAnimationFrame(() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' }));
+      }
     }
   };
 
@@ -79,11 +100,11 @@ export function CopilotView({ assetCode, eventCode, onEvidence }: {
 
       <div className="scope-switch" role="group" aria-label="Copilot scope">
         <button type="button" className={`scope ${effectiveScope === 'asset' ? 'active' : ''}`}
-          disabled={!assetCode} onClick={() => setScope('asset')}
+          disabled={!assetCode} onClick={() => chooseScope('asset')}
           title={assetCode ? undefined : 'Select a turbine in Machine Memory to use asset scope.'}>
           Asset{assetCode ? ` · ${assetCode}` : ''}
         </button>
-        <button type="button" className={`scope ${effectiveScope === 'fleet' ? 'active' : ''}`} onClick={() => setScope('fleet')}>
+        <button type="button" className={`scope ${effectiveScope === 'fleet' ? 'active' : ''}`} onClick={() => chooseScope('fleet')}>
           Fleet
         </button>
       </div>

@@ -20,7 +20,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | A / P1-02 | VERIFIED | Generic reference authority was confused with operational authorization. Operational requests now fail closed; expanded action families refuse before DB/provider calls. |
 | A / P1-03 | VERIFIED | ID membership previously admitted invented facts. Summaries/exact facts now deterministic; typed recorded outcomes copied from retrieval; generated evidence-context text conservatively constrained. |
 | B / P2-01 | VERIFIED | Specific change intent precedes HISTORY; explicit 7/30/90-day windows honored, unsupported duration requests clarified without provider calls. |
-| B / P2-02 | NOT_STARTED | No stale-request/context identity protection. |
+| B / P2-02 | VERIFIED | Abort controllers invalidate old results; keyed asset Copilot resets turns; scope/workspace switches and empty responses clear evidence. |
 | B / P2-06 | NOT_STARTED | UTC text interpreted as local datetime; regex calendar validation. |
 | C / P2-03 | NOT_STARTED | pdf-parse v1 call against installed v2. |
 | C / P2-04 | NOT_STARTED | Optional CSV description inserted as null into NOT NULL field. |
@@ -35,6 +35,21 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### B2 — cross-context response race
+
+- Reproduced in real Chrome: delayed WT-07 response displayed after PEN-T01 selection.
+- Files: `frontend/src/{App,copilot}.tsx`, `scripts/verify/context-race.mjs`.
+- Requests check their abort signal after response/error, even if transport ignores cancellation.
+  Asset selection resets details and remounts Copilot; scope changes clear turns and evidence;
+  synchronous admission prevents double Copilot turns; empty answers clear previous evidence.
+- Browser regressions PASS: asset investigation race, Copilot asset switch, asset→fleet,
+  fleet→asset, memory→Copilot, rapid double activation, fresh then empty evidence, no history
+  carried into new context. Injected delayed provider responses deliberately ignore AbortSignal.
+- Run: local dev stack + Chrome debug port 9234, `node scripts/verify/context-race.mjs`.
+  Real API reads only; no paid calls/data writes. No dependency added.
+- Gates: lint/typecheck/build/diff check PASS; full suite **341 tests PASS** plus browser checks.
+- B1 checkpoint: `22b62a4`. B2 checkpoint: this commit (`fix: isolate asynchronous answers by workspace context`).
 
 ### B1 — recent-change intent and windows
 

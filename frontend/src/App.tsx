@@ -43,6 +43,7 @@ export default function App() {
   const [investigationError, setInvestigationError] = useState('');
   const [activeProbe, setActiveProbe] = useState<string | null>(null);
   const lastRequest = useRef<{ intent: Intent; question: string; probeId: string | null } | null>(null);
+  const investigationRequest = useRef<AbortController | null>(null);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [savedNotice, setSavedNotice] = useState<{ id: string; summary: string } | null>(null);
@@ -93,6 +94,7 @@ export default function App() {
       get<ListResponse<TimelineItem>>(`${path}/timeline?limit=50`, controller.signal),
     ])
       .then(([detail, current, history]) => {
+        if (controller.signal.aborted) return;
         setAsset(detail.asset);
         setEvent(current.event);
         setTimeline(history.items);
@@ -104,7 +106,14 @@ export default function App() {
 
   /* --------------------------------------------------------- asset switching */
   const chooseAsset = (assetCode: string) => {
+    if (assetCode === selected) return;
+    investigationRequest.current?.abort();
+    setRunning(false);
     setSelected(assetCode);
+    setAsset(null);
+    setEvent(null);
+    setTimeline([]);
+    setDrawerOpen(false);
     // An answer belongs to the asset it was asked about; never carry it across a selection change.
     setResult(null);
     setEvidence([]);
@@ -114,29 +123,50 @@ export default function App() {
     lastRequest.current = null;
   };
 
+  useEffect(() => {
+    setResult(null);
+    setEvidence([]);
+    setRunning(false);
+    return () => { investigationRequest.current?.abort(); };
+  }, [selected, view]);
+
+  const chooseView = (next: View) => {
+    if (next === view) return;
+    investigationRequest.current?.abort();
+    setEvidence([]);
+    setView(next);
+  };
+
   /* ------------------------------------------------------------ investigation */
   const runInvestigation = useCallback(async (intent: Intent, question: string, probeId: string | null) => {
     if (!selected) return;
+    investigationRequest.current?.abort();
+    const controller = new AbortController();
+    investigationRequest.current = controller;
     lastRequest.current = { intent, question, probeId };
     setRunning(true);
     setInvestigationError('');
     setActiveProbe(probeId);
     setHighlighted(null);
+    setResult(null);
+    setEvidence([]);
     try {
       const response = await post<InvestigateResponse>('/investigate', {
         assetCode: selected,
         ...(event?.eventCode ? { eventCode: event.eventCode } : {}),
         intent,
         question,
-      });
+      }, controller.signal);
+      if (controller.signal.aborted) return;
       setResult(response);
       setEvidence(response.evidence);
     } catch (error) {
+      if (controller.signal.aborted) return;
       setResult(null);
       setEvidence([]);
       setInvestigationError(failureText(error) || 'The investigation could not be completed. Retry.');
     } finally {
-      setRunning(false);
+      if (!controller.signal.aborted) setRunning(false);
     }
   }, [selected, event?.eventCode]);
 
@@ -186,7 +216,7 @@ export default function App() {
       <nav className="mainnav" aria-label="Sections">
         {VIEWS.map((item) => (
           <button key={item} type="button" className={`navlink ${view === item ? 'active' : ''}`}
-            aria-current={view === item ? 'page' : undefined} onClick={() => setView(item)}>
+            aria-current={view === item ? 'page' : undefined} onClick={() => chooseView(item)}>
             {VIEW_LABELS[item]}
           </button>
         ))}
@@ -211,7 +241,8 @@ export default function App() {
             <FleetDashboard onOpenAsset={(assetCode) => { chooseAsset(assetCode); setView('memory'); }} />
           )}
           {view === 'copilot' && (
-            <CopilotView assetCode={asset?.assetCode ?? null} eventCode={event?.eventCode ?? null} onEvidence={setEvidence} />
+            <CopilotView key={selected} assetCode={selected || null}
+              eventCode={asset?.assetCode === selected ? event?.eventCode ?? null : null} onEvidence={setEvidence} />
           )}
           {view === 'data' && (
             <DataHub onImported={(report) => {
