@@ -1,0 +1,13 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.log
+coverage/
+.worktrees/
+supabase/.temp/
+data/raw/*
+!data/raw/README.md
+# Verified 2 kB CC BY 4.0 public file; small enough to version and needed by the importer.
+!data/raw/Penmanshiel_WT_static.csv

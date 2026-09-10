@@ -1,0 +1,18 @@
+{
+  "title": "Fictional pitch event investigation note — format example",
+  "organization": "Machine Memory university demo",
+  "sourceUrl": null,
+  "sourceType": "TECHNICIAN_NOTE",
+  "authorityClass": "UNVERIFIED",
+  "recordOrigin": "synthetic_demo",
+  "assetType": "wind_turbine",
+  "manufacturer": null,
+  "model": null,
+  "chunks": [
+    {
+      "content": "SYNTHETIC DEMO: A fictional technician recorded that a prior pitch-related event was investigated and a maintenance note was added. This note supplies no verified root cause, numeric setpoint, fault-code definition or operating procedure. It is included only to demonstrate how a narrative becomes retrievable machine memory.",
+      "pageNumber": null,
+      "section": "Synthetic maintenance narrative"
+    }
+  ]
+}

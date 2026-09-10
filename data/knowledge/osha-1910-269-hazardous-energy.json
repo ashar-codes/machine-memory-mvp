@@ -1,0 +1,43 @@
+{
+  "title": "29 CFR 1910.269 — Electric power generation, transmission, and distribution: hazardous energy control",
+  "organization": "Occupational Safety and Health Administration (OSHA), U.S. Department of Labor",
+  "sourceUrl": "https://www.osha.gov/laws-regs/regulations/standardnumber/1910/1910.269",
+  "sourceType": "SAFETY_REFERENCE",
+  "authorityClass": "REGULATOR",
+  "recordOrigin": "public_reference",
+  "assetType": "wind_turbine",
+  "manufacturer": null,
+  "model": null,
+  "chunks": [
+    {
+      "content": "Paragraph (d) of 29 CFR 1910.269 covers lockout/tagout for controlling energy sources in installations whose purpose is electric power generation, including associated communication and metering equipment. De-energizing electric energy sources used solely for transmission and distribution is handled instead by paragraph (m). Paraphrased from the published standard.",
+      "pageNumber": null,
+      "section": "1910.269(d)(1) scope"
+    },
+    {
+      "content": "A note to paragraph (d)(1) records that installations inside power generation facilities which are not an integral part of, and are not inextricably commingled with, generation processes or equipment fall under 1910.147 and Subpart S instead. Determining which standard applies to a given installation is a site engineering and compliance judgement, not something this system decides. Paraphrased from the published standard.",
+      "pageNumber": null,
+      "section": "1910.269(d)(1) note"
+    },
+    {
+      "content": "The standard requires a documented energy control procedure. OSHA describes it as covering the specific procedural steps for shutting down, isolating, blocking and securing machines or equipment to control hazardous energy; the specific steps for placing, removing and transferring lockout or tagout devices together with responsibility for them; and specific requirements for testing equipment to determine and verify that lockout devices, tagout devices and other energy control measures are effective. Paraphrased from the published standard.",
+      "pageNumber": null,
+      "section": "1910.269(d) documented procedure"
+    },
+    {
+      "content": "OSHA requires the employer to inspect the energy control procedure at least once a year to confirm that the procedure and the requirements of paragraph (d) are being followed, and the periodic inspection must be certified by the employer. Paraphrased from the published standard.",
+      "pageNumber": null,
+      "section": "1910.269(d) periodic inspection"
+    },
+    {
+      "content": "OSHA's eTool material for this standard states that job briefings must cover, for every worker to be protected, the particular sources and hazards of potential hazardous energy present and the methods used to control them, referring to 29 CFR 1910.269(d)(6). Paraphrased from OSHA guidance at https://www.osha.gov/etools/electric-power/hazardous-energy-control.",
+      "pageNumber": null,
+      "section": "Job briefing"
+    },
+    {
+      "content": "This excerpt is a paraphrase of selected hazardous-energy provisions and is not the complete regulatory text. It is jurisdiction-specific to the United States, contains no equipment-specific isolation sequence, and does not authorize an exception to any protection on any asset. Consult the current published text and the site energy-control programme.",
+      "pageNumber": null,
+      "section": "Applicability limits"
+    }
+  ]
+}

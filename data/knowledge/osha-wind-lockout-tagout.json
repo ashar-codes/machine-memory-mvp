@@ -1,0 +1,43 @@
+{
+  "title": "Green Job Hazards — Wind Energy: Lockout/Tagout",
+  "organization": "Occupational Safety and Health Administration (OSHA), U.S. Department of Labor",
+  "sourceUrl": "https://www.osha.gov/green-jobs/wind-energy/lockout-tagout",
+  "sourceType": "SAFETY_REFERENCE",
+  "authorityClass": "REGULATOR",
+  "recordOrigin": "public_reference",
+  "assetType": "wind_turbine",
+  "manufacturer": null,
+  "model": null,
+  "chunks": [
+    {
+      "content": "Lockout/tagout describes the practices and procedures that protect workers from equipment starting up unexpectedly, from equipment being re-energized without warning, and from stored energy being released while servicing or maintenance is under way. Published by OSHA as general guidance for wind energy work. Paraphrased from the source page; it is general regulatory guidance and is not a turbine-specific or manufacturer-specific procedure.",
+      "pageNumber": null,
+      "section": "Scope of lockout/tagout"
+    },
+    {
+      "content": "OSHA states that roughly three million workers service equipment and are at greatest risk when lockout/tagout is not applied properly, and that compliance with the standard is estimated to prevent on the order of 120 deaths and 50,000 injuries each year. Workers hurt by hazardous energy lose about 24 workdays on average. Paraphrased from the source page.",
+      "pageNumber": null,
+      "section": "Why it matters"
+    },
+    {
+      "content": "OSHA notes that wind turbines contain substantial internal machinery and components, including blades, that require maintenance, and that workers servicing them may be injured by unexpected energization or start-up of equipment or by the release of stored energy. Paraphrased from the source page.",
+      "pageNumber": null,
+      "section": "Wind turbine hazard"
+    },
+    {
+      "content": "OSHA states that wind farm employers must implement the lockout/tagout procedures set out in the OSHA standards, and directs readers to 29 CFR 1910.269(d) and 29 CFR 1910.147. Paraphrased from the source page. Which standard applies to a given task depends on the installation and the work; this reference does not decide that question for any particular asset.",
+      "pageNumber": null,
+      "section": "Applicable standards"
+    },
+    {
+      "content": "Significant requirements OSHA lists for a lockout/tagout procedure, in paraphrase: only authorized employees may lock or tag out equipment for servicing; lockout and tagout devices are reserved for energy control and no other purpose; devices must identify the worker who applied them; all energy sources must be identified and isolated; isolating devices must be locked or tagged in the safe or off position by authorized employees only; stored or residual energy must then be safely discharged or relieved; the authorized employee must verify isolation before work begins; the lock and tag stay on until the work is finished; and only the employee who applied a lock or tag removes it, unless the employer has a specific procedure meeting the standard.",
+      "pageNumber": null,
+      "section": "Procedure requirements"
+    },
+    {
+      "content": "This is general published regulatory guidance. It does not supply turbine-specific isolation points, torque values, pressure limits, setpoints or a site lockout/tagout sequence, and it does not authorize work on any particular machine. The site energy-control programme and the equipment documentation govern those details.",
+      "pageNumber": null,
+      "section": "Applicability limits"
+    }
+  ]
+}

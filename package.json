@@ -1,0 +1,43 @@
+{
+  "name": "machine-memory-mvp",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/shared",
+    "backend",
+    "frontend"
+  ],
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "concurrently -k -n api,web \"npm run dev -w @machine-memory/backend\" \"npm run dev -w @machine-memory/frontend\"",
+    "lint": "eslint .",
+    "typecheck": "npm run typecheck --workspaces && tsc -p tsconfig.scripts.json",
+    "test": "vitest run",
+    "build": "npm run build --workspaces",
+    "db:seed": "node --import tsx scripts/data/seed.ts",
+    "rag:ingest": "node --import tsx scripts/rag/ingest.ts",
+    "data:penmanshiel": "node --import tsx scripts/data/import-penmanshiel.ts",
+    "rag:ingest:corpus": "node --import tsx scripts/rag/ingest-corpus.ts"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.1",
+    "@types/node": "24.10.1",
+    "concurrently": "9.2.4",
+    "eslint": "9.39.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.48.1",
+    "tsx": "4.23.13",
+    "vitest": "4.1.11",
+    "vite": "6.4.3",
+    "@types/pg": "8.15.6"
+  },
+  "dependencies": {
+    "dotenv": "17.2.3",
+    "pg": "8.16.3",
+    "zod": "4.1.13",
+    "openai": "6.9.1"
+  }
+}

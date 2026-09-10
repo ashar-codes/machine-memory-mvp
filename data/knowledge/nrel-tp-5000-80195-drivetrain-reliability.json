@@ -1,0 +1,58 @@
+{
+  "title": "Wind Turbine Drivetrain Reliability and Wind Plant Operations and Maintenance Research and Development Opportunities (NREL/TP-5000-80195)",
+  "organization": "National Renewable Energy Laboratory (NREL) and Argonne National Laboratory, for the U.S. Department of Energy",
+  "sourceUrl": "https://www.nrel.gov/docs/fy21osti/80195.pdf",
+  "sourceType": "TECHNICAL_REFERENCE",
+  "authorityClass": "RESEARCH",
+  "recordOrigin": "public_reference",
+  "assetType": "wind_turbine",
+  "manufacturer": null,
+  "model": null,
+  "chunks": [
+    {
+      "content": "Technical report NREL/TP-5000-80195, September 2021, by Jonathan Keller, Shawn Sheng and Yi Guo of NREL with Benjamin Gould and Aaron Greco of Argonne National Laboratory. It summarizes research and development opportunities identified at recent Drivetrain Reliability Collaborative meetings. This is published research, not an equipment manufacturer's maintenance procedure. Paraphrased summary.",
+      "pageNumber": 1,
+      "section": "Report identity"
+    },
+    {
+      "content": "The report notes that wind plant operational expenditure remains a significant share of the cost of wind energy, citing a capacity-weighted average of about 44 dollars per kilowatt per year for land-based plants commissioned in the United States between 2015 and 2018, and that recent data put wind plant operational expenditure at roughly a quarter to more than a third of the levelized cost of energy. About half of land-based operational expenditure is tied directly to turbine operations and maintenance. Paraphrased.",
+      "pageNumber": 1,
+      "section": "Introduction — O&M cost share"
+    },
+    {
+      "content": "The report states that failures of main bearings, the gearbox and generator, and the blades are the largest contributors to turbine downtime both onshore and offshore, and that available literature indicates pitch system failure rates can be more than twice as high offshore as onshore. Paraphrased.",
+      "pageNumber": 1,
+      "section": "Introduction — dominant downtime contributors"
+    },
+    {
+      "content": "The report observes that pitch bearings, main bearings and gearboxes in conventional drivetrains often fail to reach their specified twenty-year minimum life, chiefly because of premature bearing failures, which cause downtime and expensive repairs that frequently require large lifting cranes. It adds that the dominant failure modes and the conditions producing them are not fully accounted for in product design or routinely modelled for life management. Paraphrased.",
+      "pageNumber": 3,
+      "section": "R&D opportunities — premature failure"
+    },
+    {
+      "content": "On pitch bearings: the report describes slew ring or pitch bearings as connecting the blade root to the hub and carrying simultaneous radial, axial and overturning moment loads. It reports growing industry interest in pitch bearing reliability, with some populations showing a twelve percent failure rate over twenty years. These bearings are usually grease lubricated, large in diameter and thin in section, which makes them vulnerable to deflection and resulting stress concentrations. The report notes that advanced controllers and increased pitch activity have greatly increased total pitch travel, and identifies fatigue, wear and frictional corrosion such as false brinelling and fretting corrosion as failure modes described in ISO 15243 but not accounted for in ISO 281 or ISO/TS 16281. Paraphrased.",
+      "pageNumber": 5,
+      "section": "2.1.1.1 Pitch bearing fatigue, wear and frictional corrosion"
+    },
+    {
+      "content": "The report raises open research questions on pitch bearings, in paraphrase: how design life should be calculated when the usual bearing fatigue life standards do not apply; how different pitch bearing concepts should be evaluated; whether premature failures can be mitigated through design changes and control strategies without derating; and how large blades, advanced control strategies, wake effects, offshore loading and environmental conditions, and plant layout influence pitch bearing reliability. These are stated as open questions, not as maintenance instructions.",
+      "pageNumber": 5,
+      "section": "2.1.1.1 Open research questions"
+    },
+    {
+      "content": "On data and monitoring: the report describes research into SCADA-based modelling for gearbox fault detection and prediction, and a prognostics and health management framework for wind turbines in which remaining useful life is the expected output, integrating data-domain and physics-domain modelling. It notes that managing plants with multiple turbine types is difficult because failure modes and rates vary by turbine type, component manufacturer and model, so management methods must be scalable and transferable. Paraphrased.",
+      "pageNumber": 8,
+      "section": "2.2 Data analytics and PHM"
+    },
+    {
+      "content": "The report states that comprehensive and consistent data including predictive time series and failure records is needed, that such data should be securely protected, quality controlled and transparent, and it observes that roughly twenty to thirty percent of electricity outage information can sometimes be missing. It also cautions that artificial intelligence models are often not supported by a solid physical understanding of the process being modelled, so data science must be combined with domain knowledge. Paraphrased.",
+      "pageNumber": 8,
+      "section": "2.2 Data quality and model grounding"
+    },
+    {
+      "content": "This is general published research about wind turbine drivetrain reliability across the industry. It is not an OEM procedure, contains no torque values, pressure limits or setpoints for any specific turbine, and must not be treated as approval to carry out maintenance on a particular asset.",
+      "pageNumber": null,
+      "section": "Applicability limits"
+    }
+  ]
+}
