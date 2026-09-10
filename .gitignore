@@ -11,3 +11,8 @@ data/raw/*
 !data/raw/README.md
 # Verified 2 kB CC BY 4.0 public file; small enough to version and needed by the importer.
 !data/raw/Penmanshiel_WT_static.csv
+# Official Penmanshiel status exports: 55-57 kB each, CC-BY-4.0, checksummed by the importer and
+# needed by the parser tests. The 61 MB source archive they came from is deliberately NOT committed.
+!data/raw/penmanshiel/
+!data/raw/penmanshiel/*.csv
+!data/raw/penmanshiel/README.md

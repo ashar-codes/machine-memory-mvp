@@ -347,6 +347,17 @@ describe('document chunking', () => {
     expect(chunkText(many).length).toBeLessThanOrEqual(120);
   });
 
+  it('never lets a reset reach real public data', () => {
+    // demo:reset clears presentation residue and, with --include-imports, a user's own imports.
+    // Genuine public_data — the imported Penmanshiel history — is reachable by neither.
+    const presentation = ['user_demo', 'simulation'];
+    const withImports = [...presentation, 'user_import'];
+    expect(presentation).not.toContain('public_data');
+    expect(withImports).not.toContain('public_data');
+    expect(withImports).not.toContain('public_reference');
+    expect(withImports).not.toContain('synthetic_demo');
+  });
+
   it('protects the public and synthetic corpora from deletion', () => {
     expect(PROTECTED_ORIGINS).toContain('public_reference');
     expect(PROTECTED_ORIGINS).toContain('public_data');
