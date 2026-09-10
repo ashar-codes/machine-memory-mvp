@@ -75,7 +75,9 @@ Archive-only commit left a clean tree before creating remediation branch.
 - Gates: lint/typecheck/build/diff check PASS; full suite **13 files / 326 tests PASS**.
   `npm audit --json`: zero vulnerabilities. `.env` ignored/untracked; secret-pattern scan found
   only existing dummy DB-URI test fixture and literal frontend setup label DATABASE_URL.
-- Checkpoint: `fix: constrain generated operational facts` (hash recorded next checkpoint).
+- Live metadata secret scan: 44 metadata rows checked, no configured credential values or
+  recognizable provider/private-key secrets found; values were not logged.
+- Checkpoint: `fcda34a` — `fix: constrain generated operational facts`.
 
 No migrations added/applied, no live DB writes.
 Unit tests must not call paid providers. Live verification must be separate and preserve
@@ -83,6 +85,25 @@ public_data, public_reference and synthetic_demo. Do not run broad reset over us
 
 ## Continuation
 
-Complete A (P1-02, then P1-03), then B → C → D → E → F in ledger order.
+Phase A is complete. **Next exact finding: B1 / P2-01** (recent-change intent/window).
+Start with `backend/src/copilot.ts` (`classifyIntent`), `backend/src/retrieval.ts`
+(`RECENT_CHANGE_WINDOW_DAYS`, `retrieveEvidence`, `recentChanges`) and
+`tests/integration/{retrieval,dynamic}.test.ts`, `tests/integration/fakeDatabase.ts`.
+Reproduce "What changed recently before this event?" selecting HISTORY before editing.
+Use the September 7 inspection and explicit 7/30/90-day windows; do not silently use 30 days
+for an unsupported requested window. Do not claim the intent fix already follows from A2.
+Then continue B2/P2-02 → B3/P2-06 → C → D → E → F in ledger order.
 Run lint/typecheck/relevant tests/diff check for each coherent checkpoint; full gates before final.
 Do not open Internet access or claim local readiness until outstanding correctness gates pass.
+
+### Handoff state
+
+- Completed: P1-02, P1-03; archived audit unchanged. Latest code checkpoint `fcda34a`.
+- Remaining: every B/C/D/E/F ledger item; P1-01 intentionally DEFERRED.
+- No migrations added or applied; no live data created/deleted/updated during Phase A.
+- Last full gates: 13 files / 326 tests, lint/typecheck/build/diff check PASS; npm audit zero.
+- Remaining known defects are described by the immutable audit and NOT_STARTED ledger rows.
+- Local full hackathon demo: NOT READY. Internet: KEEP BLOCKED.
+- Verification commands: `node --import tsx scripts/verify/safety.ts` (requires loopback app;
+  seven requests count against existing rate limit), `node --import tsx scripts/verify/grounding.ts`
+  (configured PostgreSQL; BEGIN READ ONLY; injected provider, no paid calls).
