@@ -1,12 +1,13 @@
 
 
-## Operational events
+## Real public operational data
 
-A fourth way in, alongside manual entry, CSV import and document upload: a normalized read-only
-event boundary. Machine Memory has no live SCADA connection; a simulator ships in its place.
+A fifth way in, and the only one that is not user-supplied: `npm run data:penmanshiel -- --events`
+imports genuine Penmanshiel status exports as `public_data`.
 
-Events arrive through `recordEvent()` — the same function manual entry uses — carry
-`record_origin = 'simulation'`, and are deduplicated by `(source, externalEventId)`. Signal
-snapshots shown beside an alarm are display-only and never become evidence.
+It reuses `asset_events`, the `(event_source, external_event_id)` idempotency index and the ordinary
+retrieval path — no separate pipeline. Severity is mapped conservatively from the source's own
+Informational/Warning/Stop classification and can never become `critical`, and the dataset's total
+absence of work orders and root causes is preserved rather than filled in.
 
-See `docs/SCADA_INTEGRATION.md`.
+See `docs/PENMANSHIEL_DATA.md`.

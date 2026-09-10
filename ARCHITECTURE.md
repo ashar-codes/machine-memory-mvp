@@ -1,25 +1,19 @@
 
 
-## Operational-event boundary (v2.2)
+## Public operational data (v2.3)
 
 ```
-SimulatorScadaAdapter ─▶ NormalizedScadaEvent ─▶ recordEvent() ─▶ asset_events
-                                                        │
-                                          SSE feed ◀────┴──▶ investigate()  (best-effort)
+Zenodo archive ─▶ Status_*.csv (raw, byte-preserved) ─▶ parser ─▶ derived CSV
+                                                              └─▶ batched insert ─▶ asset_events
 ```
 
-`recordEvent()` in `backend/src/events.ts` is the single write path for an asset event. Manual
-entry, CSV import and the operational boundary all use it, so a fault is stored, provenanced and
-reflected in asset status identically whatever delivered it. `POST /api/events` was refactored onto
-it rather than left as a parallel insert.
+Real Penmanshiel events reuse the existing pipeline entirely: the same `asset_events` table, the
+same retrieval, the same copilot. The only new code is a parser and an import stage.
 
-The boundary is one-directional by construction: the normalized schema is a strict object with no
-field that can express a command, and `ScadaAdapter` has `connect`, `disconnect` and `onEvent` and
-no write method. A future OPC UA, MQTT or historian adapter produces the same normalized event and
-nothing downstream changes.
+Idempotency reuses the `(event_source, external_event_id)` index the operational-event boundary
+already added, so no migration was needed. The external id is deterministic —
+`<sourceTurbine>:<startedAt>:<sourceCode>`.
 
-Real-time delivery is Server-Sent Events. One-directional, plain HTTP through the existing Vite
-proxy and Host/Origin checks, no broker and no extra dependency.
-
-Persistence never depends on AI: the event is committed, then investigated best-effort through the
-existing Gemini → Groq → deterministic chain.
+Operational rows are **not embedded**. Recurrence and period questions are SQL over structured rows;
+only reviewed public reference text lives in pgvector. That separation is what lets a count be a
+count rather than a model's estimate.

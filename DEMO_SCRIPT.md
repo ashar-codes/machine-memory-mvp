@@ -1,32 +1,34 @@
 
 
-## Demo C — a fault that arrives on its own
+## Demo D — the same engine, on real public data
 
-Run after Demo B, so WT-10 already has imported history and an indexed document. Reset with
-`npm run demo:reset -- --include-imports` first if you are starting fresh, then re-run Demo B.
+The closing act. Everything so far was synthetic or uploaded; this is genuine published data.
 
-Opening line: *"So far every fault got here because a person typed it or uploaded it. Now let's
-have one arrive on its own."*
+Opening line: *"Everything you have seen so far was either fictional demonstration data or a file we
+uploaded ourselves. Let's point the same engine at real public wind-farm data."*
 
-1. **SCADA Simulator.** Read the header out loud, because it is the honest framing and it is more
-   impressive than overclaiming: *Machine Memory is not connected to live industrial SCADA. This
-   feed is simulated. Events enter through the same normalized read-only boundary a future
-   historian or SCADA adapter would use — and once an event arrives, the investigation is real.*
-2. Point at **read-only · no control channel**. There is no endpoint in this application that sends
-   anything to a turbine. That is a design property, not a policy.
-3. Select **WT-10** and **Gearbox temperature fault**, press **Start simulation**.
-4. The feed streams: NORMAL (feed only) → GBX-TEMP-WARN (recorded) → NORMAL → **GEAR-TMP-402
-   CRITICAL** (recorded). Informational rows never become machine history; warnings and faults do.
-5. **New fault detected** appears, badged SIMULATION, with the simulated signals — say plainly that
-   these are illustrative values, not OEM thresholds, and that they are never cited as evidence.
-   *The alarm declares the fault; the RAG pipeline investigates it. It does not pretend to have
-   discovered a physical threshold.*
-6. **Machine Memory investigation** runs automatically. It finds the prior GEAR-TMP-402 occurrences
-   imported in Demo B, the work orders, the uploaded gearbox document and the public OSHA/NREL
-   corpus — evidence spanning three provenance classes at once.
-7. **Fleet.** WT-10 is now faulted, and GEAR-TMP-402 appears under recurring faults with mixed
-   `simulation` and `user_import` provenance shown honestly.
+1. **Fleet**, then the asset rail. Two farms, clearly separated: **Demonstration Wind Farm** and
+   **Penmanshiel Wind Farm · PUBLIC DATA**.
+2. Say what the synthetic farm is for: a controlled setting where maintenance, resolutions and a
+   recurring fault story can be exercised end to end.
+3. Open **PEN-T01**. Real Senvion MM82 turbine, from Cubico's published Zenodo dataset, CC-BY-4.0.
+   Note there is no PEN-T03 — the published dataset has no turbine 03, and none was invented.
+4. **Recorded events** panel: 576 event records, 23 distinct codes, 2023-01-01 to 2023-02-27. Every
+   number is a SQL count over imported rows. The frequent codes are real published codes with the
+   publisher's own messages.
+5. **AI Copilot → asset scope →** *"Summarize this turbine's event history."* Real records, cited.
+6. *"Has this event occurred before?"* with `PEN-5000` selected — three genuine occurrences of
+   "Breakdown obstacle light", counted in SQL.
+7. **The important one.** *"How was this solved previously?"* The answer states that occurrences
+   exist but **no verified maintenance resolution is present in this data**. Say why that matters:
+   the public dataset has no work orders and no root causes, and the system will not invent one.
+   *"Refusing to answer is a feature. It is the difference between a retrieval system and a
+   plausible-sentence generator."*
+8. *"What do we know about this turbine, and what published material is relevant to it?"* One answer
+   combining real operational facts (cited to `public_data`) with OSHA and NREL technical references
+   (cited to `public_reference`) — kept visibly separate, with the model noting the published
+   material is general and not turbine-specific.
 
-Closing line: *"The same investigation ran whether the fault was typed in, imported from a CSV, or
-delivered by an operational feed. That is the point: the memory belongs to the machine, not to the
-route the event took to get here."*
+Closing line: *"The same Machine Memory engine that powers our synthetic controlled demo also works
+against genuine public wind-turbine operational data — and nothing was trained. The records were
+ingested and indexed; Gemini is unchanged."*

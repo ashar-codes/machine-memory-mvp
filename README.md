@@ -1,16 +1,26 @@
 
 
-## SCADA simulator
+## Real public wind turbine data
 
-Machine Memory is **not connected to live industrial SCADA**. The SCADA Simulator page replays
-deterministic demonstration scenarios through the same normalized read-only boundary a future
-historian or SCADA adapter would use. Once an event arrives, the investigation is real.
+Alongside the synthetic demonstration farm, Machine Memory holds **genuine public operational
+data**: 1,172 real event records from two Penmanshiel turbines, February 2023.
 
-Select an asset and a scenario, press Start, and a fault streams in over Server-Sent Events:
-normal → warning → critical in about 13 seconds. The critical event is persisted with `simulation`
-provenance, the asset's status updates, the timeline and fleet counts follow, and Machine Memory
-investigates it automatically using the ordinary pipeline — no SCADA-specific retrieval path.
+Source: Cubico Sustainable Investments Ltd, "Penmanshiel wind farm data" v3, Zenodo record
+16807304, CC-BY-4.0.
 
-There is no control channel. No endpoint in this application sends anything to equipment.
-`docs/SCADA_INTEGRATION.md` explains the boundary, the future-adapter interface, and why reacting
-to an alarm is a different problem from raw-signal anomaly detection.
+```bash
+npm run data:penmanshiel                       # 14 real turbine identities
+npm run data:penmanshiel -- --events           # real event history for PEN-T01 and PEN-T02
+```
+
+Both are idempotent. The site appears as **Penmanshiel Wind Farm · PUBLIC DATA**, kept entirely
+separate from the fictional Demonstration Wind Farm, and every imported row carries
+`record_origin = public_data`.
+
+The dataset has operational events and **no** work orders, root causes or repair records. That gap
+is preserved: ask how a real event was solved and Machine Memory says a verified resolution is not
+present, rather than inventing one. Severity is mapped conservatively and `critical` is
+unreachable, because the published data has no such class.
+
+Nothing is trained on this data. Structured rows are queried in SQL; only reviewed public reference
+*text* is embedded. See `docs/PENMANSHIEL_DATA.md`.

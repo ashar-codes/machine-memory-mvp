@@ -1,18 +1,15 @@
 
 
-## SCADA simulator — 2026-09-10
+## Real public data — 2026-09-10
 
-A simulated operational-event feed and the read-only boundary it arrives through. Machine Memory
-still has no live SCADA connection, and the interface says so on the page.
+Genuine Penmanshiel operational events are now imported: 1,172 rows for two turbines, February 2023,
+from Zenodo record 16807304 (CC-BY-4.0). Verified live — the copilot summarizes real event history,
+counts real recurrences in SQL, and combines real operational facts with public OSHA/NREL reference
+evidence in a single answer with the two clearly separated by provenance.
 
-Verified live against Supabase: a `gearbox_temperature` run on WT-10 streamed normal → warning →
-critical over SSE; the critical `GEAR-TMP-402` event persisted with `simulation` provenance, moved
-WT-10 to `fault`, appeared in the timeline, fleet counts and recurring-fault list, and triggered an
-automatic investigation returning HIGH strength with evidence spanning three provenance classes
-(`public_reference`, `simulation`, `user_import`) and all citations resolving. Replaying the same
-`externalEventId` returned the stored row rather than creating a second event.
+Two accuracy defects surfaced from working with real data rather than synthetic: the deterministic
+answer conflated "no resolution recorded" with "no records at all", and intent classification let a
+passing mention of "maintenance" outrank an explicit request for technical references.
 
-Three defects were found by running it rather than by reading it: an unref'd timer that silently
-stalled a scenario between steps, an unhandled `error` event on a checked-out pg client that
-crashed the process on a dropped TLS socket, and `description` being NOT NULL while the normalized
-contract makes it optional.
+Still not imported: SCADA signal rows (42 MB per turbine-month, no retrieval benefit), and turbines
+beyond PEN-T01/PEN-T02.
