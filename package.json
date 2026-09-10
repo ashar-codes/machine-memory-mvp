@@ -18,6 +18,7 @@
     "test": "vitest run",
     "build": "npm run build --workspaces",
     "db:seed": "node --import tsx scripts/data/seed.ts",
+    "demo:reset": "node --import tsx scripts/data/demo-reset.ts",
     "rag:ingest": "node --import tsx scripts/rag/ingest.ts",
     "data:penmanshiel": "node --import tsx scripts/data/import-penmanshiel.ts",
     "rag:ingest:corpus": "node --import tsx scripts/rag/ingest-corpus.ts"
