@@ -1,68 +1,32 @@
-# Machine Memory architecture
 
-Machine Memory: An Asset-Conditioned Retrieval-Augmented Generation (RAG) System for Wind Turbine Maintenance Intelligence.
 
-## Scope and stack
-
-First phase establishes a production-shaped **local university MVP foundation**, not production readiness. npm workspaces: React/Vite/TypeScript frontend, Express/TypeScript/Zod backend, type-only shared package. Supabase PostgreSQL + pgvector supplies persistent structured history and semantic evidence. Node `pg` uses parameterized SQL; no browser Supabase client. The Google Gemini API is the designated synthesis provider (`gemini-3.6-flash` through the Interactions API); `gemini-embedding-001` truncated and renormalized to 1536 dimensions is fixed for ingestion. No orchestration framework, autonomous agents, container requirement or machine-control integrations.
-
-The asset is the memory unit; schema supports future asset types. Demo uses a fictional wind farm. Penmanshiel may supply bounded public metadata/events later, without misrepresenting fictional maintenance as real history.
-
-## Boundaries
-
-Browser → backend → PostgreSQL. Backend → Gemini for embeddings/synthesis only when configured. CLI ingestion → Gemini embeddings → transactional PostgreSQL document/chunk insertion. Credentials stay server-side. Keep query/retrieval services in backend; data parsing and offline ingestion under scripts. Shared package contains wire types/constants only, no database/LLM implementation.
-
-## Hybrid pipeline (implemented)
-
-Implemented across `backend/src/retrieval.ts`, `evidence.ts`, `synthesis.ts`, `llm.ts` and `investigate.ts`. The numbered design below is what the code now does, with two deviations recorded at the end of this section.
-
-1. Validate asset, optional event, intent and question; load selected asset from SQL. Apply deterministic unsafe-operation detection before normal synthesis; unsupported procedures/setpoints fail closed.
-2. Intent selects developer-written SQL templates. SQL computes exact counts, coverage ranges, recent changes and recurrence. Store count as evidence with query scope/time range/provenance, not as model arithmetic. Same asset history and compatible fleet comparisons use separate queries.
-3. Embed question once; filter document/chunk metadata by asset type, manufacturer and model before ranking1536-dimensional cosine distance. Exact current-asset narratives and compatible cross-asset narratives remain distinguishable. Null metadata means unspecified, not approved for every model. Do not use a fault-code string alone to equate different OEMs.
-4. Fuse/deduplicate evidence using stable typed IDs such as `event:<uuid>`, `resolution:<uuid>`, `chunk:<uuid>`, `aggregate:<scope-hash>`. Preserve SQL facts as canonical; do not replace counts with truncated top-k results.
-5. Authority: applicable OEM documentation for model-specific technical instructions; regulator for general safety; research for background; historical work orders/resolutions for reported past actions; user/synthetic assertions never elevate to technical authority. Conflicts produce uncertainty and block unsafe recommendations.
-6. Run deterministic strength and safety gates. Pass only bounded evidence + fixed instructions to the Gemini Interactions API with `store:false`, no tools and a JSON `response_format` schema. Retrieved documents are untrusted data; embedded instructions cannot change policy. Never execute returned SQL/code or let LLM select arbitrary tools.
-7. Validate answer structure and every citation ID. Citation existence is necessary, **not proof a claim is supported**: check factual grounding, numeric values against authoritative excerpts, and reject uncited operational recommendations. Backend overwrites model confidence/safety fields. On failures, return insufficient evidence or sanitized provider error; no invented fallback facts.
-
-### Deviations from the original design
-
-**Evidence IDs are `EV-1`, `EV-2`, ... in presentation order, not typed UUIDs like `event:<uuid>`.** Short IDs are what a language model cites reliably and what a reader can scan in the evidence panel. They are stable within a single response only, and the contract now says so. The underlying record identity is preserved in the evidence title and timestamp.
-
-**Ranking happens in TypeScript, not SQL.** The knowledge query returns a bounded candidate set with cosine similarity and keyword rank computed in PostgreSQL; the composite ordering — authority class, role for the intent, applicability, then similarity — is applied in `evidence.ts`. This keeps the authority rules readable and directly testable, and it is well within budget for a corpus of this size. Revisit if the corpus grows by orders of magnitude.
-
-## New memory lifecycle
-
-Resolution POST validates → locks/resolves asset in transaction → inserts user_demo resolution → commits → responds with STRUCTURED_SAVED_SEMANTIC_PENDING → the timeline refreshes and the record is immediately retrievable by structured retrieval.
-
-Semantic indexing then runs as a separate best-effort step in `backend/src/memoryIndex.ts`, **after** the response has been sent. It embeds the resolution narrative and writes a `user_demo` document and chunk. Three properties matter: it cannot roll back the committed resolution; a failure is logged and nothing else; and success is never reported to the client, because the frozen status enum would then be claiming completion for work that may still be in flight. A retry sweep for previously failed indexing is not implemented and is recorded as open.
-
-This is why the demonstration loop works even with no Gemini key at all: structured retrieval finds the new resolution on the very next question, because it was committed to SQL, not because it was embedded.
-
-## Integration interfaces
-
-Wire contracts: docs/API_CONTRACT.md + packages/shared/src/index.ts. Schema: supabase/migrations. Seed format: docs/SEED_CONTRACT.md. Local knowledge manifests: docs/DATA_RAG_HANDOFF.md. These become authoritative before parallel implementation. No schema/type amendments without architect decision record and coordinated rebasing.
-
-## Official model references
-
-Model selection was settled against the live API, not only the documentation: the documented free-tier `gemini-2.5-flash` returns 404 `no longer available to new users` and its error names `gemini-3.6-flash` as the replacement, which is what this project uses (https://ai.google.dev/gemini-api/docs/models).  `gemini-embedding-001` supports an explicitly requested `outputDimensionality` of 1536 (https://ai.google.dev/gemini-api/docs/embeddings). Google documents that `gemini-embedding-001` output is unit length only at its native 3072 dimensions, so truncated vectors are renormalized before they are stored or compared. No fine-tuning is required: RAG indexes evidence; it does not retrain model weights.
-
-## Dynamic ingestion layer (v2)
-
-Additive. The retrieval, evidence, safety and synthesis modules are unchanged in shape; the new
-modules feed the same tables and the same pipeline.
+## Generation failover (v2.1)
 
 ```
-Data Hub CSV ─→ tabular.ts (parse) ─→ mapping.ts (deterministic + Gemini suggestion, allowlisted)
-                                   ─→ imports.ts (validate rows, transactional insert) ─→ SQL retrieval
-Document ────→ uploads.ts (validate) ─→ knowledge.ts (chunk, embed) ─→ pgvector ─→ semantic retrieval
-Copilot ─────→ copilot.ts ─→ asset: existing investigate() unchanged
-                          ─→ fleet: validatePlan → fleet.ts parameterized SQL
+Gemini ──failure──▶ Groq ──failure──▶ deterministic answer from retrieved evidence
 ```
 
-The asset copilot is a thin layer: it classifies intent deterministically, resolves a bounded
-follow-up textually, and calls the same `investigate()` the workspace uses. It adds no retrieval
-path and no safety exception.
+`provider.ts` is a composite `LlmClient`, so nothing downstream changed: `investigate.ts`,
+`copilot.ts` and `mapping.ts` already took an injected client and were not modified.
 
-Evidence fusion gained a per-document cap so one large corpus cannot occupy every evidence slot and
-hide a smaller, more specific source. Authority still outranks similarity in ordering, and
-`procedural` still gates what may be quoted as guidance.
+- **Gemini** — primary generation *and the sole embedding provider*.
+- **Groq** (`openai/gpt-oss-120b`) — secondary **text generation only**.
+- **Deterministic** — the existing grounded fallback, unchanged.
+
+Failover triggers only when the primary *fails*: an exception, or a null/empty result. An answer
+Gemini successfully produced is never re-rolled on Groq, because judging content and retrying
+elsewhere would make the answer a matter of provider roulette. When Gemini succeeds Groq is not
+called at all.
+
+**Embeddings never fail over, and this is the important part.** The pgvector corpus was built with
+`gemini-embedding-001`. Two embedding models do not share a vector space merely because they share
+a dimension count — a 1536-dimension Groq vector scored against Gemini vectors would return
+confident nonsense, silently, with no error anywhere. `GroqGenerator` therefore has no `embed`
+method at all, and `embed` returns null rather than substituting a provider. Losing semantic
+ranking is the safe failure; corrupting it is not.
+
+Both providers receive the identical evidence bundle and the identical system instructions, and
+both outputs pass through the same `parseModelAnswer` and the same citation validation. The
+deterministic safety gate runs *before* either provider, so a refusal never reaches a model.
+`AI_GENERATION_PROVIDER` (`auto` | `gemini` | `groq`) forces a provider for testing; it is a
+backend environment variable, never a runtime setting.

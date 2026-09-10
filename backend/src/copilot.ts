@@ -17,6 +17,7 @@ import {
   detectUnsafeRequest, validateCitations,
 } from './rag.js';
 import { DEFAULT_RECURRENCE_MINIMUM, DEFAULT_WINDOW_DAYS, FLEET_OPERATIONS, runPlan, validatePlan } from './fleet.js';
+import type { GenerationProvider, GenerationTrace } from './provider.js';
 import type { Queryable } from './retrieval.js';
 
 export const MAX_HISTORY_MESSAGES = 6;
@@ -140,7 +141,7 @@ function deterministicFleetAnswer(label: string, rows: Record<string, unknown>[]
   };
 }
 
-export interface CopilotDeps { db: Queryable; llm?: LlmClient | null; now?: Date; onDegraded?: InvestigateDeps['onDegraded'] }
+export interface CopilotDeps { db: Queryable; llm?: LlmClient | null; now?: Date; onDegraded?: InvestigateDeps['onDegraded']; onGeneration?: (provider: GenerationProvider) => void }
 
 export async function runFleetCopilot(question: string, deps: CopilotDeps): Promise<CopilotResponse> {
   // The fleet scope answers with counts, so a prohibited request is refused before any query runs.
@@ -164,12 +165,13 @@ export async function runFleetCopilot(question: string, deps: CopilotDeps): Prom
   }
 
   const { label, rows } = await runPlan(deps.db, plan);
-  const structuredFacts = { operation: plan.operation, eventCode: plan.eventCode, minimumOccurrences: plan.minimumOccurrences, windowDays: plan.days, matchingRows: rows.length, rows: rows.slice(0, 20) };
+  const generation: { provider: GenerationProvider } = { provider: 'deterministic' };
   let answer = deterministicFleetAnswer(label, rows);
 
   if (deps.llm?.structured && rows.length) {
     try {
-      const drafted = await deps.llm.structured(FLEET_SYNTHESIS, { question, label, rows: rows.slice(0, 20) }, FLEET_SCHEMA as unknown as Record<string, unknown>);
+      const trace: GenerationTrace = {};
+      const drafted = await deps.llm.structured(FLEET_SYNTHESIS, { question, label, rows: rows.slice(0, 20) }, FLEET_SCHEMA as unknown as Record<string, unknown>, trace);
       const body = drafted as { summary?: unknown; findings?: unknown; uncertainties?: unknown } | null;
       const summary = typeof body?.summary === 'string' ? body.summary.trim().slice(0, 1200) : '';
       if (summary) {
@@ -185,6 +187,8 @@ export async function runFleetCopilot(question: string, deps: CopilotDeps): Prom
           ? body.uncertainties.filter((item): item is string => typeof item === 'string').map((item) => item.trim().slice(0, 600)).filter(Boolean).slice(0, 6)
           : [];
         answer = { ...answer, summary, findings: findings.length ? findings : answer.findings, uncertainties: [...answer.uncertainties, ...uncertainties].slice(0, 6) };
+        generation.provider = trace.provider ?? 'gemini';
+        deps.onGeneration?.(generation.provider);
       } else {
         deps.onDegraded?.('synthesis');
       }
@@ -194,6 +198,11 @@ export async function runFleetCopilot(question: string, deps: CopilotDeps): Prom
   }
 
   const fleetPlan: FleetQueryPlan = { operation: plan.operation, parameters: { eventCode: plan.eventCode, minimumOccurrences: plan.minimumOccurrences, days: plan.days }, label };
+  const structuredFacts = {
+    operation: plan.operation, eventCode: plan.eventCode, minimumOccurrences: plan.minimumOccurrences,
+    windowDays: plan.days, matchingRows: rows.length, rows: rows.slice(0, 20),
+    generationProvider: generation.provider, generationDegraded: generation.provider !== 'gemini',
+  };
   return { answer, evidence: [], scope: 'fleet', assetCode: null, plan: fleetPlan, structuredFacts };
 }
 
@@ -222,13 +231,18 @@ export async function runAssetCopilot(
     if (history === 0 && intent !== 'TECHNICAL_GUIDANCE') {
       const empty = emptyMemoryAnswer();
       return { ...empty, scope: 'asset', assetCode: input.assetCode, plan: null,
-        structuredFacts: { resolvedIntent: intent, resolvedQuestion: question, machineMemoryEmpty: true } };
+        structuredFacts: { resolvedIntent: intent, resolvedQuestion: question, machineMemoryEmpty: true,
+          generationProvider: 'deterministic', generationDegraded: true } };
     }
   }
 
+  const generation: { provider: GenerationProvider } = { provider: 'deterministic' };
   const outcome = await investigate(
     { assetCode: input.assetCode, eventCode: input.eventCode, intent, question },
-    { db: deps.db, llm: deps.llm, now: deps.now, onDegraded: deps.onDegraded },
+    {
+      db: deps.db, llm: deps.llm, now: deps.now, onDegraded: deps.onDegraded,
+      onGeneration: (provider) => { generation.provider = provider; deps.onGeneration?.(provider); },
+    },
   );
   if (outcome.status === 'asset_not_found') return { status: 'asset_not_found' };
 
@@ -241,7 +255,10 @@ export async function runAssetCopilot(
     scope: 'asset',
     assetCode: input.assetCode,
     plan: null,
-    structuredFacts: { resolvedIntent: intent, resolvedQuestion: question, historyTurnsUsed: history.length },
+    structuredFacts: {
+      resolvedIntent: intent, resolvedQuestion: question, historyTurnsUsed: history.length,
+      generationProvider: generation.provider, generationDegraded: generation.provider !== 'gemini',
+    },
   };
 }
 

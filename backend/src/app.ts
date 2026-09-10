@@ -13,6 +13,7 @@ import { safetyAnswer } from './rag.js';
 import type { Queryable } from './retrieval.js';
 import { runAssetCopilot, runFleetCopilot } from './copilot.js';
 import { createDynamicRoutes, copilotBody, RouteError } from './routes.js';
+import type { GenerationProvider } from './provider.js';
 import { ImportError } from './imports.js';
 import { KnowledgeError } from './knowledge.js';
 import { TabularError } from './tabular.js';
@@ -193,7 +194,11 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
       if (safe) { res.json({ ...safe, scope: input.scope, assetCode: input.assetCode ?? null, plan: null, structuredFacts: {} }); return; }
       throw new ApiError(503,'DATABASE_NOT_CONFIGURED','Configure DATABASE_URL and apply the schema and seed.');
     }
-    const deps = { db: queryable(pool), llm, onDegraded: (stage: 'embedding'|'synthesis'|'validation') => console.warn(`Copilot degraded at stage: ${stage}.`) };
+    const deps = {
+      db: queryable(pool), llm,
+      onDegraded: (stage: 'embedding'|'synthesis'|'validation') => console.warn(`Copilot degraded at stage: ${stage}.`),
+      onGeneration: (provider: GenerationProvider) => { if (provider !== 'gemini') console.warn(`Copilot answered via ${provider}.`); },
+    };
     if (input.scope === 'fleet') { res.json(await runFleetCopilot(input.question, deps)); return; }
     if (!input.assetCode) throw new ApiError(400,'VALIDATION_ERROR','An asset must be selected for asset-scope questions.');
     const outcome = await runAssetCopilot({ assetCode: input.assetCode, eventCode: input.eventCode, question: input.question, history: input.history }, deps);

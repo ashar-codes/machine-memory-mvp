@@ -1,19 +1,27 @@
 // The only module that talks to Google Gemini. Everything else takes this as an injected interface,
 // so the pipeline can be tested, and run, without network access or credentials.
+//
+// Gemini is the primary generation provider and the *sole* embedding provider. Generation failover
+// to a secondary provider lives in provider.ts; embeddings deliberately have no failover.
 import { GoogleGenAI } from '@google/genai';
+import type { GenerationTrace } from './provider.js';
 import { SYSTEM_INSTRUCTIONS, type EvidenceBundle } from './synthesis.js';
 
 export interface LlmClient {
   /** Question embedding for semantic retrieval, or null when embedding is unavailable. */
   embed(input: string): Promise<number[] | null>;
-  /** Raw model output for the supplied bundle, or null when synthesis is unavailable. */
-  synthesize(bundle: EvidenceBundle): Promise<unknown | null>;
+  /**
+   * Raw model output for the supplied bundle, or null when synthesis is unavailable.
+   * `trace` is an optional per-call sink recording which provider answered; it is diagnostics
+   * only, and a client that ignores it behaves identically.
+   */
+  synthesize(bundle: EvidenceBundle, trace?: GenerationTrace): Promise<unknown | null>;
   /**
    * Constrained JSON for a non-synthesis task (column mapping, fleet query planning).
    * Optional so a test double only has to implement what it exercises. Callers must treat the
    * result as an untrusted suggestion and validate it against their own allowlist.
    */
-  structured?(instruction: string, payload: unknown, schema: Record<string, unknown>): Promise<unknown | null>;
+  structured?(instruction: string, payload: unknown, schema: Record<string, unknown>, trace?: GenerationTrace): Promise<unknown | null>;
 }
 
 export interface LlmConfig {

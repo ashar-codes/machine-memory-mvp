@@ -8,6 +8,7 @@
 import type { Answer, Evidence, InvestigateRequest, InvestigateResponse } from '@machine-memory/shared';
 import { deriveSignals, fuseEvidence, hasAuthoritativeReference } from './evidence.js';
 import type { LlmClient } from './llm.js';
+import type { GenerationProvider, GenerationTrace } from './provider.js';
 import {
   INSUFFICIENT_SUMMARY, NO_PROCEDURE_UNCERTAINTY, UNSAFE_SUMMARY,
   detectUnsafeRequest, requiresVerifiedEvidence, scoreEvidence, validateCitations,
@@ -24,6 +25,8 @@ export interface InvestigateDeps {
   now?: Date;
   /** Reports degraded synthesis without leaking provider internals into the HTTP response. */
   onDegraded?: (stage: 'embedding' | 'synthesis' | 'validation') => void;
+  /** Reports which generation provider produced the answer. Diagnostics only. */
+  onGeneration?: (provider: GenerationProvider) => void;
 }
 
 export type InvestigateOutcome =
@@ -53,13 +56,18 @@ async function draft(
   result: RetrievalResult, evidence: Evidence[], raw: RawEvidence[],
   question: string, deps: InvestigateDeps,
 ): Promise<DraftAnswer> {
-  const fallback = () => deterministicAnswer(result, evidence, raw);
+  const fallback = () => { deps.onGeneration?.('deterministic'); return deterministicAnswer(result, evidence, raw); };
   if (!deps.llm || evidence.length === 0) return fallback();
+  // A fresh trace per call: the composite records which provider answered without shared state.
+  const trace: GenerationTrace = {};
   try {
-    const output = await deps.llm.synthesize(buildBundle(result, evidence, raw, question));
+    const output = await deps.llm.synthesize(buildBundle(result, evidence, raw, question), trace);
     if (output == null) { deps.onDegraded?.('synthesis'); return fallback(); }
+    // Every provider's output goes through the same parser and the same citation validation.
+    // An invented citation is stripped here whether Gemini or Groq produced it.
     const parsed = parseModelAnswer(output, evidence);
     if (!parsed) { deps.onDegraded?.('validation'); return fallback(); }
+    deps.onGeneration?.(trace.provider ?? 'gemini');
     return parsed;
   } catch {
     // Provider failure must not destroy an investigation that already has retrieved evidence.
