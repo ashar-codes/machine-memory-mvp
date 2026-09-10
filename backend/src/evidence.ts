@@ -5,6 +5,16 @@ import type { EvidenceRole, RawEvidence, RetrievalResult } from './retrieval.js'
 import type { EvidenceSignals } from './rag.js';
 
 export const MAX_EVIDENCE_ITEMS = 12;
+/**
+ * How many chunks one document may contribute to a single answer.
+ *
+ * Without this, a large reviewed corpus fills every slot with near-duplicate passages from the
+ * same two or three documents, and a smaller but highly relevant source — a manual a technician
+ * uploaded for this exact model — is never seen even when it is the top vector hit. The cap
+ * changes nothing about authority: ordering still puts authority above similarity, and
+ * `procedural` still decides what may be quoted as guidance.
+ */
+export const MAX_PER_SOURCE = 3;
 
 const AUTHORITY_WEIGHT: Record<string, number> = {
   REGULATOR: 3, OEM: 3, RESEARCH: 2.5, HISTORICAL: 1, UNVERIFIED: 0.5,
@@ -64,9 +74,30 @@ export function fuseEvidence(result: RetrievalResult, limit = MAX_EVIDENCE_ITEMS
     seen.add(key);
     unique.push(item);
   }
-  const ordered = unique
+  const scored = unique
     .map((item, index) => ({ item, index, score: rankScore(item, result.intent, result.asset) }))
     // Stable: equal scores keep retrieval order, which is already deterministic newest-first.
+    .sort((a, b) => (b.score - a.score) || (a.index - b.index));
+
+  // Highest-scoring first, but no single document may take more than its share of the answer.
+  // Anything held back is reconsidered afterwards, so the cap can never shrink the evidence set.
+  const perSource = new Map<string, number>();
+  const selected: typeof scored = [];
+  const deferred: typeof scored = [];
+  for (const entry of scored) {
+    if (selected.length >= limit) break;
+    const key = entry.item.sourceKey;
+    if (!key) { selected.push(entry); continue; }
+    const used = perSource.get(key) ?? 0;
+    if (used >= MAX_PER_SOURCE) { deferred.push(entry); continue; }
+    perSource.set(key, used + 1);
+    selected.push(entry);
+  }
+  for (const entry of deferred) {
+    if (selected.length >= limit) break;
+    selected.push(entry);
+  }
+  const ordered = selected
     .sort((a, b) => (b.score - a.score) || (a.index - b.index))
     .slice(0, limit)
     .map((entry) => entry.item);

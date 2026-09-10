@@ -33,6 +33,8 @@ export interface RawEvidence {
   similarity: number | null;
   keywordRank: number | null;
   applicability: { assetType: string | null; manufacturer: string | null; model: string | null };
+  /** Document identity for knowledge chunks, so fusion can limit how many one source contributes. */
+  sourceKey?: string;
   /** True only for reviewed public references that may be quoted as guidance, never for demo history. */
   procedural: boolean;
 }
@@ -382,6 +384,7 @@ export async function searchKnowledge(
       kind: 'KNOWLEDGE' as const,
       role: text(row.source_type) === 'SAFETY_REFERENCE' ? 'SAFETY_REFERENCE' as const : filter.role,
       title: `${text(row.title)}${row.section ? ` — ${text(row.section)}` : ''}`,
+      sourceKey: text(row.title),
       excerpt: excerpt(text(row.content)),
       assetCode: null, timestamp: null, recordOrigin, authorityClass,
       sourceType: text(row.source_type), sourceUrl: nullableText(row.source_url),

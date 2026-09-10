@@ -152,7 +152,7 @@ export async function runFleetCopilot(question: string, deps: CopilotDeps): Prom
   if (deps.llm?.structured) {
     try {
       const suggested = await deps.llm.structured(PLAN_INSTRUCTIONS, { question }, PLAN_SCHEMA as unknown as Record<string, unknown>);
-      const validated = validatePlan(suggested);
+      const validated = validatePlan(suggested, question);
       if (validated) plan = validated;
       else deps.onDegraded?.('synthesis');
     } catch {

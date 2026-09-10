@@ -13,6 +13,8 @@ export type FleetOperation = typeof FLEET_OPERATIONS[number];
 export const DEFAULT_RECURRENCE_MINIMUM = 2;
 export const DEFAULT_WINDOW_DAYS = 365;
 const MAX_WINDOW_DAYS = 3650;
+// A 'recurring fault' threshold beyond this is not a meaningful question in this product.
+const MAX_RECURRENCE_MINIMUM = 10;
 const MAX_ROWS = 50;
 
 export interface FleetPlan { operation: FleetOperation; eventCode: string | null; minimumOccurrences: number; days: number }
@@ -27,8 +29,13 @@ const clampInt = (value: unknown, fallback: number, min: number, max: number): n
 /**
  * Coerces an untrusted plan object into a safe one. An unknown operation is refused outright
  * rather than defaulted, so a model cannot smuggle in an operation the backend does not implement.
+ *
+ * `question` is used to decide whether a numeric parameter was actually asked for. A model asked
+ * "which turbines have recurring faults?" will happily invent a threshold of 100 and turn a useful
+ * query into an empty one, so a number the user never mentioned is discarded in favour of the
+ * documented default. The backend owns the numbers; the model only picks the operation.
  */
-export function validatePlan(raw: unknown): FleetPlan | null {
+export function validatePlan(raw: unknown, question = ''): FleetPlan | null {
   if (!raw || typeof raw !== 'object') return null;
   const body = raw as Record<string, unknown>;
   const operation = typeof body.operation === 'string' ? body.operation : '';
@@ -36,16 +43,21 @@ export function validatePlan(raw: unknown): FleetPlan | null {
   const rawCode = typeof body.eventCode === 'string' ? body.eventCode.trim() : '';
   // A malformed code is dropped, never passed through: the query simply runs unfiltered by code.
   const eventCode = rawCode && EVENT_CODE_PATTERN.test(rawCode) ? rawCode : null;
+  const askedForNumber = /\d/.test(question);
   return {
     operation: operation as FleetOperation,
     eventCode,
-    minimumOccurrences: clampInt(body.minimumOccurrences, DEFAULT_RECURRENCE_MINIMUM, 2, 100),
-    days: clampInt(body.days, DEFAULT_WINDOW_DAYS, 1, MAX_WINDOW_DAYS),
+    minimumOccurrences: askedForNumber
+      ? clampInt(body.minimumOccurrences, DEFAULT_RECURRENCE_MINIMUM, 2, MAX_RECURRENCE_MINIMUM)
+      : DEFAULT_RECURRENCE_MINIMUM,
+    days: askedForNumber || /\b(quarter|month|year|week|recent|lately)\b/i.test(question)
+      ? clampInt(body.days, DEFAULT_WINDOW_DAYS, 1, MAX_WINDOW_DAYS)
+      : DEFAULT_WINDOW_DAYS,
   };
 }
 
 export async function recurringFaults(db: Queryable, options: { minimumOccurrences?: number; days?: number; eventCode?: string | null } = {}): Promise<RecurringFault[]> {
-  const minimum = clampInt(options.minimumOccurrences, DEFAULT_RECURRENCE_MINIMUM, 2, 100);
+  const minimum = clampInt(options.minimumOccurrences, DEFAULT_RECURRENCE_MINIMUM, 2, MAX_RECURRENCE_MINIMUM);
   const days = clampInt(options.days, DEFAULT_WINDOW_DAYS, 1, MAX_WINDOW_DAYS);
   const result = await db.query(
     `select a.asset_code, e.event_code, count(*)::int as occurrences,

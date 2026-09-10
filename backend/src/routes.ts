@@ -113,12 +113,13 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     const client = await db().connect();
     try {
       await client.query('BEGIN');
-      const site = await client.query(
+      // sites.name has no unique constraint, so an upsert cannot be expressed as ON CONFLICT here.
+      // Look first, insert only when genuinely absent, or a second turbine on the same farm would
+      // silently create a duplicate site and split the fleet in two.
+      const existingSite = await client.query('select id from public.sites where lower(name) = lower($1) order by created_at limit 1', [input.siteName]);
+      const siteId = existingSite.rows[0]?.id ?? (await client.query(
         `insert into public.sites (name, timezone, metadata, record_origin)
-         values ($1,'UTC','{"createdVia":"data_hub"}'::jsonb,'user_import')
-         on conflict do nothing returning id`, [input.siteName]);
-      const siteId = site.rows[0]?.id
-        ?? (await client.query('select id from public.sites where name = $1 limit 1', [input.siteName])).rows[0]?.id;
+         values ($1,'UTC','{"createdVia":"data_hub"}'::jsonb,'user_import') returning id`, [input.siteName])).rows[0]?.id;
       if (!siteId) throw new RouteError(500, 'SITE_UNAVAILABLE', 'The site could not be created.');
       const existing = await client.query('select 1 from public.assets where asset_code = $1', [input.assetCode]);
       if (existing.rowCount) throw new RouteError(409, 'ASSET_EXISTS', 'An asset with that code already exists.');
