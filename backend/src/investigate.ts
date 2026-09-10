@@ -14,7 +14,7 @@ import {
   detectUnsafeRequest, requiresOperationalAuthorization, requiresVerifiedEvidence, safetyAnswer, scoreEvidence, validateCitations,
 } from './rag.js';
 import {
-  loadAsset, retrieveEvidence,
+  loadAsset, recentChangeDays, retrieveEvidence,
   type Queryable, type RawEvidence, type RetrievalResult,
 } from './retrieval.js';
 import { buildBundle, deterministicAnswer, groundModelAnswer, parseModelAnswer, type DraftAnswer } from './synthesis.js';
@@ -66,6 +66,14 @@ export async function investigate(input: InvestigateRequest, deps: InvestigateDe
   const asset = await loadAsset(deps.db, input.assetCode);
   if (!asset) {
     return { status: 'asset_not_found' };
+  }
+  if (input.intent === 'RECENT_CHANGES' && recentChangeDays(input.question) === null) {
+    deps.onGeneration?.('deterministic');
+    return { status: 'ok', response: { evidence: [], answer: {
+      summary: 'Choose a recent-change window of 7, 30 or 90 days, ending at the selected event (or now when no event exists).',
+      findings: [], uncertainties: ['The requested time window was not applied.'],
+      evidenceStrength: 'INSUFFICIENT', safetyStatus: 'NORMAL',
+    } } };
   }
 
   let embedding: number[] | null = null;

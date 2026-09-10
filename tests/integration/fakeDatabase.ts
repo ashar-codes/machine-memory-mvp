@@ -141,11 +141,11 @@ export function createFakeDatabase(options: FakeOptions = {}): FakeDatabase {
         const [assetId, eventCode] = values;
         return { rows: incidents.filter((row) => row.asset_id === assetId && row.event_code === eventCode) };
       }
-      if (has('from public.work_orders where asset_id')) {
+      if (has('from public.work_orders where asset_id') && !has(') changes')) {
         const [assetId, eventCode] = values;
         return { rows: workOrders.filter((row) => row.asset_id === assetId && (eventCode == null || row.event_code === eventCode)) };
       }
-      if (has('from public.resolutions where asset_id')) {
+      if (has('from public.resolutions where asset_id') && !has(') changes')) {
         const [assetId, eventCode] = values;
         return {
           rows: allResolutions.filter((row) => row.asset_id === assetId && row.event_code === eventCode)

@@ -19,7 +19,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 |---|---|---|
 | A / P1-02 | VERIFIED | Generic reference authority was confused with operational authorization. Operational requests now fail closed; expanded action families refuse before DB/provider calls. |
 | A / P1-03 | VERIFIED | ID membership previously admitted invented facts. Summaries/exact facts now deterministic; typed recorded outcomes copied from retrieval; generated evidence-context text conservatively constrained. |
-| B / P2-01 | NOT_STARTED | Generic HISTORY precedes specific change intent; fixed window. |
+| B / P2-01 | VERIFIED | Specific change intent precedes HISTORY; explicit 7/30/90-day windows honored, unsupported duration requests clarified without provider calls. |
 | B / P2-02 | NOT_STARTED | No stale-request/context identity protection. |
 | B / P2-06 | NOT_STARTED | UTC text interpreted as local datetime; regex calendar validation. |
 | C / P2-03 | NOT_STARTED | pdf-parse v1 call against installed v2. |
@@ -35,6 +35,23 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### B1 — recent-change intent and windows
+
+- Reproduced three misclassified questions and ignored 7/90-day windows. Also corrected a
+  fake-database matcher that intercepted the change UNION as a work-order query, letting
+  the old empty-result window assertion pass vacuously.
+- Files: `backend/src/{copilot,retrieval,investigate}.ts`, `tests/integration/fakeDatabase.ts`,
+  new `tests/integration/remediation-recent.test.ts`, `scripts/verify/recent.ts`.
+- 15 new regressions: intent, actual fixture rows/order, exact spans, unsupported/ambiguous
+  durations and zero provider calls on clarification. Default remains 30 days, ending at
+  selected event (now if no event); explicit supported syntax is numeric day windows.
+- Live: six real PostgreSQL retrieval + deterministic synthesis cases PASS, newest inspection
+  `2026-09-07T09:00:00.000Z`; citations resolve. Read-only transaction, no provider calls or writes.
+  `node --import tsx scripts/verify/recent.ts`.
+- Protected baseline captured at `/private/tmp/mm-remediation.Km3hfl/database-before.jsonl`.
+- Gates: lint/typecheck/build/diff check PASS; full suite 14 files / **341 tests PASS**.
+- Checkpoint: this B1 commit (`fix: honor recent-change intent and supported windows`).
 
 ### A1 — safety / operational authorization
 

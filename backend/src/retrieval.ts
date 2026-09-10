@@ -8,6 +8,16 @@ export interface Queryable {
 }
 
 export const RECENT_CHANGE_WINDOW_DAYS = 30;
+
+/** Only explicit supported day windows are understood; never silently coerce a request. */
+export function recentChangeDays(question: string): number | null {
+  const durations = [...question.matchAll(/\b(\d+(?:\.\d+)?|[a-z]+)[ -]+(days?|weeks?|months?|years?|hours?)\b/gi)];
+  if (!durations.length) return /\b(last|past|previous)\s+(?:\d+|a|an|one|two|seven|thirty|ninety)\b/i.test(question)
+    ? null : RECENT_CHANGE_WINDOW_DAYS;
+  if (durations.length !== 1) return null;
+  const [, amount, unit] = durations[0];
+  return /^days?$/i.test(unit) && ['7', '30', '90'].includes(amount) ? Number(amount) : null;
+}
 const MAX_STRUCTURED_ROWS = 20;
 const MAX_KNOWLEDGE_CANDIDATES = 200;
 
@@ -477,9 +487,11 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
     evidence.push(...narratives);
     if (!fleet.evidence.length) notes.push('No other asset in this database has recorded the same event code.');
   }
-  if (wantsChanges) {
+  const changeDays = recentChangeDays(options.question);
+  if (wantsChanges && changeDays === null) notes.push('Choose a recent-change window of 7, 30 or 90 days.');
+  if (wantsChanges && changeDays !== null) {
     const end = new Date(anchorAt);
-    const start = new Date(end.getTime() - RECENT_CHANGE_WINDOW_DAYS * 86_400_000);
+    const start = new Date(end.getTime() - changeDays * 86_400_000);
     recentWindow = { startIso: start.toISOString(), endIso: end.toISOString() };
     evidence.push(...await recentChanges(db, asset.assetCode, asset.id, recentWindow.startIso, recentWindow.endIso));
   }
