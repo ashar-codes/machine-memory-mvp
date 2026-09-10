@@ -1,1 +1,4 @@
 *.csv text eol=lf
+# Checksum-verified public Zenodo file: it is published with CRLF and the import test asserts its
+# byte-exact MD5. Normalizing its line endings silently breaks that provenance check.
+data/raw/Penmanshiel_WT_static.csv binary
