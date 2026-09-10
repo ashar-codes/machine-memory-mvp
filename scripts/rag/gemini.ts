@@ -18,13 +18,17 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 /** 429 and 5xx are transient; 4xx of any other kind means the request itself is wrong. */
 export function isTransient(error: unknown): boolean {
   const status = (error as { status?: unknown })?.status;
-  if (typeof status === 'number') return status === 429 || (status >= 500 && status < 600);
+  const message = String((error as { message?: unknown })?.message ?? '');
+  // An exhausted daily quota does not clear inside a retry window; a per-minute rate limit does.
+  if (status === 429) return !QUOTA_EXHAUSTED.test(message);
+  if (typeof status === 'number') return status >= 500 && status < 600;
   // No HTTP status at all means the request never reached the service: a transport failure such as
   // `fetch failed`, a reset socket or a DNS blip. Those deserve the same bounded retry as a 429.
-  return TRANSPORT_FAILURE.test(String((error as { message?: unknown })?.message ?? ''));
+  return TRANSPORT_FAILURE.test(message);
 }
 
 const TRANSPORT_FAILURE = /fetch failed|network|socket|terminated|ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN/i;
+const QUOTA_EXHAUSTED = /exceeded your current quota|quota_exceeded|billing/i;
 
 export function createGeminiEmbedCall(apiKey: string, model: string): EmbedCall {
   const client = new GoogleGenAI({ apiKey, httpOptions: { timeout: 60_000 } });

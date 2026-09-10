@@ -1,0 +1,4 @@
+Turbine,Alarm_Code,Job Summary,Diagnosis,Action Taken,Date Completed
+WT-10,GEAR-TMP-402,Gearbox cooler service after temperature excursion,Cooler matrix fouling reduced heat rejection,Cooler matrix cleaned and refitted; temperature returned to normal band,2026-07-05
+WT-10,GEAR-TMP-402,Cooler fan controller replacement,Fan controller operating intermittently at high ambient,Controller replaced; fan operation confirmed steady on restart,2026-09-01
+WT-10,YAW-POS-118,Yaw encoder wiring inspection,Encoder wiring connector partially unseated,Connector re-seated and locked; encoder agreement restored,2026-08-11

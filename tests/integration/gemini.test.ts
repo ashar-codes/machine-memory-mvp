@@ -88,6 +88,14 @@ describe('free-tier rate limiting', () => {
     expect(isTransient(httpError(404))).toBe(false);
   });
 
+  it('does not retry a 429 that reports an exhausted quota', () => {
+    // A daily quota does not clear inside a backoff window; retrying just adds latency.
+    const exhausted = Object.assign(new Error('429 You exceeded your current quota, please check your plan and billing details.'), { status: 429 });
+    expect(isTransient(exhausted)).toBe(false);
+    const perMinute = Object.assign(new Error('429 Too many requests, retry shortly.'), { status: 429 });
+    expect(isTransient(perMinute)).toBe(true);
+  });
+
   it('treats a transport failure that never got a status as transient', () => {
     // Observed in real ingestion: undici raises `TypeError: fetch failed` with no HTTP status.
     expect(isTransient(new TypeError('fetch failed'))).toBe(true);

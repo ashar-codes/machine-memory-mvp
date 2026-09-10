@@ -48,13 +48,18 @@ const ANSWER_SCHEMA = {
 // This machine's route to the API drops connections intermittently. Without a bounded retry a
 // single blip silently costs the request its semantic evidence, so both calls get the same
 // treatment the offline ingester gets: retry transport failures, 429 and 5xx, then give up.
+// A 429 that reports an exhausted quota will not clear within a retry window: backing off just
+// burns ten seconds per request and makes the interface feel broken. A per-minute rate limit will.
+const QUOTA_EXHAUSTED = /exceeded your current quota|quota_exceeded|billing/i;
 const TRANSIENT = /fetch failed|network|socket|terminated|ECONNRESET|ECONNREFUSED|ETIMEDOUT|EAI_AGAIN/i;
 const MAX_ATTEMPTS = 4;
 
 function isTransient(error: unknown): boolean {
   const status = (error as { status?: unknown })?.status;
-  if (typeof status === 'number') return status === 429 || (status >= 500 && status < 600);
-  return TRANSIENT.test(String((error as { message?: unknown })?.message ?? ''));
+  const message = String((error as { message?: unknown })?.message ?? '');
+  if (status === 429) return !QUOTA_EXHAUSTED.test(message);
+  if (typeof status === 'number') return status >= 500 && status < 600;
+  return TRANSIENT.test(message);
 }
 
 async function withRetry<T>(operation: () => Promise<T>): Promise<T> {

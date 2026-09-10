@@ -153,7 +153,7 @@ const SYNONYMS: Record<string, string[]> = {
   description: ['description', 'detail', 'details', 'comment', 'comments', 'remark', 'remarks', 'observedsymptoms', 'symptoms', 'observed', 'notes'],
   event_type: ['eventtype', 'maintenancetype', 'worktype', 'activity', 'activitytype', 'type', 'action', 'workperformed', 'workdone', 'maintenanceaction', 'jobtype', 'servicetype'],
   component: ['component', 'part', 'partname', 'componentname', 'item', 'subcomponent', 'parttouched', 'componenttouched', 'assembly', 'equipment'],
-  summary: ['summary', 'worksummary', 'workordersummary', 'subject', 'task', 'workdescription'],
+  summary: ['summary', 'worksummary', 'workordersummary', 'jobsummary', 'job', 'subject', 'task', 'workdescription', 'title'],
   root_cause: ['rootcause', 'cause', 'failurecause', 'diagnosis', 'faultcause'],
   resolution: ['resolution', 'resolutionsummary', 'outcome', 'actiontaken', 'repair', 'correctiveaction', 'fix'],
   completed_at: ['completedat', 'completiondate', 'closeddate', 'finished', 'donedate', 'completed', 'datecompleted', 'closedat'],

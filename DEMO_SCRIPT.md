@@ -47,3 +47,45 @@ Select **WT-07** before anyone is watching so the first thing on screen is a tur
 ## What not to claim
 
 Do not present synthetic history as real plant data. Do not describe the reference corpus as ingested unless `npm run rag:ingest:corpus` actually reported success. Do not read a historical resolution aloud as if it were the approved fix. Do not call any of this equipment control.
+
+## Demo B — Dynamic Machine Memory
+
+The new demonstration. Files are in `data/demo/`; run `npm run demo:reset -- --include-imports`
+beforehand so `WT-10` does not already exist.
+
+Opening line: *"That was a machine the system already knew. Now watch it learn one it has never
+seen."*
+
+1. **Scenario Lab → Add turbine.** Asset code `WT-10`, site `Demonstration Wind Farm`, manufacturer
+   `Fictional Demo OEM`, model `Demo 2MW`. Create it.
+2. **Machine Memory → WT-10.** Empty. Ask the copilot anything and it says so plainly rather than
+   guessing — that honesty is the point, and it is what makes the next step land.
+3. **Data Hub → Event / fault log →** `data/demo/wt10_events.csv`. Pause on the mapping table: the
+   headers are `Turbine_ID`, `Alarm_Code`, `Raised`, `Observed` — nothing like the internal field
+   names. Show that required fields are marked, that a mapping can be corrected in the dropdown,
+   and that the import is blocked until every required field is assigned. Import 4 rows.
+4. **AI Copilot → asset scope →** *"Has this happened before?"* Three `GEAR-TMP-402` occurrences,
+   two of them prior. **The count is computed in SQL, not by the model.**
+5. **Data Hub → Work orders →** `data/demo/wt10_work_orders.csv`. Import.
+6. **AI Copilot →** *"How was it solved previously?"* The recorded causes and outcomes come back,
+   labelled as user-imported and explicitly not an approved procedure.
+7. **Data Hub → Maintenance history →** `data/demo/wt10_maintenance.csv`, then ask *"What changed
+   recently?"* — the change window is SQL-computed, and nothing claims causation.
+8. **Knowledge Base → Index a technical document →** `data/demo/gearbox_thermal_note.txt`.
+   Title it, upload, and watch it chunk, embed and report *Knowledge indexed successfully*.
+9. **AI Copilot →** *"What does the technical reference say about gearbox oil cooler fouling on this
+   platform?"* The new document appears in the citations — and the answer says it is unreviewed
+   user-imported material, because uploading a file adds knowledge, never authority.
+10. **Safety, on the new machine:** *"Can I bypass the gearbox temperature protection and keep
+    running?"* Refused, with OSHA evidence, exactly as on WT-07.
+11. **Fleet.** WT-10 now appears alongside WT-07 under recurring faults.
+
+Closing line: *"Machine Memory learned an entirely new machine and its technical knowledge without
+retraining Gemini. Nothing was fine-tuned. The turbine simply has a memory now."*
+
+### If the model is unavailable
+
+Free-tier quota is finite. If Gemini is rate-limited during the demo, answers still come back —
+assembled deterministically from the retrieved evidence, with the same counts, the same citations
+and the same refusals. Say so out loud: it demonstrates that the machine's memory lives in the
+database, not in the model.
