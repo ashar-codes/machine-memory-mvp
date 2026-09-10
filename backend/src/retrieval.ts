@@ -1,6 +1,6 @@
 // Structured and semantic retrieval. Every statement here is repository-owned, parameterized SQL.
 // The language model never sees this file's queries, never supplies SQL and never reaches the database.
-import type { AuthorityClass, Intent, RecordOrigin } from '@machine-memory/shared';
+import { RECORD_ORIGINS, type AuthorityClass, type Intent, type RecordOrigin } from '@machine-memory/shared';
 
 /** Minimal database surface. `pg.Pool` is adapted to this in app.ts so tests can supply a fake. */
 export interface Queryable {
@@ -88,8 +88,7 @@ function count(value: unknown): number {
 }
 function origin(value: unknown): RecordOrigin {
   const candidate = text(value);
-  return (['public_data', 'public_reference', 'synthetic_demo', 'user_demo'] as const)
-    .includes(candidate as RecordOrigin) ? candidate as RecordOrigin : 'synthetic_demo';
+  return (RECORD_ORIGINS as readonly string[]).includes(candidate) ? candidate as RecordOrigin : 'synthetic_demo';
 }
 function authority(value: unknown): AuthorityClass {
   const candidate = text(value);
@@ -403,9 +402,11 @@ export async function searchKnowledge(
 const PUBLIC_ORIGINS: RecordOrigin[] = ['public_data', 'public_reference'];
 
 const TECHNICAL_FILTER = (asset: AssetContext): KnowledgeFilter => ({
-  authorityClasses: ['OEM', 'REGULATOR', 'RESEARCH'],
+  authorityClasses: ['OEM', 'REGULATOR', 'RESEARCH', 'HISTORICAL', 'UNVERIFIED'],
   sourceTypes: ['TECHNICAL_REFERENCE', 'SAFETY_REFERENCE'],
-  recordOrigins: PUBLIC_ORIGINS, assetType: asset.assetType,
+  // User-imported documents are retrievable as context. `procedural` below still requires a public
+  // origin, so an uploaded file is cited but never counts as authoritative guidance.
+  recordOrigins: [...PUBLIC_ORIGINS, 'user_import'], assetType: asset.assetType,
   manufacturer: asset.manufacturer, model: asset.model, role: 'TECHNICAL_REFERENCE',
 });
 const SAFETY_FILTER = (asset: AssetContext): KnowledgeFilter => ({
@@ -415,7 +416,7 @@ const SAFETY_FILTER = (asset: AssetContext): KnowledgeFilter => ({
 });
 const NARRATIVE_FILTER = (asset: AssetContext): KnowledgeFilter => ({
   authorityClasses: ['HISTORICAL', 'UNVERIFIED'], sourceTypes: ['TECHNICIAN_NOTE'],
-  recordOrigins: ['synthetic_demo', 'user_demo'], assetType: asset.assetType,
+  recordOrigins: ['synthetic_demo', 'user_demo', 'user_import', 'simulation'], assetType: asset.assetType,
   manufacturer: asset.manufacturer, model: asset.model, role: 'FLEET_SEMANTIC',
 });
 

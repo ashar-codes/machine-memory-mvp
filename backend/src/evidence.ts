@@ -85,7 +85,8 @@ export function fuseEvidence(result: RetrievalResult, limit = MAX_EVIDENCE_ITEMS
   return { evidence, raw: ordered };
 }
 
-const DEMO_ORIGINS = ['synthetic_demo', 'user_demo'];
+// Everything a user created locally. None of it may lift an answer out of demo status.
+const DEMO_ORIGINS = ['synthetic_demo', 'user_demo', 'user_import', 'simulation'];
 
 /**
  * Derives strength signals from retrieved evidence only.

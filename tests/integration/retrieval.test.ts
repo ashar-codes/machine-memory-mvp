@@ -136,12 +136,15 @@ describe('RECENT_CHANGES retrieval', () => {
 });
 
 describe('TECHNICAL_GUIDANCE retrieval', () => {
-  it('filters knowledge to reviewed public references with acceptable authority', async () => {
+  it('retrieves reviewed public references alongside user imports, and nothing else', async () => {
     const db = createFakeDatabase();
     await retrieveEvidence(db, { ...base, intent: 'TECHNICAL_GUIDANCE', question: 'Show technical guidance' });
     const knowledgeCall = db.calls.find((call) => call.sql.includes('from public.document_chunks c'));
-    expect(knowledgeCall?.values[0]).toEqual(['OEM', 'REGULATOR', 'RESEARCH']);
-    expect(knowledgeCall?.values[2]).toEqual(['public_data', 'public_reference']);
+    // Uploaded documents must be findable, or dynamic knowledge ingestion would be pointless.
+    // Their admissibility as *guidance* is gated separately, by `procedural`, in the test below.
+    expect(knowledgeCall?.values[0]).toEqual(['OEM', 'REGULATOR', 'RESEARCH', 'HISTORICAL', 'UNVERIFIED']);
+    expect(knowledgeCall?.values[2]).toEqual(['public_data', 'public_reference', 'user_import']);
+    expect(knowledgeCall?.values[2]).not.toContain('synthetic_demo');
     expect(knowledgeCall?.values[3]).toBe('wind_turbine');
   });
 
@@ -153,6 +156,10 @@ describe('TECHNICAL_GUIDANCE retrieval', () => {
     expect(procedural.every((item) => ['public_data', 'public_reference'].includes(item.recordOrigin))).toBe(true);
     const demo = result?.evidence.filter((item) => item.recordOrigin === 'synthetic_demo') ?? [];
     expect(demo.every((item) => item.procedural === false)).toBe(true);
+    // The safety property that must survive dynamic ingestion: an uploaded document is evidence,
+    // never authority. Nothing a user uploads can satisfy the authoritative-reference gate.
+    const imported = result?.evidence.filter((item) => item.recordOrigin === 'user_import') ?? [];
+    expect(imported.every((item) => item.procedural === false)).toBe(true);
   });
 
   it('demotes historical maintenance to context rather than procedural authority', async () => {

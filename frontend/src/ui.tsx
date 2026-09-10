@@ -6,6 +6,8 @@ const ORIGIN_LABEL: Record<RecordOrigin, string> = {
   public_reference: 'Public reference',
   synthetic_demo: 'Synthetic demo',
   user_demo: 'User demo',
+  user_import: 'User import',
+  simulation: 'Simulation',
 };
 
 /** Provenance is shown on every record. A technician must never have to guess where a fact came from. */

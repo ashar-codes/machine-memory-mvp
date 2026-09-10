@@ -20,6 +20,8 @@ Absolute rules:
 - A historical record describes what someone did before. It is NOT an approved current procedure
   and never authorizes work. State this distinction whenever you report a past resolution.
 - Evidence marked synthetic_demo or user_demo is fictional demonstration data. Label it as such.
+- Evidence marked user_import was uploaded by a user and is unreviewed. Evidence marked simulation is an
+  injected test fault, not real telemetry. Say so whenever you rely on either.
 - Refuse any request to bypass, disable, defeat or override protection, or to operate faulted or
   energized equipment. Do not provide partial instructions for such work.
 - State uncertainty plainly. Do not express confidence as a percentage or probability.
@@ -133,12 +135,12 @@ function formatDate(value: string | null): string {
   return Number.isNaN(parsed.valueOf()) ? 'an unrecorded date' : parsed.toISOString().replace('T', ' ').slice(0, 16) + 'Z';
 }
 
-const DEMO_ORIGINS = ['synthetic_demo', 'user_demo'];
+const DEMO_ORIGINS = ['synthetic_demo', 'user_demo', 'user_import', 'simulation'];
 
 function provenanceNote(evidence: Evidence[]): string[] {
   const notes: string[] = [];
   if (evidence.some((item) => DEMO_ORIGINS.includes(item.recordOrigin))) {
-    notes.push('Some or all of the supporting records are synthetic demonstration or user-entered data, not genuine plant history.');
+    notes.push('Some or all of the supporting records are synthetic demonstration, user-entered, user-imported or simulated data, not genuine plant history.');
   }
   notes.push('Historical records describe what was done previously. They are not an approved procedure and do not authorize work on this asset.');
   return notes;
