@@ -13,8 +13,8 @@ import type {
 import { investigate, type InvestigateDeps } from './investigate.js';
 import type { LlmClient } from './llm.js';
 import {
-  INSUFFICIENT_SUMMARY, NO_PROCEDURE_UNCERTAINTY, UNSAFE_SUMMARY,
-  detectUnsafeRequest, validateCitations,
+  INSUFFICIENT_SUMMARY,
+  detectUnsafeRequest, requiresOperationalAuthorization, safetyAnswer, validateCitations,
 } from './rag.js';
 import { DEFAULT_RECURRENCE_MINIMUM, DEFAULT_WINDOW_DAYS, FLEET_OPERATIONS, runPlan, validatePlan } from './fleet.js';
 import type { GenerationProvider, GenerationTrace } from './provider.js';
@@ -148,9 +148,9 @@ export interface CopilotDeps { db: Queryable; llm?: LlmClient | null; now?: Date
 
 export async function runFleetCopilot(question: string, deps: CopilotDeps): Promise<CopilotResponse> {
   // The fleet scope answers with counts, so a prohibited request is refused before any query runs.
-  if (detectUnsafeRequest(question)) {
+  if (detectUnsafeRequest(question) || requiresOperationalAuthorization(question)) {
     return {
-      answer: { summary: UNSAFE_SUMMARY, findings: [], evidenceStrength: 'INSUFFICIENT', uncertainties: [NO_PROCEDURE_UNCERTAINTY], safetyStatus: 'REFUSED' },
+      answer: safetyAnswer({ assetCode: '', intent: 'GENERAL', question })!.answer,
       evidence: [], scope: 'fleet', assetCode: null, plan: null, structuredFacts: {},
     };
   }
@@ -219,7 +219,7 @@ export async function runAssetCopilot(
 
   // A turbine onboarded a minute ago has nothing to retrieve. Say that plainly rather than
   // returning a generic insufficiency that reads like a failure.
-  if (!detectUnsafeRequest(question)) {
+  if (!detectUnsafeRequest(question) && !requiresOperationalAuthorization(question)) {
     const counts = await deps.db.query(`select
       (select count(*)::int from public.asset_events e join public.assets a on a.id=e.asset_id where a.asset_code=$1) as events,
       (select count(*)::int from public.maintenance_events m join public.assets a on a.id=m.asset_id where a.asset_code=$1) as maintenance,

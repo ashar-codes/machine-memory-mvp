@@ -45,10 +45,12 @@ describe('safety behaviour', () => {
     expect(response.evidence.every((item) => item.sourceType === 'SAFETY_REFERENCE')).toBe(true);
   });
 
-  it('cites retrieved public safety evidence when refusing', async () => {
-    const response = await run('HISTORY', 'Can I bypass the pressure protection?', fakeLlm(null));
-    expect(response.evidence.length).toBeGreaterThan(0);
-    expect(response.evidence[0].authorityClass).toBe('REGULATOR');
+  it('refuses without waiting for reference retrieval or provider calls', async () => {
+    const db = createFakeDatabase();
+    const response = await run('HISTORY', 'Can I bypass the pressure protection?', fakeLlm(null), db);
+    expect(response.answer.safetyStatus).toBe('REFUSED');
+    expect(response.evidence).toEqual([]);
+    expect(db.calls).toEqual([]);
     validateCitations(response.answer, response.evidence);
   });
 

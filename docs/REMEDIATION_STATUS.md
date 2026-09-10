@@ -1,0 +1,64 @@
+# Predeployment remediation status
+
+Historical audit: `docs/audits/codex-predeployment-audit-2026-09-11.md`, describing
+`197ff7248dbefc87a6ca254e15d55682115bb349`. Do not modify that report.
+Archive commit: `6a49352`; SHA256 `25f3406f1f18a9244577e576cdc1e63dc3a4d3d24014873922da246f58f74378`.
+Branch: `fix/predeployment-audit`. No later feature commits existed at start.
+
+## Baseline
+
+2026-09-11: lint PASS; typecheck PASS; tests PASS (11 files / 280 tests,
+610 ms); build PASS (40 Vite modules); `git diff --check` PASS.
+Archive inspection: byte-identical to original external report, UTF-8 text,
+no secret-pattern/known configured credential values or embedded binary artifacts.
+Archive-only commit left a clean tree before creating remediation branch.
+
+## Finding ledger
+
+| Phase / finding | Status | Root cause / next work |
+|---|---|---|
+| A / P1-02 | VERIFIED | Generic reference authority was confused with operational authorization. Operational requests now fail closed; expanded action families refuse before DB/provider calls. |
+| A / P1-03 | NOT_STARTED | Valid citation membership does not constrain exact claims; unchecked summary. |
+| B / P2-01 | NOT_STARTED | Generic HISTORY precedes specific change intent; fixed window. |
+| B / P2-02 | NOT_STARTED | No stale-request/context identity protection. |
+| B / P2-06 | NOT_STARTED | UTC text interpreted as local datetime; regex calendar validation. |
+| C / P2-03 | NOT_STARTED | pdf-parse v1 call against installed v2. |
+| C / P2-04 | NOT_STARTED | Optional CSV description inserted as null into NOT NULL field. |
+| C / P2-05 | NOT_STARTED | Concurrent preview commits have no atomic DB claim. |
+| C / P2-08 | NOT_STARTED | Runtime documents use query task; model-space compatibility unenforced. |
+| D / P2-07 | NOT_STARTED | Candidate cap before relevance; authority creates admission. |
+| D / P2-09 | NOT_STARTED | Replay payload combines stored ID with incoming fields. |
+| D / P2-11 | NOT_STARTED | Detached pool acquisition outside catch. |
+| D / P2-10 | NOT_STARTED | Parent not rechecked after embedding; reset leaves derived status. Only fix if small/safe. |
+| E / P1-04 | NOT_STARTED | No global bounded expensive-job admission / slow-consumer handling. |
+| F / false claims | NOT_STARTED | Correct only demonstrated overclaims outside archived audit. |
+| P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
+
+## Checkpoints / verification
+
+### A1 — safety / operational authorization
+
+- Files: `backend/src/{rag,investigate,copilot}.ts`, `tests/integration/investigation.test.ts`,
+  new `tests/integration/remediation-safety.test.ts`, `scripts/verify/safety.ts`.
+- Reproduced before fix: 23 of 25 initial regression cases failed, including generic-authority
+  thresholds and safety requests blocked by a failed DB connection.
+- Tests added: 26 cases (defeat families, buried/manager requests, generic OSHA/NREL,
+  user imports/synthetic history, operational limits, descriptive history allowed).
+- Intentional contract behavior: refused requests no longer retrieve reference citations;
+  they return an empty evidence set without DB, embedding or generation work.
+- No approved asset-specific procedure corpus/authorization contract exists. Generic reviewed
+  material cannot authorize operations. Finite English matching is NOT universal semantic safety.
+- Live: `node --import tsx scripts/verify/safety.ts` passed 7 real loopback HTTP probes,
+  including asset/fleet Copilot. No database writes or paid generation required.
+- Gates: lint/typecheck/build/diff check PASS; full suite **12 files / 306 tests PASS**.
+- Checkpoint: `fix: fail closed for unsupported operational guidance` (hash recorded next checkpoint).
+
+No migrations added/applied, no live DB writes.
+Unit tests must not call paid providers. Live verification must be separate and preserve
+public_data, public_reference and synthetic_demo. Do not run broad reset over user data.
+
+## Continuation
+
+Complete A (P1-02, then P1-03), then B → C → D → E → F in ledger order.
+Run lint/typecheck/relevant tests/diff check for each coherent checkpoint; full gates before final.
+Do not open Internet access or claim local readiness until outstanding correctness gates pass.

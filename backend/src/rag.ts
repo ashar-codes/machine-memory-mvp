@@ -5,29 +5,54 @@ const unsafe = /\b(bypass|(?:defeat|disable|override)\s+(?:(?:an?|the|safety)\s+
 // Topics where an unsupported answer would be a safety claim rather than a history summary.
 const critical = /\b(isolat(?:e|ion)|lockout|tagout|energiz\w*|voltage|torque|pressure|setpoint|protection|interlock|safe(?:ty)?|hydraulic\s+procedure)\b/i;
 
+// Conservative English action families, not a universal semantic-safety classifier. Matching
+// never grants permission; suspicious operational requests also fail closed below.
+const protectiveTarget = /\b(interlocks?|protections?|protective functions?|trips?|safety(?: systems?)?|isolations?|lockout|tagout|emergency stop|alarm protection)\b/i;
+const defeatAction = /\b(disabl\w*|deactivat\w*|switch\w*|turn\w*|defeat\w*|overrid\w*|circumvent\w*|remov\w*|ignor\w*|skip\w*)\b/i;
+const continueDespite = /\b(?:continue|operat\w*|run\w*|restart|generat\w*)\b[^.!?]{0,100}\b(?:despite|without|even (?:if|though)|regardless)\b/i;
+
+/**
+ * This MVP has no reviewed asset-specific procedure/limit authorization records. Public
+ * regulator/research references, historical repairs and upload metadata cannot grant that
+ * authorization. Keep operational requests closed until an explicit approved-evidence
+ * contract exists; do not infer approval from authority_class or an LLM's judgement.
+ */
+export function requiresOperationalAuthorization(question: string): boolean {
+  const text = question.normalize('NFKC').replace(/[\u2010-\u2015_-]/g, ' ');
+  return /\b(thresholds?|setpoints?|torque|voltage|pressure limits?|numeric (?:limits?|values?)|(?:protection|trip) settings?|operating limits?)\b/i.test(text)
+    || /\b(?:correct|approved|required|safe|maximum|minimum|guess)\b[^.!?]{0,70}\b(?:pressure|temperature|speed|load|limit|setting|value)\b/i.test(text)
+    || /\b(?:pressure|temperature|speed|load)\b[^.!?]{0,50}\b(?:should|must|set|apply|limit)\b/i.test(text)
+    || /\b(?:set|adjust|raise|lower|apply)\b[^.!?]{0,70}\b(?:pressure|temperature|speed|load|voltage|torque|limit|setting)\b/i.test(text)
+    || /\b(?:procedure|instructions?|step by step|how (?:do|can|should|to)|tell me (?:how|to))\b[^.!?]{0,100}\b(?:isolat\w*|lockout|tagout|restart|repair|replac\w*|operat\w*|energiz\w*|interlock|protection|turbine|machine|equipment)\b/i.test(text)
+    || /\b(?:isolat\w*|lockout|tagout|hydraulic|repair|restart|maintenance)\b[^.!?]{0,50}\b(?:procedure|instructions?|sequence|steps)\b/i.test(text);
+}
+
 export const UNSAFE_SUMMARY = 'I cannot provide instructions to bypass protections or perform unsafe equipment operation. Follow approved site procedures and consult authorized personnel.';
 export const INSUFFICIENT_SUMMARY = 'Insufficient verified evidence.';
 export const NO_PROCEDURE_UNCERTAINTY = 'No verified asset-specific safety procedure has been retrieved. Historical and demo records do not authorize operational actions.';
 
 /** True when the request asks for a prohibited action, whichever intent the client claimed. */
 export function detectUnsafeRequest(question: string): boolean {
-  return unsafe.test(question);
+  const text = question.normalize('NFKC').replace(/[\u2010-\u2015_-]/g, ' ');
+  return unsafe.test(question) || unsafe.test(text)
+    || /\bisolat\w*\s+incorrectly\b/i.test(text)
+    || text.split(/[.!?\n]/).some((clause) => protectiveTarget.test(clause)
+      && (defeatAction.test(clause) || continueDespite.test(clause)));
 }
 
 /** True when the answer would need authoritative evidence before it may state anything procedural. */
 export function requiresVerifiedEvidence(input: Pick<InvestigateRequest, 'intent' | 'question'>): boolean {
-  return input.intent === 'SAFETY' || input.intent === 'TECHNICAL_GUIDANCE' || critical.test(input.question);
+  return input.intent === 'SAFETY' || input.intent === 'TECHNICAL_GUIDANCE'
+    || requiresOperationalAuthorization(input.question);
 }
 
 /**
- * Pre-retrieval boundary, unchanged from the foundation. Returns a complete refusal or
- * insufficiency response with no evidence. The pipeline calls this only when the database is
- * unavailable; with a database it uses detectUnsafeRequest/requiresVerifiedEvidence so that a
- * refusal can still cite retrieved public safety evidence.
+ * No provider or database is required for a refusal. Also used for the no-database fallback.
  */
 export function safetyAnswer(input: InvestigateRequest): InvestigateResponse | null {
   const refused = detectUnsafeRequest(input.question);
-  if (!refused && input.intent !== 'SAFETY' && !critical.test(input.question)) return null;
+  if (!refused && !requiresOperationalAuthorization(input.question)
+    && input.intent !== 'SAFETY' && !critical.test(input.question)) return null;
   return {
     answer: {
       summary: refused ? UNSAFE_SUMMARY : INSUFFICIENT_SUMMARY,
