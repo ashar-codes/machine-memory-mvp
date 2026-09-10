@@ -14,6 +14,8 @@ import type { Queryable } from './retrieval.js';
 import { runAssetCopilot, runFleetCopilot } from './copilot.js';
 import { createDynamicRoutes, copilotBody, RouteError } from './routes.js';
 import type { GenerationProvider } from './provider.js';
+import { createScadaRoutes, ScadaError } from './scadaRoutes.js';
+import { createStreamHub } from './stream.js';
 import { ImportError } from './imports.js';
 import { KnowledgeError } from './knowledge.js';
 import { TabularError } from './tabular.js';
@@ -68,6 +70,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   });
   // Upload routes parse their own multipart bodies; the JSON parser must not consume them.
   app.use((req,res,next) => req.path.startsWith('/api/import/preview') || req.path.startsWith('/api/knowledge/upload')
+    || req.path.startsWith('/api/scada/')
     ? next() : express.json({ limit: '32kb', strict: true })(req,res,next));
   app.use('/api', rateLimit({ windowMs: 60_000, limit: 120, standardHeaders: 'draft-8', legacyHeaders: false, handler: (_req,_res,next) => next(new ApiError(429,'RATE_LIMITED','Too many requests.')) }));
   const aiLimit = rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: 'draft-8', legacyHeaders: false, handler: (_req,_res,next) => next(new ApiError(429,'RATE_LIMITED','Too many investigation requests.')) });
@@ -79,6 +82,32 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   // Parsed uploads are held between preview and commit only, bounded and TTL-expired in routes.ts.
   const previews = new Map<string, { table: Table; importType: string; filename: string; expiresAt: number }>();
   const dynamicRoutes = createDynamicRoutes({ pool, llm, embeddingModel, embeddingDimensions: EMBEDDING_DIMENSIONS, queryable, previews });
+  const hub = createStreamHub();
+  const scadaRoutes = createScadaRoutes({
+    pool, llm, queryable, hub,
+    // The event is already committed by the time this runs. Investigation is strictly best-effort:
+    // if retrieval or every model provider is unavailable, the fault stays recorded regardless.
+    onCriticalEvent: (event) => {
+      if (!pool) return;
+      void (async () => {
+        try {
+          const outcome = await investigate(
+            { assetCode: event.assetCode, eventCode: event.eventCode, intent: 'GENERAL',
+              question: `A ${event.severity} ${event.eventCode} event was just recorded on ${event.assetCode}. What does this machine's memory show about it?` },
+            { db: queryable(pool), llm, onDegraded: (stage) => console.warn(`Automatic investigation degraded at stage: ${stage}.`) },
+          );
+          if (outcome.status !== 'ok') return;
+          hub.publish({ type: 'event', payload: {
+            ...(event as unknown as Record<string, unknown>),
+            investigation: { answer: outcome.response.answer, evidence: outcome.response.evidence },
+          } });
+        } catch {
+          // Never rethrow into the ingest path: the fault is recorded, the analysis is a bonus.
+          console.warn('Automatic investigation failed; the event remains recorded.');
+        }
+      })();
+    },
+  });
   async function findAsset(assetCode: string) {
     const result = await db().query(`SELECT ${assetFields} FROM public.assets WHERE asset_code=$1`, [assetCode]);
     if (!result.rows[0]) throw new ApiError(404,'ASSET_NOT_FOUND','Asset not found.');
@@ -220,11 +249,12 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     res.json({ assetCode: asset.asset_code, empty: total === 0, counts: camelRow(row) });
   });
   app.use(dynamicRoutes);
+  app.use(scadaRoutes);
   app.use((_req,_res,next) => next(new ApiError(404,'NOT_FOUND','Route not found.')));
   const errorHandler: ErrorRequestHandler = (error,_req,res,_next) => {
     let status = 500, code = 'INTERNAL_ERROR', message = 'The request could not be completed.';
     if (error instanceof z.ZodError) { status=400;code='VALIDATION_ERROR';message='Request fields are invalid or unsupported.'; }
-    else if (error instanceof ApiError || error instanceof RouteError) { status=error.status;code=error.code;message=error.message; }
+    else if (error instanceof ApiError || error instanceof RouteError || error instanceof ScadaError) { status=error.status;code=error.code;message=error.message; }
     // These carry a rule description, never uploaded file contents, so they are safe to return.
     else if (error instanceof UploadError) { status=400;code='UPLOAD_REJECTED';message=error.message; }
     else if (error instanceof TabularError) { status=400;code='FILE_UNREADABLE';message=error.message; }

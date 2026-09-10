@@ -10,6 +10,7 @@ import type pg from 'pg';
 import type { ImportPreview, ImportReport, KnowledgeUploadReport } from '@machine-memory/shared';
 import { runAssetCopilot, runFleetCopilot } from './copilot.js';
 import { fleetSummary, recurringFaults } from './fleet.js';
+import { recordEvent } from './events.js';
 import { commitImport, ImportError, refreshAssetStatus } from './imports.js';
 import { chunkText, deleteSource, getSource, ingestDocument, KnowledgeError, listSources } from './knowledge.js';
 import type { LlmClient } from './llm.js';
@@ -145,19 +146,19 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     const client = await db().connect();
     try {
       await client.query('BEGIN');
-      const asset = await client.query('select id from public.assets where asset_code = $1 FOR KEY SHARE', [input.assetCode]);
-      if (!asset.rows[0]) throw new RouteError(404, 'ASSET_NOT_FOUND', 'Asset not found.');
-      // Simulation provenance is stored on the row itself, so a fabricated fault can never be
-      // displayed, cited or exported as if it were real telemetry.
-      const origin = input.simulation ? 'simulation' : 'user_demo';
-      const created = await client.query(
-        `insert into public.asset_events (asset_id, event_code, title, subsystem, severity, occurred_at, description, record_origin)
-         values ($1,$2,$3,$4,$5,$6,$7,$8)
-         returning id, asset_id, event_code, title, subsystem, severity, occurred_at, cleared_at, description, record_origin`,
-        [asset.rows[0].id, input.eventCode, input.title, input.subsystem ?? null, input.severity, input.occurredAt, input.description ?? null, origin]);
-      await refreshAssetStatus(deps.queryable(client), [input.assetCode]);
+      // The same shared path the operational-event boundary uses. There is deliberately no second
+      // way to write an asset_events row: provenance and status handling must not diverge.
+      const outcome = await recordEvent(deps.queryable(client), {
+        assetCode: input.assetCode, eventCode: input.eventCode, title: input.title,
+        subsystem: input.subsystem ?? null, severity: input.severity, occurredAt: input.occurredAt,
+        description: input.description ?? null,
+        // Simulation provenance is stored on the row itself, so a fabricated fault can never be
+        // displayed, cited or exported as if it were real telemetry.
+        recordOrigin: input.simulation ? 'simulation' : 'user_demo',
+      });
+      if (outcome.status === 'asset_not_found') throw new RouteError(404, 'ASSET_NOT_FOUND', 'Asset not found.');
       await client.query('COMMIT');
-      res.status(201).json({ event: camel(created.rows[0]) });
+      res.status(201).json({ event: camel(outcome.event) });
     } catch (error) {
       await client.query('ROLLBACK').catch(() => undefined);
       throw error;

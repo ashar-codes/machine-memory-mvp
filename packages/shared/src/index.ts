@@ -69,3 +69,23 @@ export interface FleetSummary {
   totals:{assets:number; healthy:number; warning:number; faulted:number; other:number; openIncidents:number; recurringFaults:number; knowledgeSources:number; knowledgeChunks:number};
   recentMemory:{kind:string; title:string; detail:string; timestamp:string; recordOrigin:RecordOrigin; assetCode:string|null}[];
 }
+
+// ---- v1.3 read-only operational-event boundary. Additive; nothing above changed. ----
+export const SCADA_SEVERITIES = ['info','warning','critical'] as const;
+export type ScadaSeverity = typeof SCADA_SEVERITIES[number];
+export interface ScadaSignal {label:string; value:number; unit:string}
+/** Illustrative demonstration values. Not OEM thresholds, never embedded, never cited as evidence. */
+export interface ScadaEventPayload {
+  id:string; assetCode:string; eventCode:string; title:string; subsystem:string|null;
+  severity:ScadaSeverity; occurredAt:string; description:string|null; recordOrigin:RecordOrigin;
+  source:string; externalEventId:string; duplicate:boolean; signalSnapshot:ScadaSignal[];
+}
+export interface ScadaTelemetryPayload {
+  runId:string; assetCode:string; title:string; severity:ScadaSeverity; occurredAt:string; signalSnapshot:ScadaSignal[];
+}
+export interface ScadaRunPayload {runId:string; scenarioId:string; assetCode:string; status:'started'|'finished'|'stopped'|'failed'; step?:number; total?:number}
+export interface ScadaScenario {id:string; name:string; summary:string; steps:number; durationSeconds:number}
+export interface ScadaStatus {connected:boolean; simulated:true; source:string; running:boolean; scenarios:ScadaScenario[]; recentEvents:ScadaEventPayload[]}
+export interface StartSimulationRequest {scenarioId:string; assetCode:string; speed?:'1x'|'fast'}
+export interface StartSimulationResponse {runId:string; scenarioId:string; assetCode:string; status:'started'}
+
