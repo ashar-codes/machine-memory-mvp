@@ -56,6 +56,18 @@ describe('recurrence and frequency', () => {
   });
 
   it.each([
+    'How many event records are stored for this turbine in total?',
+    'How many events are recorded on this turbine altogether?',
+    'What is the total number of faults logged for this machine?',
+  ])('counts over the whole asset when the question names the turbine: %s', (question) => {
+    // The defect: the counting branch re-derived its own scope and dropped the "this turbine"
+    // rule, so an asset-wide total was answered as the selected event's recurrence.
+    const routed = route(question);
+    expect(routed.aggregate).toBe(true);
+    expect(routed.scope).toBe('ASSET_WIDE');
+  });
+
+  it.each([
     'Has this happened before?',
     'Has it recurred?',
     'Have we seen this before?',

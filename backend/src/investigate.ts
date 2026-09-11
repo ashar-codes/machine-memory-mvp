@@ -14,9 +14,10 @@ import {
   detectUnsafeRequest, requiresOperationalAuthorization, requiresVerifiedEvidence, safetyAnswer, scoreEvidence, validateCitations,
 } from './rag.js';
 import {
-  loadAsset, recentChangeDays, retrieveEvidence,
+  knownEventCodes, loadAsset, recentChangeDays, retrieveEvidence,
   type Queryable, type RawEvidence, type RetrievalResult,
 } from './retrieval.js';
+import { extractEventCodes, routeQuery } from './routing.js';
 import { buildBundle, deterministicAnswer, groundModelAnswer, parseModelAnswer, type DraftAnswer } from './synthesis.js';
 
 export interface InvestigateOverrides {
@@ -84,7 +85,36 @@ export async function investigate(input: InvestigateRequest, deps: InvestigateDe
   if (!asset) {
     return { status: 'asset_not_found' };
   }
-  if (input.intent === 'RECENT_CHANGES' && recentChangeDays(input.question) === null) {
+
+  // A request that names no intent is free text, and free text is routed here.
+  //
+  // This is the shared point every caller passes through, so the typed Machine Memory box, the
+  // copilot and any future entry point resolve the same question the same way: a code named in
+  // the sentence outranks the selected one, and an asset-wide question is not narrowed to it.
+  // Callers that already know the intent — the preset probes, the copilot's own router, the
+  // operational-event boundary — supply it and are used exactly as given.
+  let { intent, eventCode } = input;
+  let routing = deps.routing;
+  if (!intent) {
+    // The lookup only normalizes the spelling of a code the question actually contains, so it is
+    // skipped entirely when none does.
+    const known = extractEventCodes(input.question).length > 0
+      ? await knownEventCodes(deps.db, input.assetCode) : [];
+    const routed = routeQuery(input.question, { currentEventCode: eventCode ?? null, knownEventCodes: known });
+    if (routed.clarification) {
+      deps.onGeneration?.('deterministic');
+      return { status: 'ok', response: { evidence: [], answer: {
+        summary: routed.clarification, findings: [],
+        uncertainties: ['No investigation was run, because the question could be read more than one way.'],
+        evidenceStrength: 'INSUFFICIENT', safetyStatus: 'INSUFFICIENT',
+      } } };
+    }
+    intent = routed.intent;
+    eventCode = routed.eventCode ?? undefined;
+    routing = { scope: routed.scope, aggregate: routed.aggregate };
+  }
+
+  if (intent === 'RECENT_CHANGES' && recentChangeDays(input.question) === null) {
     deps.onGeneration?.('deterministic');
     return { status: 'ok', response: { evidence: [], answer: {
       summary: 'Choose a recent-change window of 7, 30 or 90 days, ending at the selected event (or now when no event exists).',
@@ -100,8 +130,8 @@ export async function investigate(input: InvestigateRequest, deps: InvestigateDe
   }
 
   const result = await timed(deps, 'retrieval', () => retrieveEvidence(deps.db, {
-    intent: input.intent, assetCode: input.assetCode, eventCode: input.eventCode,
-    question: input.question, embedding, now: deps.now, scope: deps.routing?.scope,
+    intent, assetCode: input.assetCode, eventCode,
+    question: input.question, embedding, now: deps.now, scope: routing?.scope,
   }));
   if (!result) return { status: 'asset_not_found' };
 
@@ -111,7 +141,7 @@ export async function investigate(input: InvestigateRequest, deps: InvestigateDe
 
   // General reference questions may use reviewed material. This is evidence availability,
   // NOT authorization for operational instructions/limits (closed before retrieval above).
-  const needsVerified = requiresVerifiedEvidence(input);
+  const needsVerified = requiresVerifiedEvidence({ intent, question: input.question });
   const authoritative = hasAuthoritativeReference(raw);
   const safetyStatus: Answer['safetyStatus'] = needsVerified && !authoritative ? 'INSUFFICIENT' : 'NORMAL';
 

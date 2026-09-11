@@ -168,11 +168,14 @@ export function routeQuery(question: string, context: RouteContext = {}): Routed
     return { intent: 'SIMILAR_INCIDENTS', scope: 'FLEET', eventCode, aggregate, clarification: null, reason: 'fleet comparison' };
   }
 
-  // "How often has X occurred" is a counting question: aggregate facts, scoped to the named code.
+  // "How often has X occurred" is a counting question: aggregate facts, scoped by the same rules
+  // as every other intent. Re-deriving the scope here instead of calling scopeFor dropped the
+  // "this turbine" rule, so "how many event records are stored for this turbine in total" was
+  // answered about the selected event's recurrence rather than the asset's own total.
   if (aggregate) {
     return {
       intent: 'HISTORY',
-      scope: explicitCode ? 'EVENT_CODE' : has(text, ASSET_WIDE) ? 'ASSET_WIDE' : context.currentEventCode ? 'CURRENT_EVENT' : 'ASSET_WIDE',
+      scope: scopeFor(context.currentEventCode ? 'CURRENT_EVENT' : 'ASSET_WIDE'),
       eventCode, aggregate: true, clarification: null, reason: 'asks for a count',
     };
   }

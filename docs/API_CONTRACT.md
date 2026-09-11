@@ -16,7 +16,7 @@ Uploads are multipart and retain their existing per-file/field bounds.
 | GET /api/assets/:assetCode/current-event | Current event or null |
 | GET /api/assets/:assetCode/incidents; /timeline | Paginated incident/history records |
 | GET /api/assets/:assetCode/memory-status; /event-summary | Stored history counts and event summary |
-| POST /api/investigate | InvestigateRequest → InvestigateResponse |
+| POST /api/investigate | InvestigateRequest → InvestigateResponse; omit `intent` for free text and the question is routed |
 | POST /api/copilot | CopilotRequest → CopilotResponse, asset or fleet scope |
 | POST /api/resolutions | 201 ResolutionResponse; structured saved, semantic pending |
 | POST /api/assets; POST /api/events | 201 user-created asset or demonstration event |

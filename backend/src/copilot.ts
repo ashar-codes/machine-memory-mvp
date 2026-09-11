@@ -18,7 +18,7 @@ import {
 } from './rag.js';
 import { DEFAULT_RECURRENCE_MINIMUM, DEFAULT_WINDOW_DAYS, FLEET_OPERATIONS, runPlan, validatePlan } from './fleet.js';
 import type { GenerationProvider, GenerationTrace } from './provider.js';
-import type { Queryable } from './retrieval.js';
+import { knownEventCodes as lookupEventCodes, type Queryable } from './retrieval.js';
 import { extractEventCodes, routeQuery, type RoutedQuery } from './routing.js';
 import { isQualitativeCommentary } from './synthesis.js';
 
@@ -226,13 +226,8 @@ export async function runAssetCopilot(
   // never for a request that will be refused: the fail-closed safety gate must reach its refusal
   // without touching the database, and most questions need no lookup at all.
   const refusable = detectUnsafeRequest(question) || requiresOperationalAuthorization(question);
-  const knownEventCodes: string[] = [];
-  if (!refusable && extractEventCodes(question).length > 0) {
-    const known = await deps.db.query(
-      `select distinct e.event_code from public.asset_events e
-         join public.assets a on a.id = e.asset_id where a.asset_code = $1 limit 500`, [input.assetCode]);
-    knownEventCodes.push(...known.rows.map((row) => String(row.event_code)));
-  }
+  const knownEventCodes = !refusable && extractEventCodes(question).length > 0
+    ? await lookupEventCodes(deps.db, input.assetCode) : [];
   const routed: RoutedQuery = routeQuery(question, {
     currentEventCode: input.eventCode ?? null, knownEventCodes,
   });

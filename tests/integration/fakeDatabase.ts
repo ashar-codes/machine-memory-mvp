@@ -84,6 +84,8 @@ export interface FakeOptions {
   knowledge?: Row[];
   extraResolutions?: Row[];
   assetCodes?: string[];
+  /** Additional events on the fixture assets, for questions that name a second code. */
+  extraEvents?: Row[];
 }
 
 const time = (value: unknown) => new Date(String(value)).getTime();
@@ -95,6 +97,7 @@ export function createFakeDatabase(options: FakeOptions = {}): FakeDatabase {
     ? assets.filter((asset) => options.assetCodes?.includes(String(asset.asset_code)))
     : assets;
   const calls: FakeDatabase['calls'] = [];
+  const allEvents = [...events, ...(options.extraEvents ?? [])];
 
   return {
     calls,
@@ -102,12 +105,49 @@ export function createFakeDatabase(options: FakeOptions = {}): FakeDatabase {
       calls.push({ sql, values });
       const has = (fragment: string) => sql.includes(fragment);
 
+      // Checked before the fleet statement below, which shares its join clause.
+      if (has('select distinct e.event_code')) {
+        const asset = visibleAssets.find((row) => row.asset_code === values[0]);
+        const codes = [...new Set(allEvents.filter((row) => row.asset_id === asset?.id).map((row) => row.event_code))];
+        return { rows: codes.map((event_code) => ({ event_code })) };
+      }
+      // Asset-wide totals: counted over every code on the asset, never over the selected one.
+      if (has('count(distinct event_code)')) {
+        const rows = allEvents.filter((row) => row.asset_id === values[0]);
+        const sorted = [...rows].sort((a, b) => time(a.occurred_at) - time(b.occurred_at));
+        return { rows: [{
+          total: rows.length, codes: new Set(rows.map((row) => row.event_code)).size,
+          first_at: sorted[0]?.occurred_at ?? null, last_at: sorted[sorted.length - 1]?.occurred_at ?? null,
+        }] };
+      }
+      if (has('group by event_code order by count(*) desc')) {
+        const byCode = new Map<string, Row[]>();
+        for (const row of allEvents.filter((item) => item.asset_id === values[0])) {
+          byCode.set(String(row.event_code), [...(byCode.get(String(row.event_code)) ?? []), row]);
+        }
+        return { rows: [...byCode.entries()]
+          .sort((a, b) => (b[1].length - a[1].length) || a[0].localeCompare(b[0]))
+          .slice(0, 8)
+          .map(([event_code, rows]) => ({ event_code, occurrences: rows.length, title: rows[0].title })) };
+      }
+      // The copilot's "does this asset have any memory at all" probe.
+      if (has('as asset_exists')) {
+        const asset = visibleAssets.find((row) => row.asset_code === values[0]);
+        return { rows: [{
+          events: allEvents.filter((row) => row.asset_id === asset?.id).length,
+          maintenance: maintenance.filter((row) => row.asset_id === asset?.id).length,
+          work_orders: workOrders.filter((row) => row.asset_id === asset?.id).length,
+          notes: notes.filter((row) => row.asset_id === asset?.id).length,
+          resolutions: allResolutions.filter((row) => row.asset_id === asset?.id).length,
+          asset_exists: asset ? 1 : 0,
+        }] };
+      }
       if (has('from public.assets where asset_code')) {
         return { rows: visibleAssets.filter((row) => row.asset_code === values[0]) };
       }
       if (has('order by (cleared_at is null) desc')) {
         const [assetId, eventCode] = values;
-        const matching = events
+        const matching = allEvents
           .filter((row) => row.asset_id === assetId && (eventCode == null || row.event_code === eventCode))
           .sort((a, b) => (Number(b.cleared_at === null) - Number(a.cleared_at === null))
             || (time(b.occurred_at) - time(a.occurred_at)));
@@ -115,7 +155,7 @@ export function createFakeDatabase(options: FakeOptions = {}): FakeDatabase {
       }
       if (has('previous_count')) {
         const [assetId, eventCode, selectedId, anchor] = values;
-        const previous = events.filter((row) => row.asset_id === assetId && row.event_code === eventCode
+        const previous = allEvents.filter((row) => row.asset_id === assetId && row.event_code === eventCode
           && time(row.occurred_at) <= time(anchor) && (selectedId == null || row.id !== selectedId));
         const sorted = [...previous].sort((a, b) => time(a.occurred_at) - time(b.occurred_at));
         return {
@@ -131,9 +171,13 @@ export function createFakeDatabase(options: FakeOptions = {}): FakeDatabase {
       }
       if (has('from public.asset_events') && has('order by occurred_at desc, id desc')) {
         const [assetId, eventCode, selectedId, anchor] = values;
-        return {
-          rows: events.filter((row) => row.asset_id === assetId && row.event_code === eventCode
+        // Asset-wide retrieval binds the asset alone; event-scoped history also binds the code.
+        const scoped = has('and event_code = $2')
+          ? allEvents.filter((row) => row.event_code === eventCode
             && time(row.occurred_at) <= time(anchor) && (selectedId == null || row.id !== selectedId))
+          : allEvents;
+        return {
+          rows: scoped.filter((row) => row.asset_id === assetId)
             .sort((a, b) => time(b.occurred_at) - time(a.occurred_at)),
         };
       }
@@ -163,7 +207,7 @@ export function createFakeDatabase(options: FakeOptions = {}): FakeDatabase {
       if (has('join public.assets a on a.id = e.asset_id')) {
         const [eventCode, assetId] = values;
         return {
-          rows: events.filter((row) => row.event_code === eventCode && row.asset_id !== assetId).map((row) => {
+          rows: allEvents.filter((row) => row.event_code === eventCode && row.asset_id !== assetId).map((row) => {
             const asset = assets.find((candidate) => candidate.id === row.asset_id) ?? {};
             const incident = incidents.find((candidate) => candidate.asset_id === row.asset_id && candidate.event_code === eventCode) ?? {};
             return { ...row, asset_code: asset.asset_code, asset_type: asset.asset_type, manufacturer: asset.manufacturer, model: asset.model, symptoms: incident.symptoms ?? null, root_cause: incident.root_cause ?? null, resolution_summary: incident.resolution_summary ?? null };
@@ -176,7 +220,7 @@ export function createFakeDatabase(options: FakeOptions = {}): FakeDatabase {
           ...maintenance.filter((row) => row.asset_id === assetId).map((row) => ({ id: row.id, kind: 'MAINTENANCE', title: row.event_type, description: row.description, at: row.occurred_at, record_origin: row.record_origin })),
           ...workOrders.filter((row) => row.asset_id === assetId).map((row) => ({ id: row.id, kind: 'WORK_ORDER', title: row.summary, description: row.resolution, at: row.completed_at ?? row.created_at, record_origin: row.record_origin })),
           ...allResolutions.filter((row) => row.asset_id === assetId).map((row) => ({ id: row.id, kind: 'RESOLUTION', title: `Resolution: ${String(row.event_code)}`, description: row.resolution_summary, at: row.created_at, record_origin: row.record_origin })),
-          ...events.filter((row) => row.asset_id === assetId).map((row) => ({ id: row.id, kind: 'ASSET_EVENT', title: `${String(row.event_code)} — ${String(row.title)}`, description: row.description, at: row.occurred_at, record_origin: row.record_origin })),
+          ...allEvents.filter((row) => row.asset_id === assetId).map((row) => ({ id: row.id, kind: 'ASSET_EVENT', title: `${String(row.event_code)} — ${String(row.title)}`, description: row.description, at: row.occurred_at, record_origin: row.record_origin })),
         ];
         return {
           rows: rows.filter((row) => time(row.at) >= time(start) && time(row.at) <= time(end))
