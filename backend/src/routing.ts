@@ -89,10 +89,21 @@ const FLEET = /\b(other turbines?|across the fleet|fleet[- ]wide|fleet|other ass
 const AGGREGATE = /\b(how (often|many|frequently)|how much|number of|count of|total( number)?|frequency|times has|times did)\b/;
 const RESOLUTION = /\b(solved|resolved|fix(ed)?|repair\w*|resolution|root cause|corrective action|what was done)\b/;
 /** Named publishers, standards bodies and words that only occur in requests for literature. */
-const REFERENCE_SIGNAL = /\b(osha|nrel|iec|iso|ansi|cfr|manual\w*|document\w*|reference\w*|literature|research|published|publication\w*|guidance|standard\w*|specification\w*|technical (note|report|reference|guidance)|white ?paper|study|studies)\b/;
+const REFERENCE_SIGNAL = /\b(osha|nrel|iec|iso|ansi|cfr|manual\w*|document\w*|reference\w*|literature|research|published|publication\w*|guidance|standard\w*|specification\w*|technical (note|report|reference|guidance)|white ?paper|study|studies|note)\b/;
+/**
+ * "What does X say about Y" is a question about a source, whatever X is. This is how a question
+ * about a just-uploaded document reaches reference retrieval instead of machine history.
+ */
+const QUOTES_A_SOURCE = /\bwhat does\b[^?]{0,60}\b(say|state|mention|cover|describe)\b|\baccording to\b|\bsays? about\b|\bstates? about\b/;
 /** Subjects that indicate an engineering topic rather than one machine's log. */
 const TOPICAL_SUBJECT = /\b(reliability|durability|design life|failure modes?|best practice|hazardous energy|lockout|tagout|drivetrain|gearbox|bearing|pitch system|converter|generator|o&m|operations and maintenance)\b/;
 const CHANGE_SIGNAL = /\b(chang\w*|replac\w*|swapp\w*|serviced|work (was )?(done|carried out)|what was touched)\b/;
+/**
+ * Named maintenance activity. Distinct from CHANGE_SIGNAL because "what maintenance was carried
+ * out on this turbine recently" names no change verb, and fell through to plain history, which
+ * answered with the whole event log instead of the recorded work.
+ */
+const MAINTENANCE_SUBJECT = /\b(maintenance|service[sd]?|servicing|inspect\w*|overhaul\w*|work orders?)\b/;
 const BEFORE_FAULT = /\b(before|prior to|preceding|leading up to|ahead of)\b.{0,30}\b(this |the )?(fault|event|alarm|failure|it)\b/;
 const RECENCY = /\b(recent\w*|lately|last \d+\s*(day|week|month)s?|past \d+\s*(day|week|month)s?|in the last|since)\b/;
 const HISTORY_SIGNAL = /\b(previous\w*|before|recur\w*|happened|history|again|past|occurr\w*|seen before|ever)\b/;
@@ -143,7 +154,8 @@ export function routeQuery(question: string, context: RouteContext = {}): Routed
   // A request for literature is topical even when it also says "maintenance". This is the case
   // that a keyword chain got wrong: "wind turbine drivetrain reliability maintenance" is a subject,
   // not a question about this machine's change window.
-  const wantsReference = has(text, REFERENCE_SIGNAL) || (has(text, TOPICAL_SUBJECT) && !aboutThisMachine);
+  const wantsReference = has(text, REFERENCE_SIGNAL) || has(text, QUOTES_A_SOURCE)
+    || (has(text, TOPICAL_SUBJECT) && !aboutThisMachine);
   if (wantsReference && !aggregate) {
     return { intent: 'TECHNICAL_GUIDANCE', scope: aboutThisMachine ? scopeFor('CURRENT_EVENT') : 'ASSET_WIDE', eventCode, aggregate, clarification: null, reason: 'request for published reference material' };
   }
@@ -165,10 +177,11 @@ export function routeQuery(question: string, context: RouteContext = {}): Routed
     };
   }
 
-  // The change window is specifically "what was done before this fault". A bare mention of
-  // maintenance is not enough; it needs a change verb or an explicit before-the-fault framing.
-  if ((has(text, CHANGE_SIGNAL) && (aboutThisMachine || has(text, RECENCY))) || has(text, BEFORE_FAULT)
-    || (/\bmaintenance\b/.test(text) && has(text, BEFORE_FAULT))) {
+  // The change window answers "what was done to this machine". A bare mention of maintenance is
+  // not enough — that is what sent a research question here — but maintenance *about this machine*,
+  // or within a stated recent window, is exactly what this window is for.
+  if (((has(text, CHANGE_SIGNAL) || has(text, MAINTENANCE_SUBJECT)) && (aboutThisMachine || has(text, RECENCY)))
+    || has(text, BEFORE_FAULT)) {
     return { intent: 'RECENT_CHANGES', scope: scopeFor('CURRENT_EVENT'), eventCode, aggregate, clarification: null, reason: 'asks what changed before the event' };
   }
 
@@ -176,12 +189,6 @@ export function routeQuery(question: string, context: RouteContext = {}): Routed
   // "before/again/previously" vocabulary: "the most common events on this turbine" is history.
   if (has(text, HISTORY_SIGNAL) || has(text, RECENCY) || has(text, ASSET_WIDE)) {
     return { intent: 'HISTORY', scope: scopeFor('CURRENT_EVENT'), eventCode, aggregate, clarification: null, reason: 'asks about recorded history' };
-  }
-
-  // Maintenance without a change verb, a before-the-fault framing or a reference signal is a
-  // question about this machine's recorded work, which the change window serves.
-  if (/\bmaintenance\b/.test(text) && aboutThisMachine) {
-    return { intent: 'RECENT_CHANGES', scope: scopeFor('CURRENT_EVENT'), eventCode, aggregate, clarification: null, reason: 'asks about recorded maintenance' };
   }
 
   return { intent: 'GENERAL', scope: scopeFor(explicitCode ? 'EVENT_CODE' : 'CURRENT_EVENT'), eventCode, aggregate, clarification: null, reason: 'no specific signal' };

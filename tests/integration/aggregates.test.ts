@@ -167,3 +167,45 @@ describe('exact totals cite evidence containing the total', () => {
     expect(maintenance?.detail).toMatch(/\b2 retrieved maintenance records\b/);
   });
 });
+
+describe('an answer reports what the retrieved sources say', () => {
+  const chunk = (overrides: Partial<RawEvidence>): RawEvidence => evidenceItem({
+    kind: 'KNOWLEDGE', role: 'TECHNICAL_REFERENCE', sourceType: 'TECHNICAL_REFERENCE',
+    recordOrigin: 'public_reference', authorityClass: 'RESEARCH', procedural: true,
+    assetCode: null, timestamp: null, ...overrides,
+  });
+
+  it('quotes the reference instead of announcing that one exists', () => {
+    // The defect: every reference question answered "Reviewed public reference material was
+    // retrieved", which states nothing the reader could act on or check.
+    const retrieval = result({
+      intent: 'TECHNICAL_GUIDANCE',
+      evidence: [chunk({
+        sourceId: 'KNOWLEDGE:c-1', sourceKey: 'NREL drivetrain report', title: 'NREL drivetrain report — Introduction',
+        excerpt: 'Gearbox and generator failures dominate wind plant downtime.',
+      })],
+    });
+    const { evidence, raw } = fuseEvidence(retrieval);
+    const answer = deterministicAnswer(retrieval, evidence, raw);
+    const finding = answer.findings.find((entry) => /reference/i.test(entry.title))!;
+    expect(finding.detail).toContain('Gearbox and generator failures dominate wind plant downtime.');
+    expect(finding.detail).toMatch(/does not authorize work/i);
+    expect(finding.citationIds.length).toBeGreaterThan(0);
+    expect(() => validateCitations({ ...answer, evidenceStrength: 'MODERATE', safetyStatus: 'NORMAL' }, evidence)).not.toThrow();
+  });
+
+  it('counts one document once, however many of its passages were retrieved', () => {
+    const passages = Array.from({ length: 5 }, (_, index) => chunk({
+      sourceId: `KNOWLEDGE:c-${index}`, sourceKey: 'NREL drivetrain report',
+      title: `NREL drivetrain report — section ${index}`, excerpt: `passage ${index}`,
+    }));
+    const retrieval = result({ intent: 'TECHNICAL_GUIDANCE', evidence: passages });
+    const { evidence, raw } = fuseEvidence(retrieval);
+    const answer = deterministicAnswer(retrieval, evidence, raw);
+    expect(answer.summary).toContain('NREL drivetrain report');
+    expect(answer.summary).not.toMatch(/\d+ sources/);
+    const finding = answer.findings.find((entry) => /reference/i.test(entry.title))!;
+    // One quotation from the one document, not the same title restated per passage.
+    expect(finding.detail.match(/NREL drivetrain report/g)).toHaveLength(1);
+  });
+});

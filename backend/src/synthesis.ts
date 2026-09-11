@@ -280,11 +280,55 @@ export function deterministicAnswer(result: RetrievalResult, evidence: Evidence[
       citationIds: changeIds.slice(0, 6),
     });
   }
-  if (referenceIds.length) {
-    parts.push('Reviewed public reference material was retrieved.');
+  // Retrieved material that carries no procedural authority still answers questions *about what
+  // the document says*. Without this branch an uploaded document could rank first and still be
+  // absent from the answer, because the only reference finding required `procedural`.
+  //
+  // The detail quotes the retrieved excerpt verbatim, so it is grounded by construction, and it is
+  // framed as reported speech: what the source states, never what is approved.
+  const unverifiedKnowledge = evidence
+    .map((item, index) => ({ item, source: raw[index] }))
+    .filter(({ item, source }) => source?.kind === 'KNOWLEDGE' && !source.procedural && item.excerpt.trim());
+  if (unverifiedKnowledge.length) {
+    const lead = unverifiedKnowledge[0];
+    const label = lead.source.recordOrigin === 'user_import' ? 'an uploaded, unreviewed source' : 'an unverified source';
+    parts.push(`Retrieved material from ${label} was found.`);
     findings.push({
-      title: 'Public reference material',
-      detail: 'Reviewed public technical or regulatory references applicable to this asset type were retrieved. They are general published material and are not specific to this turbine or its manufacturer unless stated in the excerpt.',
+      title: `Retrieved source: ${lead.item.title}`,
+      detail: `${lead.item.title} states: "${lead.item.excerpt.trim()}" This is ${label} (${lead.item.authorityClass}, ${lead.source.recordOrigin}). It records what that document says; it is not an approved procedure and does not authorize work.`,
+      citationIds: unverifiedKnowledge.slice(0, 3).map(({ item }) => item.id),
+    });
+  }
+
+  if (referenceIds.length) {
+    // Report what the references say, not merely that they exist. Excerpts are copied verbatim
+    // from retrieved rows — the same mechanism used for every other fact here — because a finding
+    // that only announces "reference material was retrieved" answers nothing and sends the reader
+    // to the evidence pane. Free generation still may not paraphrase any of it.
+    //
+    // Grouped by document rather than by chunk: six passages of one report are one source, and
+    // naming it six times reads as six sources.
+    const byDocument = new Map<string, { id: string; title: string; excerpt: string }>();
+    for (const id of referenceIds) {
+      const index = evidence.findIndex((item) => item.id === id);
+      const item = evidence[index];
+      if (!item) continue;
+      const key = raw[index]?.sourceKey ?? item.title;
+      if (!byDocument.has(key)) byDocument.set(key, { id, title: key, excerpt: item.excerpt.trim() });
+    }
+    const documents = [...byDocument.values()];
+    const quoted = documents.filter((document) => document.excerpt).slice(0, 2);
+    const remaining = documents.slice(quoted.length).map((document) => document.title);
+    parts.push(documents.length === 1
+      ? `Reviewed public reference material was retrieved from ${documents[0].title}.`
+      : `Reviewed public reference material was retrieved from ${documents.length} sources.`);
+    findings.push({
+      title: quoted.length ? `Reference: ${quoted[0].title}` : 'Public reference material',
+      detail: [
+        ...quoted.map((document) => `${document.title} states: "${document.excerpt}"`),
+        remaining.length ? `Also retrieved: ${remaining.join('; ')}.` : '',
+        'This is reviewed published material applicable to this asset type. It is not specific to this turbine or its manufacturer unless the excerpt says so, and it does not authorize work.',
+      ].filter(Boolean).join(' '),
       citationIds: referenceIds.slice(0, 6),
     });
   }
