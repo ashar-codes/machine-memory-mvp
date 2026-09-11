@@ -4,6 +4,7 @@
 // Kept in its own module so app.ts keeps its original shape and the existing contract stays
 // readable. Every external input is parsed with Zod; nothing here writes to disk or shells out.
 import type { Router } from 'express';
+import { createWorkGate, withLazyClient, type WorkGate } from './work.js';
 import express from 'express';
 import { z } from 'zod';
 import type pg from 'pg';
@@ -70,6 +71,7 @@ const page = z.strictObject({
 });
 
 export interface RouteDeps {
+  work?: WorkGate;
   pool?: pg.Pool;
   llm?: LlmClient | null;
   embeddingModel: string;
@@ -102,6 +104,7 @@ export async function extractPdfText(bytes: Buffer): Promise<string> {
 
 export function createDynamicRoutes(deps: RouteDeps): Router {
   const router = express.Router();
+  const work = deps.work ?? createWorkGate();
   const db = () => {
     if (!deps.pool) throw new RouteError(503, 'DATABASE_NOT_CONFIGURED', 'Configure DATABASE_URL and apply the schema.');
     return deps.pool;
@@ -172,7 +175,8 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     } finally { client.release(); }
   });
 
-  router.post('/api/import/preview', uploader.single('file'), async (req, res) => {
+  router.post('/api/import/preview', work.handle(async (req, res) => {
+    await new Promise<void>((resolve, reject) => uploader.single('file')(req, res, (error) => error ? reject(error) : resolve()));
     const type = importType.parse(req.body?.importType);
     const upload = checkUpload(req.file, 'tabular');
     const content = decodeText(upload.bytes);
@@ -203,7 +207,7 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
       unmappedRequired, mappingSource: proposal.source, notes: proposal.notes,
     };
     res.json(preview);
-  });
+  }));
 
   router.post('/api/import/commit', express.json({ limit: '64kb', strict: true }), async (req, res) => {
     const input = commitBody.parse(req.body);
@@ -255,7 +259,8 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     } finally { client.release(); }
   });
 
-  router.post('/api/knowledge/upload', uploader.single('file'), async (req, res) => {
+  router.post('/api/knowledge/upload', work.handle(async (req, res) => {
+    await new Promise<void>((resolve, reject) => uploader.single('file')(req, res, (error) => error ? reject(error) : resolve()));
     const meta = knowledgeMeta.parse({
       title: req.body?.title, organization: req.body?.organization,
       sourceType: req.body?.sourceType || undefined,
@@ -274,16 +279,12 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
         upload.filename, upload.sha256, upload.bytes.length, JSON.stringify({ chunks: chunks.length })]);
     const dataSourceId = source.rows[0].id as string;
 
-    const client = await db().connect();
-    let result;
-    try {
-      result = await ingestDocument(deps.queryable(client), deps.llm ?? null, chunks, {
-        title: meta.title, organization: meta.organization, sourceType: meta.sourceType,
-        assetType: meta.assetType ?? 'wind_turbine', manufacturer: meta.manufacturer ?? null, model: meta.model ?? null,
-        dataSourceId, originalFilename: upload.filename, contentSha256: upload.sha256,
-        embeddingModel: deps.embeddingModel, embeddingDimensions: deps.embeddingDimensions,
-      });
-    } finally { client.release(); }
+    const result = await withLazyClient(db(), (indexDb) => ingestDocument(indexDb, deps.llm ?? null, chunks, {
+      title: meta.title, organization: meta.organization, sourceType: meta.sourceType,
+      assetType: meta.assetType ?? 'wind_turbine', manufacturer: meta.manufacturer ?? null, model: meta.model ?? null,
+      dataSourceId, originalFilename: upload.filename, contentSha256: upload.sha256,
+      embeddingModel: deps.embeddingModel, embeddingDimensions: deps.embeddingDimensions,
+    }));
 
     await q().query(`update public.data_sources set status=$2 where id=$1`,
       [dataSourceId, result.chunksEmbedded === result.chunksCreated ? 'indexed' : 'imported']);
@@ -296,7 +297,7 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
         : `Stored ${result.chunksCreated} passages; ${result.chunksEmbedded} were embedded. Unembedded passages remain keyword searchable.`,
     };
     res.status(201).json(report);
-  });
+  }));
 
   router.get('/api/knowledge', async (req, res) => {
     const { limit, offset } = page.parse(req.query);

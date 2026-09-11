@@ -21,6 +21,7 @@ import { KnowledgeError } from './knowledge.js';
 import { TabularError } from './tabular.js';
 import { UploadError } from './uploads.js';
 import type { Table } from './tabular.js';
+import { budgetLlm, createWorkGate, withLazyClient, WorkLimitError } from './work.js';
 
 const code = z.string().trim().min(1).max(64).regex(/^[A-Za-z0-9_-]+$/);
 const eventCode = z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/);
@@ -48,6 +49,8 @@ export interface AppOptions {
 
 export function createApp({ pool, llmConfigured = false, llm = null, embeddingModel = DEFAULT_EMBEDDING_MODEL }: AppOptions = {}) {
   const app = express();
+  const work = createWorkGate();
+  llm = budgetLlm(llm);
   app.disable('x-powered-by');
   app.set('trust proxy', false);
   app.use((_req,res,next) => { res.locals.requestId = randomUUID(); res.set('X-Request-ID', res.locals.requestId as string); next(); });
@@ -82,7 +85,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   });
   // Parsed uploads are held between preview and commit only, bounded and TTL-expired in routes.ts.
   const previews = new Map<string, { table: Table; importType: string; filename: string; expiresAt: number }>();
-  const dynamicRoutes = createDynamicRoutes({ pool, llm, embeddingModel, embeddingDimensions: EMBEDDING_DIMENSIONS, queryable, previews });
+  const dynamicRoutes = createDynamicRoutes({ pool, llm, embeddingModel, embeddingDimensions: EMBEDDING_DIMENSIONS, queryable, previews, work });
   const hub = createStreamHub();
   const scadaRoutes = createScadaRoutes({
     pool, llm, queryable, hub,
@@ -90,7 +93,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     // if retrieval or every model provider is unavailable, the fault stays recorded regardless.
     onCriticalEvent: (event) => {
       if (!pool) return;
-      void (async () => {
+      void work.run(async () => {
         try {
           const outcome = await investigate(
             { assetCode: event.assetCode, eventCode: event.eventCode, intent: 'GENERAL',
@@ -106,7 +109,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
           // Never rethrow into the ingest path: the fault is recorded, the analysis is a bonus.
           console.warn('Automatic investigation failed; the event remains recorded.');
         }
-      })();
+      }).catch(() => console.warn('Automatic investigation skipped; demo work capacity reached.'));
     },
   });
   async function findAsset(assetCode: string) {
@@ -153,7 +156,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     ) t ORDER BY timestamp DESC,kind,id DESC LIMIT $2 OFFSET $3`, [asset.id,limit+1,offset]);
     res.json({items:result.rows.slice(0,limit).map(camelRow),limit,offset,hasMore:result.rows.length>limit});
   });
-  app.post('/api/investigate', aiLimit, async (req,res) => {
+  app.post('/api/investigate', aiLimit, work.handle(async (req,res) => {
     empty.parse(req.query);
     const input = investigation.parse(req.body) as InvestigateRequest;
     // Without a database the only honest answers are the deterministic safety ones.
@@ -168,8 +171,8 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     });
     if (outcome.status === 'asset_not_found') throw new ApiError(404,'ASSET_NOT_FOUND','Asset not found.');
     res.json(outcome.response);
-  });
-  app.post('/api/resolutions', async (req,res) => {
+  }));
+  app.post('/api/resolutions', work.handle(async (req,res) => {
     empty.parse(req.query);
     const input = resolution.parse(req.body);
     const client = await db().connect();
@@ -194,27 +197,22 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
       const indexPool = pool;
       // Indexing runs in its own transaction, so it needs a dedicated client: BEGIN and COMMIT
       // issued through a pool can land on different connections.
-      void (async () => {
-        const client = await indexPool.connect();
-        try {
-          const indexed = await indexResolution(queryable(client), llm, {
-            resolutionId: record.id, assetId: record.assetId, assetCode: input.assetCode,
-            eventCode: input.eventCode, rootCause: input.rootCause, resolutionSummary: input.resolutionSummary,
-            component: input.component, notes: input.notes, assetType: record.assetType,
-            manufacturer: record.manufacturer, model: record.model,
-            embeddingModel, embeddingDimensions: EMBEDDING_DIMENSIONS,
-          });
-          if (!indexed) console.warn('Resolution saved; semantic indexing skipped. Structured retrieval is unaffected.');
-        } finally {
-          client.release();
-        }
-      })().catch(() => {
+      void work.run(async () => {
+        const indexed = await withLazyClient(indexPool, (indexDb) => indexResolution(indexDb, llm, {
+          resolutionId: record.id, assetId: record.assetId, assetCode: input.assetCode,
+          eventCode: input.eventCode, rootCause: input.rootCause, resolutionSummary: input.resolutionSummary,
+          component: input.component, notes: input.notes, assetType: record.assetType,
+          manufacturer: record.manufacturer, model: record.model,
+          embeddingModel, embeddingDimensions: EMBEDDING_DIMENSIONS,
+        }));
+        if (!indexed) console.warn('Resolution saved; semantic indexing skipped. Structured retrieval is unaffected.');
+      }).catch(() => {
         // Includes acquisition (also after pool shutdown), indexing and release failures.
         console.warn('Resolution saved; semantic indexing failed. Structured retrieval is unaffected.');
       });
     }
-  });
-  app.post('/api/copilot', aiLimit, express.json({ limit: '64kb', strict: true }), async (req,res) => {
+  }));
+  app.post('/api/copilot', aiLimit, express.json({ limit: '64kb', strict: true }), work.handle(async (req,res) => {
     empty.parse(req.query);
     const input = copilotBody.parse(req.body);
     if (!pool) {
@@ -235,7 +233,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     const outcome = await runAssetCopilot({ assetCode: input.assetCode, eventCode: input.eventCode, question: input.question, history: input.history }, deps);
     if ('status' in outcome) throw new ApiError(404,'ASSET_NOT_FOUND','Asset not found.');
     res.json(outcome);
-  });
+  }));
   app.get('/api/assets/:assetCode/memory-status', async (req,res) => {
     empty.parse(req.query);
     const asset = await findAsset(code.parse(req.params.assetCode));
@@ -256,7 +254,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   const errorHandler: ErrorRequestHandler = (error,_req,res,_next) => {
     let status = 500, code = 'INTERNAL_ERROR', message = 'The request could not be completed.';
     if (error instanceof z.ZodError) { status=400;code='VALIDATION_ERROR';message='Request fields are invalid or unsupported.'; }
-    else if (error instanceof ApiError || error instanceof RouteError || error instanceof ScadaError) { status=error.status;code=error.code;message=error.message; }
+    else if (error instanceof ApiError || error instanceof RouteError || error instanceof ScadaError || error instanceof WorkLimitError) { status=error.status;code=error.code;message=error.message; }
     // These carry a rule description, never uploaded file contents, so they are safe to return.
     else if (error instanceof UploadError) { status=400;code='UPLOAD_REJECTED';message=error.message; }
     else if (error instanceof TabularError) { status=400;code='FILE_UNREADABLE';message=error.message; }

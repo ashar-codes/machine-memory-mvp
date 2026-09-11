@@ -36,7 +36,7 @@ describe('detached resolution indexing failures', () => {
       await vi.waitFor(() => expect(warning).toHaveBeenCalledWith('Resolution saved; semantic indexing failed. Structured retrieval is unaffected.'));
       expect(statements).toContain('COMMIT'); expect(statements).not.toContain('ROLLBACK');
       expect(savedRelease).toHaveBeenCalledOnce();
-      expect(indexRelease).toHaveBeenCalledTimes(['connect', 'shutdown'].includes(failure) ? 0 : 1);
+      expect(indexRelease).toHaveBeenCalledTimes(failure === 'query' ? 1 : 0);
       expect(warning.mock.calls.flat().join(' ')).not.toContain('private');
     } finally {
       warning.mockRestore(); server.closeAllConnections();

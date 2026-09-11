@@ -6,6 +6,7 @@
 import type { Response } from 'express';
 
 export const MAX_CLIENTS = 8;
+export const MAX_FRAME_BYTES = 64 * 1024;
 const HEARTBEAT_MS = 25_000;
 
 /** Everything the feed can emit. Data only: no client message ever travels the other way. */
@@ -23,9 +24,20 @@ export interface StreamHub {
 
 export function createStreamHub(): StreamHub {
   const clients = new Set<Response>();
+  const send = (client: Response, frame: string) => {
+    try {
+      if (client.writableLength > MAX_FRAME_BYTES || !client.write(frame)) {
+        clients.delete(client);
+        client.destroy();
+      }
+    } catch {
+      clients.delete(client);
+      try { client.destroy(); } catch { /* already gone */ }
+    }
+  };
   // A comment line keeps the connection alive through proxies that would otherwise time it out.
   const heartbeat = setInterval(() => {
-    for (const client of clients) client.write(': keep-alive\n\n');
+    for (const client of clients) send(client, ': keep-alive\n\n');
   }, HEARTBEAT_MS);
   heartbeat.unref?.();
 
@@ -43,18 +55,19 @@ export function createStreamHub(): StreamHub {
         Connection: 'keep-alive',
         'X-Accel-Buffering': 'no',
       });
-      res.write('retry: 3000\n\n');
       clients.add(res);
       const remove = () => { clients.delete(res); };
       res.on('close', remove);
+      send(res, 'retry: 3000\n\n');
       return remove;
     },
 
     publish(event) {
       const frame = `event: ${event.type}\ndata: ${JSON.stringify(event.payload)}\n\n`;
+      if (Buffer.byteLength(frame) > MAX_FRAME_BYTES) return;
       for (const client of clients) {
         // One broken pipe must not stop delivery to the others.
-        try { client.write(frame); } catch { clients.delete(client); }
+        send(client, frame);
       }
     },
 

@@ -29,12 +29,34 @@ Archive-only commit left a clean tree before creating remediation branch.
 | D / P2-07 | VERIFIED | Relevance admission and ordering precede candidate cap; authority remains provenance, not topical relevance. |
 | D / P2-09 | VERIFIED | HTTP/SSE use persisted payload; duplicate snapshots omitted; provenance conflicts return 409. |
 | D / P2-11 | VERIFIED | Entire detached indexing promise is caught, including acquisition and release. |
-| D / P2-10 | NOT_STARTED | Parent not rechecked after embedding; reset leaves derived status. Only fix if small/safe. |
-| E / P1-04 | NOT_STARTED | No global bounded expensive-job admission / slow-consumer handling. |
+| D / P2-10 | DEFERRED | Active reset needs writer quiescence, parent/index ordering and derived-status restoration; not a safe isolated patch. Stop app and all writers before reset; status restoration remains unresolved. |
+| E / P1-04 | LOCAL_CONTROLS_VERIFIED | Two active jobs, no queue, lifetime model-operation allowance, lazy DB acquisition, bounded SSE writes. Per-user/distributed billing controls remain deferred with authentication. |
 | F / false claims | NOT_STARTED | Correct only demonstrated overclaims outside archived audit. |
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### E — local resource controls
+
+- One shared application gate admits at most two investigation/Copilot/upload/preview/save
+  or background-index/automatic-analysis jobs. No pending queue. Excess HTTP work returns
+  503 WORK_CAPACITY_REACHED before multipart parsing; background work skips without undoing
+  stored events/resolutions. Slots follow actual completion, not response/disconnect events.
+- Shared lifetime allowance: 500 logical model operations (embedding, synthesis, structured),
+  counting failures. After exhaustion existing deterministic/keyword fallback applies.
+  This is not a dollar budget: provider retries/failover occur within an operation; restart
+  replenishes the allowance. Per-user, multi-process and provider-side billing limits remain
+  outside the unauthenticated local demo boundary.
+- Upload and resolution indexing acquire their dedicated transaction client at first SQL,
+  after embeddings. SSE disconnects on write backpressure/throw, including heartbeat and
+  initial frame; individual frames over 64 KiB are omitted. Eight-client cap retained.
+- Seven added tests PASS, including real loopback saturation/abort/recovery, upload connection
+  occupancy with paused embedding, allowance exhaustion and slow-stream handling. Indexing
+  failure regression now asserts zero clients acquired on embedding failure.
+- Gates: 377 tests, lint/typecheck/build/diff check PASS. No live load attack, paid calls,
+  database writes, migration, dependency change or Internet exposure for this section.
+- D3 checkpoint: `3819d44`. P2-10 explicitly deferred under its small/safe scope: an online
+  reset cannot be made coherent by a parent check alone; CLI and all writers need coordination.
 
 ### D3 — contain detached indexing failures
 
@@ -241,9 +263,10 @@ public_data, public_reference and synthetic_demo. Do not run broad reset over us
 
 ## Continuation
 
-Phases A–C and D1–D2 are complete. Next: P2-11 detached indexing failure, P2-10 reset coordination if small/safe,
-E/P1-04 resource admission, and F demonstrated documentation overclaims.
+Phases A–C, D1–D3 and local E controls are complete. Next: F demonstrated documentation
+corrections. P2-10 reset coordination is explicitly deferred under the small/safe scope.
+P1-01 authentication and per-user/distributed billing controls remain deferred.
 Use the ledger and checkpoint entries above; older checkpoints describe historical gates.
 Keep the archived audit unchanged and commit each verified section.
-Local full demo readiness remains unestablished until remaining gates pass.
-Internet exposure remains blocked; P1-01 is deliberately deferred.
+Local full demo readiness remains unestablished while reset/lifecycle gates remain open.
+Internet exposure remains blocked.
