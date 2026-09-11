@@ -18,18 +18,23 @@ const DEMO_USER = 'demo-reviewer';
 const DEMO_PASSWORD = 'local-smoke-test-placeholder';
 
 /**
- * A raw request, because fetch refuses to set a Host header: it is a forbidden header name, so
- * undici drops it silently and a Host test written with fetch would pass without testing anything.
+ * A raw request, because fetch cannot express what these tests are about.
+ *
+ * `Host` is a forbidden header name, so undici drops it silently. `Sec-Fetch-Mode` is worse: undici
+ * overwrites it with the mode of its own request, so a browser navigation written with fetch
+ * arrives as `sec-fetch-mode: cors` and the test would assert against a request nobody makes.
  */
-function rawRequest(port: number, path: string, headers: Record<string, string>) {
-  return new Promise<{ status: number; body: string }>((resolve, reject) => {
-    const call = request({ host: '127.0.0.1', port, path, method: 'GET', headers }, (response) => {
+function rawRequest(port: number, path: string, headers: Record<string, string>,
+  options: { method?: string; body?: string } = {}) {
+  return new Promise<{ status: number; body: string; headers: Record<string, string | string[] | undefined> }>((resolve, reject) => {
+    const call = request({ host: '127.0.0.1', port, path, method: options.method ?? 'GET', headers }, (response) => {
       let body = '';
       response.setEncoding('utf8');
       response.on('data', (chunk: string) => { body += chunk; });
-      response.on('end', () => resolve({ status: response.statusCode ?? 0, body }));
+      response.on('end', () => resolve({ status: response.statusCode ?? 0, body, headers: response.headers }));
     });
     call.on('error', reject);
+    if (options.body) call.write(options.body);
     call.end();
   });
 }
@@ -254,6 +259,147 @@ describe('demo deployment HTTP boundary (real loopback server, no external servi
   });
 });
 
+describe('a link to the demo from another site reaches the credential gate', () => {
+  // The deployed service was unreachable by the people it exists for: every link click from
+  // email, a chat message, a university LMS or another page is a cross-site request, and the
+  // blanket Sec-Fetch-Site rejection answered 403 before the browser ever showed the credential
+  // prompt. A top-level navigation now continues to that prompt; nothing else is relaxed.
+  let server: Server;
+  let port: number;
+  let staticDir: string;
+  const demo = readConfig(DEMO_ENV).demo as DemoDeployment;
+  const credential = `Basic ${Buffer.from(`${DEMO_USER}:${DEMO_PASSWORD}`).toString('base64')}`;
+
+  /** What a browser sends when a person clicks a link to us on someone else's page. */
+  const LINK_CLICK = {
+    'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'navigate',
+    'Sec-Fetch-Dest': 'document', Accept: 'text/html,application/xhtml+xml',
+  };
+  /** What a script on someone else's page sends. Same site value; different mode and destination. */
+  const CROSS_SITE_FETCH = {
+    'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Dest': 'empty',
+  };
+
+  beforeAll(() => {
+    staticDir = mkdtempSync(join(tmpdir(), 'machine-memory-dist-nav-'));
+    writeFileSync(join(staticDir, 'index.html'), '<!doctype html><title>Machine Memory</title><div id="root"></div>');
+  });
+  afterAll(() => rmSync(staticDir, { recursive: true, force: true }));
+
+  beforeEach(async () => {
+    server = createApp({ demo, staticDir }).listen(0, '127.0.0.1');
+    await new Promise<void>((resolve) => server.once('listening', resolve));
+    port = (server.address() as AddressInfo).port;
+  });
+  afterEach(async () => {
+    server.closeAllConnections();
+    await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+  });
+
+  const send = (path: string, headers: Record<string, string>, options?: { method?: string; body?: string }) =>
+    rawRequest(port, path, headers, options);
+  const errorCode = (body: string) => (JSON.parse(body) as { error: { code: string } }).error.code;
+
+  it.each(['/', '/investigation', '/fleet/PEN-T01'])('asks for the credential instead of refusing the link: %s', async (path) => {
+    const response = await send(path, LINK_CLICK);
+    expect(response.status).toBe(401);
+    expect(errorCode(response.body)).toBe('DEMO_AUTH_REQUIRED');
+    expect(response.headers['www-authenticate']).toBe('Basic realm="Machine Memory Demo", charset="UTF-8"');
+  });
+
+  it('serves the application once that prompt is answered', async () => {
+    const response = await send('/', { ...LINK_CLICK, Authorization: credential });
+    expect(response.status).toBe(200);
+    expect(String(response.headers['content-type'])).toMatch(/text\/html/);
+    expect(response.body).toContain('<div id="root">');
+  });
+
+  it('still refuses a cross-site script reading the API, credential or not', async () => {
+    // The browser attaches the cached Basic credential to cross-site requests on its own, so this
+    // is the case that would be a live CSRF path if it were allowed through.
+    for (const headers of [CROSS_SITE_FETCH, { ...CROSS_SITE_FETCH, Authorization: credential }]) {
+      const response = await send('/api/assets', headers);
+      expect(response.status).toBe(403);
+      expect(errorCode(response.body)).toBe('ORIGIN_REJECTED');
+    }
+  });
+
+  it.each(['POST', 'PUT', 'PATCH', 'DELETE'])('still refuses a cross-site %s to the API', async (method) => {
+    const response = await send('/api/resolutions',
+      { ...CROSS_SITE_FETCH, Authorization: credential, 'Content-Type': 'application/json', 'Content-Length': '2' },
+      { method, body: '{}' });
+    expect(response.status).toBe(403);
+    expect(errorCode(response.body)).toBe('ORIGIN_REJECTED');
+  });
+
+  it('still refuses a cross-site form post, which is a navigation but not a GET', async () => {
+    const body = 'assetCode=WT-07';
+    const response = await send('/api/resolutions',
+      { ...LINK_CLICK, 'Content-Type': 'application/x-www-form-urlencoded', 'Content-Length': String(body.length) },
+      { method: 'POST', body });
+    expect(response.status).toBe(403);
+  });
+
+  it('still refuses a cross-site event stream', async () => {
+    const response = await send('/api/scada/stream',
+      { ...CROSS_SITE_FETCH, Accept: 'text/event-stream', Authorization: credential });
+    expect(response.status).toBe(403);
+    expect(errorCode(response.body)).toBe('ORIGIN_REJECTED');
+  });
+
+  it('still refuses a cross-site upload', async () => {
+    const body = '--x\r\nContent-Disposition: form-data; name="importType"\r\n\r\nEVENT_LOG\r\n--x--\r\n';
+    const response = await send('/api/import/preview',
+      { ...CROSS_SITE_FETCH, Authorization: credential, 'Content-Type': 'multipart/form-data; boundary=x', 'Content-Length': String(body.length) },
+      { method: 'POST', body });
+    expect(response.status).toBe(403);
+  });
+
+  it('does not let the navigation exemption reach any API route but the health check', async () => {
+    for (const path of ['/api/assets', '/api/events', '/api/copilot', '/api/scada/stream', '/api']) {
+      const response = await send(path, { ...LINK_CLICK, Authorization: credential });
+      expect(response.status).toBe(403);
+      expect(errorCode(response.body)).toBe('ORIGIN_REJECTED');
+    }
+  });
+
+  it('lets a person open the health check from a link, with no credential', async () => {
+    expect((await send(HEALTH_PATH, LINK_CLICK)).status).toBe(200);
+    // And Render's own probe, which sends no Fetch Metadata at all.
+    expect((await send(HEALTH_PATH, {})).status).toBe(200);
+  });
+
+  it('does not exempt an embedded frame, only a top-level document', async () => {
+    const response = await send('/', { ...LINK_CLICK, 'Sec-Fetch-Dest': 'iframe' });
+    expect(response.status).toBe(403);
+  });
+
+  it('does not exempt a cross-site request that merely claims to be a document', async () => {
+    // Destination without navigation mode is not a page load.
+    const response = await send('/', { ...CROSS_SITE_FETCH, 'Sec-Fetch-Dest': 'document' });
+    expect(response.status).toBe(403);
+  });
+
+  it('still checks a spoofed Origin first, navigation or not', async () => {
+    for (const extra of [LINK_CLICK, CROSS_SITE_FETCH]) {
+      const response = await send('/', { ...extra, Origin: 'https://evil.example' });
+      expect(response.status).toBe(403);
+      expect(errorCode(response.body)).toBe('ORIGIN_REJECTED');
+    }
+  });
+
+  it('leaves same-origin application traffic working exactly as before', async () => {
+    const response = await send(HEALTH_PATH, {
+      Origin: PUBLIC_ORIGIN, 'Sec-Fetch-Site': 'same-origin', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Dest': 'empty',
+    });
+    expect(response.status).toBe(200);
+  });
+
+  it('still serves a client that sends no Fetch Metadata at all, such as curl', async () => {
+    expect((await send('/api/assets', { Authorization: credential })).status).toBe(503);
+  });
+});
+
 describe('the local foundation is unchanged by the demo option', () => {
   let server: Server;
   let base: string;
@@ -277,6 +423,20 @@ describe('the local foundation is unchanged by the demo option', () => {
     const response = await fetch(base + '/investigation');
     expect(response.status).toBe(404);
     expect((await response.json() as { error: { code: string } }).error.code).toBe('NOT_FOUND');
+  });
+
+  it('still refuses every cross-site request locally, navigation included', async () => {
+    // The navigation exemption is a demo-deployment rule. The local foundation serves no frontend
+    // and has no credential gate, so there is nothing a link from another site should reach.
+    const port = (server.address() as AddressInfo).port;
+    for (const headers of [
+      { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'navigate', 'Sec-Fetch-Dest': 'document' },
+      { 'Sec-Fetch-Site': 'cross-site', 'Sec-Fetch-Mode': 'cors', 'Sec-Fetch-Dest': 'empty' },
+    ]) {
+      const response = await rawRequest(port, '/api/health', headers);
+      expect(response.status).toBe(403);
+      expect(JSON.parse(response.body).error.code).toBe('ORIGIN_REJECTED');
+    }
   });
 
   it('still rejects a non-loopback host locally', async () => {

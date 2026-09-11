@@ -1,4 +1,4 @@
-import express, { type ErrorRequestHandler } from 'express';
+import express, { type ErrorRequestHandler, type Request } from 'express';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
 import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
@@ -98,6 +98,24 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   // production smoke test. It grants nothing: every path but the health check still needs the
   // shared credential.
   const allowedHosts = demo ? [demo.publicHost, ...LOCAL_HOSTS] : LOCAL_HOSTS;
+  /**
+   * The API surface. Defined once so the cross-site rule below and the page fallback further down
+   * cannot drift apart about what counts as an API path.
+   */
+  const isApiPath = (path: string) => path === '/api' || path.startsWith('/api/');
+  /**
+   * A real top-level page load: the browser is replacing the whole document, not a script issuing
+   * a request in the background.
+   *
+   * Method alone is not enough, because a malicious cross-site `fetch` can be a GET too. The two
+   * Fetch Metadata headers are what separate them, and they are trustworthy for browser traffic
+   * because `Sec-Fetch-*` are forbidden header names: page script cannot set or alter them, only
+   * the browser can. An embedded frame reports `Sec-Fetch-Dest: iframe`, not `document`, so this
+   * does not exempt framing either.
+   */
+  const isDocumentNavigation = (req: Request) => (req.method === 'GET' || req.method === 'HEAD')
+    && req.headers['sec-fetch-mode'] === 'navigate'
+    && req.headers['sec-fetch-dest'] === 'document';
   app.use((req,_res,next) => {
     const host = req.hostname;
     if (!allowedHosts.includes(host)) {
@@ -114,7 +132,26 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
         else if (origin.protocol !== 'http:' || !['localhost','127.0.0.1','[::1]'].includes(origin.hostname) || !['5173','3001'].includes(origin.port)) throw new Error();
       } catch { return next(new ApiError(403,'ORIGIN_REJECTED','Origin is not permitted.')); }
     }
-    if (req.headers['sec-fetch-site'] === 'cross-site') return next(new ApiError(403,'ORIGIN_REJECTED','Cross-site access is not permitted.'));
+    if (req.headers['sec-fetch-site'] === 'cross-site') {
+      // Following a link to the demo from email, a chat message, a university LMS, a README or
+      // any other page is a cross-site request, and rejecting all of those made the deployed
+      // service unreachable by the people it exists for. A top-level navigation is allowed
+      // through to the credential gate instead: the visitor still sees the Basic challenge and
+      // still has to hold the shared credential before anything is served.
+      //
+      // Nothing else is relaxed. Cross-site API traffic — a background fetch, an XHR, an upload,
+      // an EventSource, any POST/PUT/PATCH/DELETE — is still refused, which is what actually
+      // matters here: the browser attaches the cached Basic credential to cross-site requests
+      // automatically, so an allowed cross-site API call would be a live CSRF path. A form POST
+      // from another site is a navigation too, but it is not GET and it carries an Origin header,
+      // so it is refused twice over.
+      //
+      // The health check is the one API path a person may legitimately open by clicking: Render
+      // probes it, and it reads nothing, writes nothing and calls no provider.
+      const followedALink = demo !== null && isDocumentNavigation(req)
+        && (!isApiPath(req.path) || req.path === HEALTH_PATH);
+      if (!followedALink) return next(new ApiError(403,'ORIGIN_REJECTED','Cross-site access is not permitted.'));
+    }
     next();
   });
 
@@ -350,7 +387,7 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
       // The single-page fallback must never answer for the API: an unknown /api path stays an API
       // 404 with an API error body, not a page that looks like it worked.
       if (req.method !== 'GET' && req.method !== 'HEAD') return next();
-      if (req.path === '/api' || req.path.startsWith('/api/')) return next();
+      if (isApiPath(req.path)) return next();
       if (!req.accepts('html')) return next();
       res.sendFile(indexHtml, (error) => { if (error) next(); });
     });
