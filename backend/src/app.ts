@@ -264,6 +264,18 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
     else if (error?.type === 'entity.too.large') { status=413;code='PAYLOAD_TOO_LARGE';message='Request body exceeds 32 KB.'; }
     else if (error?.type === 'entity.parse.failed') { status=400;code='INVALID_JSON';message='Invalid JSON body.'; }
     else if (['ECONNREFUSED','ENOTFOUND','ETIMEDOUT','ECONNRESET','57P01','08006'].includes(error?.code)) { status=503;code='DATABASE_UNAVAILABLE';message='Database is unavailable.'; }
+    // pg reports a pool-acquisition timeout as a plain Error with no code. Reported as 500, it
+    // read as an application fault when the database link was simply too slow to hand out a
+    // connection — which is a temporary condition the caller should be told to retry.
+    else if (typeof error?.message === 'string' && /timeout exceeded when trying to connect/i.test(error.message)) { status=503;code='DATABASE_UNAVAILABLE';message='Database did not respond in time. Try again.'; }
+    // A 500 was previously silent on the server as well as in the response, which left an
+    // intermittent failure with nothing to diagnose it by. Logged as a shape only — error name and
+    // driver code (a SQLSTATE, or ETIMEDOUT) — never a message, query or connection detail.
+    if (status >= 500) {
+      const name = typeof error?.name === 'string' ? error.name : 'Error';
+      const driverCode = typeof error?.code === 'string' ? error.code : 'none';
+      console.error(`Request ${res.locals.requestId} failed: ${status} ${code} (${name}/${driverCode}).`);
+    }
     res.status(status).json({error:{code,message,requestId:res.locals.requestId}});
   };
   app.use(errorHandler);
