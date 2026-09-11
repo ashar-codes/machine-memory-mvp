@@ -1,8 +1,5 @@
-// The single path by which an asset event enters Machine Memory.
-//
-// Manual entry (Scenario Lab), CSV import and the read-only operational-event boundary all end up
-// here. There is deliberately no second way to write an asset_events row: a fault must be stored,
-// provenanced and reflected in asset status identically whatever delivered it.
+// Shared event path for Scenario Lab and the operational-event boundary.
+// CSV import, trusted public ingestion and seed have separate parameterized batch paths.
 import type { RecordOrigin } from '@machine-memory/shared';
 import { refreshAssetStatus } from './imports.js';
 import type { Queryable } from './retrieval.js';
@@ -81,5 +78,5 @@ export async function recordEvent(db: Queryable, input: RecordEventInput): Promi
   }
 
   await refreshAssetStatus(db, [input.assetCode]);
-  return { status: 'created', event: { ...inserted.rows[0], asset_code: input.assetCode } };
+  return { status: 'created', event: inserted.rows[0] };
 }

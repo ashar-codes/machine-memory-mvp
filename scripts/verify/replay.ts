@@ -17,7 +17,7 @@ try {
     assert.equal(first.status, 'created');
     const replay = await recordEvent(client, { ...input, assetCode: 'PEN-T01', title: 'Conflicting title', severity: 'critical', eventCode: 'DIFFERENT' });
     assert.equal(replay.status, 'duplicate');
-    if (first.status === 'created' && replay.status === 'duplicate') assert.deepEqual(replay.event, first.event);
+    if (first.status === 'created' && replay.status === 'duplicate') assert.deepEqual(replay.event, { ...first.event, asset_code: input.assetCode });
     const count = await client.query('select count(*)::int n from public.asset_events where event_source=$1', [input.source]);
     assert.equal(count.rows[0].n, 1);
     console.log('PASS: conflicting replay returns original persisted asset and all event fields; exactly one row.');

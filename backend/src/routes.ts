@@ -156,8 +156,7 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     const client = await db().connect();
     try {
       await client.query('BEGIN');
-      // The same shared path the operational-event boundary uses. There is deliberately no second
-      // way to write an asset_events row: provenance and status handling must not diverge.
+      // Uses the same event path as the operational-event boundary; CSV has a separate batch path.
       const outcome = await recordEvent(deps.queryable(client), {
         assetCode: input.assetCode, eventCode: input.eventCode, title: input.title,
         subsystem: input.subsystem ?? null, severity: input.severity, occurredAt: input.occurredAt,

@@ -73,8 +73,8 @@ export function DataHub({ onImported }: { onImported: (report: ImportReport) => 
         <h2>Data Hub</h2>
         <p>
           Add operational history to Machine Memory from a CSV export. Gemini proposes the column
-          mapping; nothing is written until you confirm it, and every imported row is stored as
-          user import provenance.
+          mapping. Preview saves source metadata; operational rows are imported after you confirm,
+          with user import or simulation provenance.
         </p>
       </div>
 

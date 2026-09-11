@@ -31,10 +31,26 @@ Archive-only commit left a clean tree before creating remediation branch.
 | D / P2-11 | VERIFIED | Entire detached indexing promise is caught, including acquisition and release. |
 | D / P2-10 | DEFERRED | Active reset needs writer quiescence, parent/index ordering and derived-status restoration; not a safe isolated patch. Stop app and all writers before reset; status restoration remains unresolved. |
 | E / P1-04 | LOCAL_CONTROLS_VERIFIED | Two active jobs, no queue, lifetime model-operation allowance, lazy DB acquisition, bounded SSE writes. Per-user/distributed billing controls remain deferred with authentication. |
-| F / false claims | NOT_STARTED | Correct only demonstrated overclaims outside archived audit. |
+| F / false claims | VERIFIED | Current runbook/checkpoints restored; preview, embedding, write-path and assurance statements corrected. |
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### F — current documentation and demonstrated claims
+
+- Restored README local setup and boundaries, PROJECT_CONTEXT checkpoint table, architecture
+  description and API route index. Shared v1 types/schema remain unchanged. Database/seed
+  foundation notes now explicitly point to later live evidence instead of posing as current gates.
+- Data Hub now states that preview writes source metadata, while confirmed operational rows
+  retain user_import or simulation origin. Documented runtime uploads/resolution embeddings,
+  separate CSV/seed event paths and limits of citation/English safety checks. Removed the
+  categorical claim that provenance badges prevent all confusion.
+- Replay review kept asset_code as internal duplicate lookup metadata rather than adding it
+  to the manual-event creation response. SCADA uses the validated new-event asset identity
+  and persisted duplicate identity; live replay verification rerun after this adjustment.
+- Gates: 377 tests, lint/typecheck/build/diff check PASS. No browser rerun for copy-only UI
+  correction. Archived audit SHA256 unchanged; no dependencies, migrations or persistent
+  live writes. E checkpoint: `70651b8`.
 
 ### E — local resource controls
 
@@ -257,16 +273,19 @@ Archive-only commit left a clean tree before creating remediation branch.
   recognizable provider/private-key secrets found; values were not logged.
 - Checkpoint: `fcda34a` — `fix: constrain generated operational facts`.
 
-No migrations added/applied, no live DB writes.
-Unit tests must not call paid providers. Live verification must be separate and preserve
+No migrations added/applied during remediation. Live fixture writes and their cleanup/rollback
+are recorded in individual checkpoints above. Unit tests must not call paid providers. Live verification must be separate and preserve
 public_data, public_reference and synthetic_demo. Do not run broad reset over user data.
 
 ## Continuation
 
-Phases A–C, D1–D3 and local E controls are complete. Next: F demonstrated documentation
-corrections. P2-10 reset coordination is explicitly deferred under the small/safe scope.
-P1-01 authentication and per-user/distributed billing controls remain deferred.
-Use the ledger and checkpoint entries above; older checkpoints describe historical gates.
-Keep the archived audit unchanged and commit each verified section.
-Local full demo readiness remains unestablished while reset/lifecycle gates remain open.
-Internet exposure remains blocked.
+Completed: A–C, D1–D3, local E controls and F documentation. The remaining scoped exception
+is P2-10 reset/writer coordination, deferred because the ledger only authorized a small/safe
+fix. A future section must establish quiescence for all writers, lock/recheck parent records,
+order deletes against indexing, and verify derived status on disposable fixtures. Do not
+run online reset or infer safe reset from provenance filters alone.
+
+P1-01 authentication remains deliberately deferred. Per-user/distributed billing controls,
+fresh migration replay, full lifecycle recovery and deployment verification remain open.
+Local full-demo readiness is not established; Internet exposure stays blocked. Keep the
+archived audit unchanged and use this ledger and PROJECT_CONTEXT for the current handoff.

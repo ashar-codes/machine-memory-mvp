@@ -1,4 +1,43 @@
+# API contract — current route index
 
+Existing shared v1 wire types remain authoritative in `packages/shared/src/index.ts`.
+Runtime schemas are in `backend/src/{app,routes,scada}.ts`. This index describes the current
+implementation; it does not introduce new request/response shapes.
+
+All routes use the loopback/Host/Origin boundary. Errors use
+`{error:{code,message,requestId}}`; model configuration in health is `configured_unverified`.
+JSON POST bodies have an effective global 32 KiB limit except separately parsed SCADA routes.
+Uploads are multipart and retain their existing per-file/field bounds.
+
+| Route family | Behavior |
+| --- | --- |
+| GET /api/health | Dependency configuration and DB connectivity; no live model probe |
+| GET /api/assets; GET /api/assets/:assetCode | Paginated assets; selected asset |
+| GET /api/assets/:assetCode/current-event | Current event or null |
+| GET /api/assets/:assetCode/incidents; /timeline | Paginated incident/history records |
+| GET /api/assets/:assetCode/memory-status; /event-summary | Stored history counts and event summary |
+| POST /api/investigate | InvestigateRequest → InvestigateResponse |
+| POST /api/copilot | CopilotRequest → CopilotResponse, asset or fleet scope |
+| POST /api/resolutions | 201 ResolutionResponse; structured saved, semantic pending |
+| POST /api/assets; POST /api/events | 201 user-created asset or demonstration event |
+| POST /api/import/preview | Multipart CSV → ImportPreview; writes source metadata only |
+| POST /api/import/commit | Confirmed mapping → 201 ImportReport; replay/conflicting claim returns 409 |
+| POST /api/knowledge/upload | Multipart text/PDF → 201 KnowledgeUploadReport; UNVERIFIED user_import |
+| GET /api/knowledge; GET /api/knowledge/:id | Source catalogue/details |
+| DELETE /api/knowledge/:id | Deletes user-added source; protected origins refused |
+| GET /api/fleet/summary; /api/fleet/recurring-faults | Allowlisted SQL aggregates |
+| POST /api/admin/ingest | 404 INGEST_DISABLED; trusted offline ingestion only |
+
+Two expensive jobs may run concurrently per app instance. Excess admission returns 503
+WORK_CAPACITY_REACHED. When the lifetime logical model-operation allowance is exhausted,
+existing deterministic/keyword degradation applies. A successful resolution save does not
+promise background indexing admission or completion.
+
+SCADA replay fields come from the stored event, including its original asset. Duplicate
+signalSnapshot is empty because signal snapshots are not persisted. An identity already
+belonging to another origin returns 409 EVENT_IDENTITY_CONFLICT rather than relabeling it.
+The success shapes below are unchanged. SSE may drop oversized frames or disconnect a
+backpressured client; it is not a durable delivery log.
 
 ## Amendment 2.2 (2026-09-10) — operational-event boundary
 

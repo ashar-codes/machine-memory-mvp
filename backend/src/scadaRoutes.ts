@@ -39,7 +39,7 @@ export interface ScadaDeps {
 function toPayload(row: Record<string, unknown>, event: NormalizedScadaEvent, duplicate: boolean): ScadaEventPayload {
   if (row.record_origin !== 'simulation') throw new ScadaError(409, 'EVENT_IDENTITY_CONFLICT', 'This source identity belongs to a different record origin.');
   return {
-    id: String(row.id), assetCode: String(row.asset_code), eventCode: String(row.event_code), title: String(row.title),
+    id: String(row.id), assetCode: duplicate ? String(row.asset_code) : event.assetCode, eventCode: String(row.event_code), title: String(row.title),
     subsystem: (row.subsystem as string | null) ?? null, severity: row.severity as ScadaEventPayload['severity'],
     occurredAt: new Date(row.occurred_at as string).toISOString(),
     description: (row.description as string | null) ?? null,

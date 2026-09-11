@@ -102,6 +102,6 @@ has imported history and an indexed technical document to retrieve.
 ## Provenance
 
 Everything from this boundary is stored `record_origin = 'simulation'` and badged SIMULATION in the
-timeline, the fault panel, the investigation evidence and the fleet feed. A simulated event can
-never be visually or programmatically confused with `public_data`, `public_reference`,
-`synthetic_demo`, `user_import`, or with a future real SCADA feed.
+timeline, the fault panel, the investigation evidence and the fleet feed. The stored origin distinguishes it from `public_data`, `public_reference`,
+`synthetic_demo` and `user_import`; UI badges communicate that distinction. This is not a
+guarantee against every display/context defect, and no real SCADA feed is connected.
