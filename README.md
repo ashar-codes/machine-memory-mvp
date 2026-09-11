@@ -1,104 +1,74 @@
 # Machine Memory
 
-**An asset-conditioned retrieval-augmented generation system for wind turbine maintenance intelligence.**
+A local wind-turbine investigation prototype combining structured history, semantic reference
+retrieval and cited evidence. The investigation workspace, Data Hub, fleet view, Scenario Lab
+and simulated event feed are implemented. It does not control equipment or authorize maintenance.
 
-The turbine is the unit of memory. A technician selects an asset and asks what happened to *this machine*: has this fault happened before, how was it resolved, have other turbines seen it, what changed recently, and what published reference material applies. When a new resolution is logged it becomes part of that machine's retrievable memory immediately, with no model retraining.
+## Run locally
 
-This is decision support for a university demonstration. It reports what is recorded. It does not issue maintenance instructions, approve work, or authorize any deviation from protection systems.
-
-## Run it on Windows (Git Bash)
-
-Node 22.12 or newer. From the extracted `machine-memory-mvp` folder:
+Requires Node 22.12 or newer. From the repository root:
 
 ```bash
 npm ci
-cp .env.example .env
+# For a new checkout only: copy .env.example to .env and fill backend credentials locally.
 npm run dev
 ```
 
-Open http://localhost:5173. With no credentials the app starts and says plainly that the database is not configured; nothing is faked. Backend health is at http://127.0.0.1:3001/api/health.
+Open http://127.0.0.1:5173; Vite proxies `/api` to the backend at 127.0.0.1:3001.
+Use only the dedicated Machine Memory database. Never point this project at an E-Set
+production database. Root `.env` is ignored; secrets must never use a `VITE_` prefix.
+For schema/seed details see [database notes](docs/DATABASE.md); migration and reset commands
+are operator actions, not necessary startup steps for an already populated database.
 
-## Connect a database
-
-1. Create a **dedicated** Supabase project. Do not reuse an unrelated production database.
-2. Run `supabase/migrations/20260909202010_machine_memory.sql` once in the SQL editor. It owns its transaction. `docs/DATABASE.md` has the verification queries.
-3. Put the session-pooler URI in `.env` as `DATABASE_URL`. Strip any `ssl*` query parameters: certificate verification is managed explicitly and the backend rejects URLs that try to override it. Percent-encode reserved characters in the password (`#` becomes `%23`), or both `new URL()` and dotenv's inline-comment stripping will mangle the URI. The Supabase pooler serves a private root, so set `DATABASE_CA_PATH=supabase/prod-ca-2021.crt` (the published Supabase Root 2021 CA, already in the repository).
-4. Seed and import:
-
-```bash
-npm run db:seed                     # synthetic demonstration farm: WT-07, WT-03, WT-11
-npm run data:penmanshiel -- --dry-run   # parse and checksum the real public file, no writes
-npm run data:penmanshiel            # import 14 real Penmanshiel turbine identities as public_data
-```
-
-The Penmanshiel import adds a **separate site** with `PEN-` asset codes. It carries turbine identity and siting only — the published static file has no events — so those turbines have empty timelines. That is honest, not broken.
-
-## Add the reference corpus
-
-Put an OpenAI key in `.env` as `OPENAI_API_KEY`, then:
+Gemini provides embeddings; generation can fall back to Groq, then deterministic answers.
+A configured key is not a successful model health check. Missing services are reported as
+degraded. Current configuration defaults live in `.env.example` and `backend/src/config.ts`.
 
 ```bash
-npm run rag:ingest:corpus -- --dry-run   # validate all manifests, no embeddings, no writes
-npm run rag:ingest:corpus                # embed and insert; costs embedding API usage
-```
-
-This ingests three reviewed public references: OSHA's wind-energy lockout/tagout page, hazardous-energy provisions of 29 CFR 1910.269, and NREL/TP-5000-80195 on drivetrain reliability. Each is stored as an attributed paraphrase with its source URL and authority class. Reruns are idempotent by content identity. The CLI only reads local reviewed JSON: it never fetches a URL, and the HTTP ingestion route is permanently disabled.
-
-Without a key the application still works. Investigations retrieve structured evidence from SQL and answer deterministically from it; only semantic ranking and synthesis are unavailable, and the interface says so.
-
-## Verify
-
-```bash
-npm run lint
+npm test
 npm run typecheck
-npm run test
+npm run lint
 npm run build
 ```
 
-`PROJECT_CONTEXT.md` records exactly which of these were executed at the last checkpoint and which were not. Do not assume a green tick that is not written there.
+These offline gates do not verify the live database, providers or browser. Consult the
+[checkpoint table](PROJECT_CONTEXT.md) and [remediation ledger](docs/REMEDIATION_STATUS.md)
+for exactly which live checks ran and which remain open.
 
-## How it answers
+## Local limits and remaining boundaries
 
+The server has no login and stays on loopback, rejects unapproved Host/Origin headers,
+and refuses production startup. Keep Internet access blocked. At most two expensive jobs
+run per app instance, with no queue; overload returns 503. A shared allowance of 500 logical
+model operations lasts until app restart. It is not a dollar or per-user billing cap.
+
+Reset coordination remains unresolved (P2-10). Stop the app, simulator and other writers and
+wait for background jobs to finish before considering the operator reset. Inspect its dry-run
+and selected origins first; it deletes user data and can leave derived asset status stale.
+Do not run it as routine startup or over data you intend to keep. Full-demo and deployment
+readiness are not established by the passing unit suite.
+
+## Real public wind turbine data
+
+Alongside the synthetic demonstration farm, Machine Memory holds **genuine public operational
+data**: 1,172 real event records from two Penmanshiel turbines, February 2023.
+
+Source: Cubico Sustainable Investments Ltd, "Penmanshiel wind farm data" v3, Zenodo record
+16807304, CC-BY-4.0.
+
+```bash
+npm run data:penmanshiel                       # 14 real turbine identities
+npm run data:penmanshiel -- --events           # real event history for PEN-T01 and PEN-T02
 ```
-request → asset + event context → deterministic safety pre-check
-        → intent-specific structured SQL (counts, timestamps, linkage, change window)
-        → semantic + keyword knowledge retrieval over pgvector
-        → evidence normalization → fusion and authority ranking
-        → deterministic evidence strength → grounded synthesis
-        → citation validation → InvestigateResponse
-```
 
-Two things make this more than "question → vector search → chatbot":
+Both are idempotent. The site appears as **Penmanshiel Wind Farm · PUBLIC DATA**, kept entirely
+separate from the fictional Demonstration Wind Farm, and every imported row carries
+`record_origin = public_data`.
 
-**Structured retrieval owns the facts.** Recurrence counts, timestamps, fleet matches and change windows are computed in parameterized SQL. The model is handed the numbers; it is never asked to count records, and it never sees or generates SQL.
+The dataset has operational events and **no** work orders, root causes or repair records. That gap
+is preserved: ask how a real event was solved and Machine Memory says a verified resolution is not
+present, rather than inventing one. Severity is mapped conservatively and `critical` is
+unreachable, because the published data has no such class.
 
-**Authority is decided before ranking.** A synthetic demonstration note can score high on similarity and still cannot become technical guidance. Only reviewed public references are marked quotable as guidance. Evidence strength is `HIGH` / `MODERATE` / `INSUFFICIENT`, computed by the backend from what was retrieved — never a percentage, and never the model's opinion of itself.
-
-## Safety behaviour
-
-Requests to bypass, disable, defeat or override protection, to skip isolation, or to work on energized or faulted equipment return `safetyStatus: REFUSED` with no procedural content, whatever intent the caller claims. The check runs on the question text, so labelling a bypass request as `HISTORY` does not get past it.
-
-Questions that would need a verified procedure or numeric limit return `INSUFFICIENT` unless authoritative reference material was actually retrieved. The system never invents torque values, pressure limits, setpoints, protection settings or lockout sequences.
-
-## Repository map
-
-| Path | Responsibility |
-| --- | --- |
-| `packages/shared/` | Frozen v1 wire types, intents, origins, evidence interfaces |
-| `backend/src/retrieval.ts` | Intent-specific parameterized SQL and pgvector search |
-| `backend/src/evidence.ts` | Deduplication, authority ranking, strength signals |
-| `backend/src/synthesis.ts` | Evidence bundle, model instructions, strict parsing, deterministic fallback |
-| `backend/src/investigate.ts` | Pipeline orchestration and safety gates |
-| `backend/src/rag.ts` | Safety detection, evidence scoring, citation validation |
-| `backend/src/llm.ts` | The only module that calls OpenAI |
-| `frontend/src/` | Investigation workspace: asset rail, investigation panel, timeline, evidence panel |
-| `supabase/` | 12-table schema with pgvector(1536), RLS, and the synthetic seed |
-| `scripts/data/` | Seed and the Penmanshiel public importer |
-| `scripts/rag/` | Reviewed local manifest ingestion |
-| `data/knowledge/` | Reviewed public reference manifests |
-| `data/raw/` | The verified public Penmanshiel static file |
-| `tests/` | Retrieval, pipeline, ingestion, public-data and HTTP boundary tests |
-
-## Reading order
-
-`PROJECT_CONTEXT.md` for status, `ARCHITECTURE.md` for design, `docs/API_CONTRACT.md` for the wire contract, `SECURITY.md` before changing anything security-relevant, `DEMO_SCRIPT.md` to present it.
+Nothing is trained on this data. Structured rows are queried in SQL; reviewed public references, user-uploaded documents and saved-resolution narratives can
+be embedded with their original provenance. See `docs/PENMANSHIEL_DATA.md`.

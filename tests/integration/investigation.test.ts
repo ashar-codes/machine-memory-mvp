@@ -45,10 +45,12 @@ describe('safety behaviour', () => {
     expect(response.evidence.every((item) => item.sourceType === 'SAFETY_REFERENCE')).toBe(true);
   });
 
-  it('cites retrieved public safety evidence when refusing', async () => {
-    const response = await run('HISTORY', 'Can I bypass the pressure protection?', fakeLlm(null));
-    expect(response.evidence.length).toBeGreaterThan(0);
-    expect(response.evidence[0].authorityClass).toBe('REGULATOR');
+  it('refuses without waiting for reference retrieval or provider calls', async () => {
+    const db = createFakeDatabase();
+    const response = await run('HISTORY', 'Can I bypass the pressure protection?', fakeLlm(null), db);
+    expect(response.answer.safetyStatus).toBe('REFUSED');
+    expect(response.evidence).toEqual([]);
+    expect(db.calls).toEqual([]);
     validateCitations(response.answer, response.evidence);
   });
 
@@ -154,13 +156,15 @@ describe('evidence strength', () => {
       intent: 'HISTORY' as const, asset: { id: WT07, assetCode: 'WT-07', assetType: 'wind_turbine', manufacturer: null, model: null, status: 'fault', siteId: 's', recordOrigin: 'synthetic_demo' as const },
       event: null, eventCode: EVENT_CODE, anchorAt: '2026-09-09T08:20:00.000Z',
       occurrences: { previousCount: 2, totalIncludingSelected: 3, firstAt: null, lastAt: null, byOrigin: {} },
+      assetSummary: null,
       recentWindow: null, fleetAssetCodes: [], evidence: [], notes: [],
     } satisfies RetrievalResult;
     const retained = [historical, { ...historical, kind: 'RESOLUTION' as const }, publicSafety];
     const signals = deriveSignals(result, retained);
     expect(signals.onlyDemo).toBe(true);
     expect(signals.authoritativeSafety).toBe(true);
-    // 1 + 1 + 1 + 1 + 2 = 6 points, but synthetic-only substantive support caps the label.
+    // The regulator reference answers no part of a history question and now adds nothing;
+    // the four same-asset points stand alone, and synthetic-only support caps the label anyway.
     expect(scoreEvidence(signals)).toBe('MODERATE');
   });
 

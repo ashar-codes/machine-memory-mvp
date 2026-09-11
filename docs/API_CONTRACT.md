@@ -1,65 +1,63 @@
-# Machine Memory API contract v1 — frozen
+# API contract — current route index
 
-> **Amendment 1.1 (2026-09-10), the only change since freeze.** `HealthResponse.phase` was widened from `'foundation'` to `'foundation' | 'mvp'` and the server now reports `'mvp'`. Reason: the investigation pipeline is implemented, and a health field that still said `foundation` would misreport completion status. No field was renamed, removed or retyped; no request shape changed. Propagated together in `packages/shared/src/index.ts`, `backend/src/app.ts`, this document and `tests/integration/http.test.ts`.
+Existing shared v1 wire types remain authoritative in `packages/shared/src/index.ts`.
+Runtime schemas are in `backend/src/{app,routes,scada}.ts`. This index describes the current
+implementation; it does not introduce new request/response shapes.
 
-Effective 2026-09-09. Wire JSON is camelCase; DB columns are snake_case. Exact TypeScript shapes live in `packages/shared/src/index.ts`. Shared package is architect-owned. These are success contracts, including endpoints awaiting implementation; see implementation status below. No silent changes during agent work.
+All routes use the loopback/Host/Origin boundary. Errors use
+`{error:{code,message,requestId}}`; model configuration in health is `configured_unverified`.
+JSON POST bodies have an effective global 32 KiB limit except separately parsed SCADA routes.
+Uploads are multipart and retain their existing per-file/field bounds.
 
-## Transport and common rules
+| Route family | Behavior |
+| --- | --- |
+| GET /api/health | Dependency configuration and DB connectivity; no live model probe |
+| GET /api/assets; GET /api/assets/:assetCode | Paginated assets; selected asset |
+| GET /api/assets/:assetCode/current-event | Current event or null |
+| GET /api/assets/:assetCode/incidents; /timeline | Paginated incident/history records |
+| GET /api/assets/:assetCode/memory-status; /event-summary | Stored history counts and event summary |
+| POST /api/investigate | InvestigateRequest → InvestigateResponse |
+| POST /api/copilot | CopilotRequest → CopilotResponse, asset or fleet scope |
+| POST /api/resolutions | 201 ResolutionResponse; structured saved, semantic pending |
+| POST /api/assets; POST /api/events | 201 user-created asset or demonstration event |
+| POST /api/import/preview | Multipart CSV → ImportPreview; writes source metadata only |
+| POST /api/import/commit | Confirmed mapping → 201 ImportReport; replay/conflicting claim returns 409 |
+| POST /api/knowledge/upload | Multipart text/PDF → 201 KnowledgeUploadReport; UNVERIFIED user_import |
+| GET /api/knowledge; GET /api/knowledge/:id | Source catalogue/details |
+| DELETE /api/knowledge/:id | Deletes user-added source; protected origins refused |
+| GET /api/fleet/summary; /api/fleet/recurring-faults | Allowlisted SQL aggregates |
+| POST /api/admin/ingest | 404 INGEST_DISABLED; trusted offline ingestion only |
 
-Local backend `http://127.0.0.1:3001`; Vite browser uses same-origin `/api` via proxy. JSON only for POST, 32 KiB request body limit. UUIDs are strings; timestamps ISO 8601 UTC strings; unknown values use null, not invented text. Asset codes match `[A-Za-z0-9_-]{1,64}` and are case-sensitive globally unique IDs. Event codes max100 characters. No login in foundation: bind only loopback and reject other Host/browser Origin values. This is not authorized for public deployment.
+Two expensive jobs may run concurrently per app instance. Excess admission returns 503
+WORK_CAPACITY_REACHED. When the lifetime logical model-operation allowance is exhausted,
+existing deterministic/keyword degradation applies. A successful resolution save does not
+promise background indexing admission or completion.
 
-Lists accept `limit` (integer1–100 default25), `offset` (integer0–10000 default0). Response `{items:T[],limit,offset,hasMore}` uses limit+1 query; this is a page indicator, not total rows. List counts must not be presented as whole-history counts. Arrays sort deterministically; histories newest timestamp then ID. Empty collections return200. Missing selected asset returns404. `GET /api/assets` sorts assetCode ascending. Unknown input properties rejected on POST and query parameters.
+SCADA replay fields come from the stored event, including its original asset. Duplicate
+signalSnapshot is empty because signal snapshots are not persisted. An identity already
+belonging to another origin returns 409 EVENT_IDENTITY_CONFLICT rather than relabeling it.
+The success shapes below are unchanged. SSE may drop oversized frames or disconnect a
+backpressured client; it is not a durable delivery log.
 
-Errors: `{error:{code:string,message:string,requestId:string}}`. 400 invalid request; 403 blocked origin/host; 404 asset/route absent or ingest disabled; 413 body too large; 415 unsupported media; 429 rate limit; 503 missing DB or incomplete investigation; 500 sanitized internal failure. No stack traces, SQL strings, credentials or model provider internals in responses.
+## Amendment 2.2 (2026-09-10) — operational-event boundary
 
-## Routes
+Additive. Every route and shape above is unchanged.
 
-| Route | Success body | Foundation status |
+| Route | Success body | Notes |
 | --- | --- | --- |
-| GET /api/health | HealthResponse | Implemented; always200, status may degraded |
-| GET /api/assets | ListResponse<Asset> | Implemented SQL; needs database |
-| GET /api/assets/:assetCode | `{asset:Asset}` | Implemented SQL |
-| GET /api/assets/:assetCode/timeline | ListResponse<TimelineItem> | Events, maintenance, notes, saved resolutions |
-| GET /api/assets/:assetCode/incidents | ListResponse<Incident> | Implemented SQL |
-| GET /api/assets/:assetCode/current-event | `{event:AssetEvent|null}` | Latest uncleared event; null if none |
-| POST /api/investigate | InvestigateResponse | **Implemented.** Hybrid structured + semantic retrieval, deterministic safety/strength, grounded synthesis, citation validation |
-| POST /api/resolutions | ResolutionResponse,201 | Transactional SQL persistence; semantic indexing attempted after the response, never reported as complete |
-| POST /api/admin/ingest | ErrorResponse,404 INGEST_DISABLED | Disabled in all environments; offline CLI only |
+| GET /api/scada/status | `ScadaStatus` | `simulated` is always `true`. Lists scenarios and recent simulator events. |
+| GET /api/scada/stream | `text/event-stream` | SSE. Named events: `telemetry`, `event`, `run`. One-directional; bounded to 8 clients. |
+| POST /api/scada/simulate | `StartSimulationResponse`, 202 | Starts a scenario run in the background. 409 `RUN_IN_PROGRESS` if one is active. |
+| POST /api/scada/simulation/stop | `{status:'stopped'}` | Cancels an in-flight simulation run. Named for what it stops: no endpoint commands equipment. |
+| POST /api/scada/ingest | `{event:ScadaEventPayload}` | 201 when created, **200 when the event is a replay**. The adapter-facing endpoint. |
 
-Health returns `service:machine-memory`, `phase:mvp`, database `not_configured|connected|unavailable`, llm `not_configured|configured_unverified`. A configured key is not proof of model access. Health is liveness/configuration; it does not verify migrations, corpus or answer correctness.
+`POST /api/scada/ingest` accepts a `NormalizedScadaEvent` and nothing else — a strict object with
+no field capable of expressing a control command. Unexpected properties are rejected. Idempotency
+is by `(source, externalEventId)`.
 
-## Investigate
+There is deliberately **no** route that writes toward industrial equipment.
 
-```json
-{"assetCode":"WT-07","eventCode":"PITCH-HYD-214","intent":"HISTORY","question":"Has this happened before?"}
-```
+New error codes: `SCENARIO_NOT_FOUND` 404, `RUN_IN_PROGRESS` 409.
 
-`eventCode` optional; `intent` required: HISTORY, PREVIOUS_RESOLUTION, SIMILAR_INCIDENTS, RECENT_CHANGES, TECHNICAL_GUIDANCE, GENERAL, SAFETY. Question required trimmed1–2000 characters. Client intent is a hint: safety scans question regardless of chosen intent. Never let a caller bypass safety with HISTORY.
-
-```json
-{"answer":{"summary":"Insufficient verified evidence.","findings":[],"evidenceStrength":"INSUFFICIENT","uncertainties":["No applicable verified evidence is available."],"safetyStatus":"INSUFFICIENT"},"evidence":[]}
-```
-
-Each finding has `title`, `detail`, `citationIds:string[]`. Each evidence has `id,title,sourceType,authorityClass,excerpt,assetCode,timestamp,recordOrigin,sourceUrl`; assetCode/timestamp/sourceUrl nullable. Origins exactly public_data, public_reference, synthetic_demo, user_demo. Strength HIGH/MODERATE/INSUFFICIENT; safety NORMAL/REFUSED/INSUFFICIENT. All cited IDs must occur in supplied evidence; reject entire generated answer on unknown IDs or unsupported uncited factual findings. Strength and safety are assigned by backend, never trusted from model output.
-
-Never return a success-shaped answer that is not backed by retrieved evidence. With no database configured, investigate returns503 `DATABASE_NOT_CONFIGURED` rather than a fabricated result; `INVESTIGATION_NOT_IMPLEMENTED` is retired. Forbidden bypass requests may return200 REFUSED without database or LLM; no procedural content. When the model provider fails or returns unusable output, the backend answers deterministically from the evidence it retrieved and never claims model synthesis occurred.
-
-Evidence IDs are `EV-1`, `EV-2`, ... assigned in presentation order for one response. They are stable within a response only and must not be stored or compared across responses.
-
-## Save resolution
-
-```json
-{"assetCode":"WT-07","eventCode":"PITCH-HYD-214","rootCause":"Demo diagnosis","resolutionSummary":"Demo maintenance result","component":"Pitch assembly","downtimeMinutes":47,"notes":"Student-entered demonstration","validated":true}
-```
-
-Required strict fields: assetCode,eventCode; rootCause/resolutionSummary1–4000 chars; component1–200; notes0–4000; downtimeMinutes integer0–525600; validated boolean. Server sets assetId, UUID, createdAt, and **user_demo** origin. `validated` records the student's assertion only; it grants no authority or safety verification. No origin/authority fields accepted from caller. Each POST creates one append-only resolution; client must not auto-retry ambiguous timeouts (no idempotency key in v1). Existing records are never overwritten.
-
-```json
-{"resolution":{"id":"UUID","assetId":"UUID","assetCode":"WT-07","eventCode":"PITCH-HYD-214","rootCause":"Demo diagnosis","resolutionSummary":"Demo maintenance result","component":"Pitch assembly","downtimeMinutes":47,"notes":"Student-entered demonstration","validated":true,"recordOrigin":"user_demo","createdAt":"2026-09-09T12:00:00.000Z"},"timelineRefresh":{"assetCode":"WT-07","url":"/api/assets/WT-07/timeline"},"memoryStatus":"STRUCTURED_SAVED_SEMANTIC_PENDING"}
-```
-
-Timeline includes the new record immediately after commit; vector embedding is explicitly pending. Backend/Data-RAG handoff must implement deterministic pending-record scanning/retries without changing this enum silently.
-
-## Ingest boundary
-
-Reserved future input type `{manifestPath:string}` is not accepted by HTTP in v1. `POST /api/admin/ingest` always404. Local `npm run rag:ingest -- --file <reviewed-json> [--dry-run]` follows docs/DATA_RAG_HANDOFF.md. No URL fetching, file upload or filesystem path access from a network request.
+`RecordOrigin` is unchanged; ingested events use the existing `simulation` member. `AssetEvent`
+rows gain nullable `eventSource` and `externalEventId`; existing consumers are unaffected.

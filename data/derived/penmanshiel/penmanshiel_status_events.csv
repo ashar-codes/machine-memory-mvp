@@ -1,0 +1,1173 @@
+asset_code,source_turbine,started_at,ended_at,duration,source_status,severity,source_code,event_code,message,iec_category,external_event_id
+PEN-T01,01,2023-01-01T04:20:33.000Z,2023-02-01T21:38:56.000Z,761:18:23,Warning,warning,5000,PEN-5000,"Breakdown obstacle light",Full Performance,01:2023-01-01T04:20:33.000Z:5000
+PEN-T01,01,2023-02-01T19:44:13.000Z,2023-02-01T19:45:00.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-01T19:44:13.000Z:10
+PEN-T01,01,2023-02-01T19:44:13.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-01T19:44:13.000Z:100070
+PEN-T01,01,2023-02-01T19:45:00.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-01T19:45:00.000Z:100130
+PEN-T01,01,2023-02-01T19:54:33.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-01T19:54:33.000Z:100180
+PEN-T01,01,2023-02-01T19:55:49.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-01T19:55:49.000Z:100190
+PEN-T01,01,2023-02-01T19:56:00.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-01T19:56:00.000Z:100200
+PEN-T01,01,2023-02-01T19:56:30.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-01T19:56:30.000Z:100210
+PEN-T01,01,2023-02-01T21:38:56.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-01T21:38:56.000Z:0
+PEN-T01,01,2023-02-02T20:26:26.000Z,2023-02-02T20:37:28.000Z,00:11:02,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-02T20:26:26.000Z:64
+PEN-T01,01,2023-02-02T20:26:26.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-02T20:26:26.000Z:100060
+PEN-T01,01,2023-02-02T20:37:28.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-02T20:37:28.000Z:0
+PEN-T01,01,2023-02-02T20:37:28.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-02T20:37:28.000Z:100130
+PEN-T01,01,2023-02-02T20:39:28.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-02T20:39:28.000Z:100180
+PEN-T01,01,2023-02-02T20:40:49.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-02T20:40:49.000Z:100190
+PEN-T01,01,2023-02-02T20:41:00.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-02T20:41:00.000Z:100200
+PEN-T01,01,2023-02-02T20:41:30.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-02T20:41:30.000Z:100210
+PEN-T01,01,2023-02-02T20:50:17.000Z,2023-02-02T21:05:44.000Z,00:15:27,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-02T20:50:17.000Z:64
+PEN-T01,01,2023-02-02T20:50:17.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-02T20:50:17.000Z:100060
+PEN-T01,01,2023-02-02T21:05:44.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-02T21:05:44.000Z:0
+PEN-T01,01,2023-02-02T21:05:44.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-02T21:05:44.000Z:100130
+PEN-T01,01,2023-02-02T21:07:44.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-02T21:07:44.000Z:100180
+PEN-T01,01,2023-02-02T21:08:45.000Z,2023-02-02T21:19:15.000Z,00:10:30,Stop,warning,4510,PEN-4510,"Tower oscillation Y level 1",Forced outage,01:2023-02-02T21:08:45.000Z:4510
+PEN-T01,01,2023-02-02T21:08:45.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-02T21:08:45.000Z:100060
+PEN-T01,01,2023-02-02T21:19:15.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-02T21:19:15.000Z:0
+PEN-T01,01,2023-02-02T21:19:15.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-02T21:19:15.000Z:100130
+PEN-T01,01,2023-02-02T21:21:15.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-02T21:21:15.000Z:100180
+PEN-T01,01,2023-02-02T21:22:43.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-02T21:22:43.000Z:100190
+PEN-T01,01,2023-02-02T21:22:54.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-02T21:22:54.000Z:100200
+PEN-T01,01,2023-02-02T21:23:24.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-02T21:23:24.000Z:100210
+PEN-T01,01,2023-02-02T21:35:28.000Z,2023-02-02T22:13:35.000Z,00:38:07,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-02T21:35:28.000Z:64
+PEN-T01,01,2023-02-02T21:35:28.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-02T21:35:28.000Z:100060
+PEN-T01,01,2023-02-02T22:13:35.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-02T22:13:35.000Z:0
+PEN-T01,01,2023-02-02T22:13:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-02T22:13:35.000Z:100130
+PEN-T01,01,2023-02-02T22:15:35.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-02T22:15:35.000Z:100180
+PEN-T01,01,2023-02-02T22:16:20.000Z,2023-02-02T23:07:26.000Z,00:51:06,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-02T22:16:20.000Z:64
+PEN-T01,01,2023-02-02T22:16:20.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-02T22:16:20.000Z:100060
+PEN-T01,01,2023-02-02T23:07:26.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-02T23:07:26.000Z:0
+PEN-T01,01,2023-02-02T23:07:26.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-02T23:07:26.000Z:100130
+PEN-T01,01,2023-02-02T23:09:26.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-02T23:09:26.000Z:100180
+PEN-T01,01,2023-02-02T23:11:09.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-02T23:11:09.000Z:100190
+PEN-T01,01,2023-02-02T23:11:20.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-02T23:11:20.000Z:100200
+PEN-T01,01,2023-02-02T23:11:50.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-02T23:11:50.000Z:100210
+PEN-T01,01,2023-02-02T23:12:06.000Z,2023-02-02T23:52:06.000Z,00:40:00,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-02T23:12:06.000Z:64
+PEN-T01,01,2023-02-02T23:12:06.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-02T23:12:06.000Z:100060
+PEN-T01,01,2023-02-02T23:52:06.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-02T23:52:06.000Z:0
+PEN-T01,01,2023-02-02T23:52:06.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-02T23:52:06.000Z:100130
+PEN-T01,01,2023-02-02T23:54:08.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-02T23:54:08.000Z:100180
+PEN-T01,01,2023-02-02T23:55:05.000Z,2023-02-03T02:40:34.000Z,02:45:29,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-02T23:55:05.000Z:64
+PEN-T01,01,2023-02-02T23:55:05.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-02T23:55:05.000Z:100060
+PEN-T01,01,2023-02-03T02:40:34.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-03T02:40:34.000Z:0
+PEN-T01,01,2023-02-03T02:40:34.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T02:40:34.000Z:100130
+PEN-T01,01,2023-02-03T02:42:34.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T02:42:34.000Z:100180
+PEN-T01,01,2023-02-03T02:43:52.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T02:43:52.000Z:100190
+PEN-T01,01,2023-02-03T02:44:03.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T02:44:03.000Z:100200
+PEN-T01,01,2023-02-03T02:44:09.000Z,2023-02-03T02:54:42.000Z,00:10:33,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-03T02:44:09.000Z:64
+PEN-T01,01,2023-02-03T02:44:09.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-03T02:44:09.000Z:100060
+PEN-T01,01,2023-02-03T02:54:42.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-03T02:54:42.000Z:0
+PEN-T01,01,2023-02-03T02:54:42.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T02:54:42.000Z:100130
+PEN-T01,01,2023-02-03T02:56:42.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T02:56:42.000Z:100180
+PEN-T01,01,2023-02-03T02:58:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T02:58:17.000Z:100190
+PEN-T01,01,2023-02-03T02:58:28.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T02:58:28.000Z:100200
+PEN-T01,01,2023-02-03T02:58:58.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-03T02:58:58.000Z:100210
+PEN-T01,01,2023-02-03T06:32:24.000Z,2023-02-03T06:34:41.000Z,00:02:17,Stop,warning,710,PEN-710,"Battery test",Technical Standby,01:2023-02-03T06:32:24.000Z:710
+PEN-T01,01,2023-02-03T06:32:24.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,01:2023-02-03T06:32:24.000Z:100030
+PEN-T01,01,2023-02-03T06:34:41.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-03T06:34:41.000Z:0
+PEN-T01,01,2023-02-03T06:34:41.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-03T06:34:41.000Z:100110
+PEN-T01,01,2023-02-03T06:34:45.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T06:34:45.000Z:100130
+PEN-T01,01,2023-02-03T06:37:21.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,01:2023-02-03T06:37:21.000Z:100140
+PEN-T01,01,2023-02-03T06:37:28.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,01:2023-02-03T06:37:28.000Z:100150
+PEN-T01,01,2023-02-03T06:37:43.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,01:2023-02-03T06:37:43.000Z:100160
+PEN-T01,01,2023-02-03T06:37:58.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T06:37:58.000Z:100180
+PEN-T01,01,2023-02-03T06:39:55.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T06:39:55.000Z:100190
+PEN-T01,01,2023-02-03T06:40:06.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T06:40:06.000Z:100200
+PEN-T01,01,2023-02-03T06:40:36.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-03T06:40:36.000Z:100210
+PEN-T01,01,2023-02-03T19:06:10.000Z,2023-02-03T19:06:58.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-03T19:06:10.000Z:10
+PEN-T01,01,2023-02-03T19:06:10.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-03T19:06:10.000Z:100070
+PEN-T01,01,2023-02-03T19:06:58.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-03T19:06:58.000Z:0
+PEN-T01,01,2023-02-03T19:06:58.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T19:06:58.000Z:100130
+PEN-T01,01,2023-02-03T19:13:48.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T19:13:48.000Z:100180
+PEN-T01,01,2023-02-03T19:15:00.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T19:15:00.000Z:100190
+PEN-T01,01,2023-02-03T19:15:11.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T19:15:11.000Z:100200
+PEN-T01,01,2023-02-03T19:15:41.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-03T19:15:41.000Z:100210
+PEN-T01,01,2023-02-03T19:46:50.000Z,2023-02-03T19:47:38.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-03T19:46:50.000Z:10
+PEN-T01,01,2023-02-03T19:46:50.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-03T19:46:50.000Z:100070
+PEN-T01,01,2023-02-03T19:47:38.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-03T19:47:38.000Z:0
+PEN-T01,01,2023-02-03T19:47:38.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T19:47:38.000Z:100130
+PEN-T01,01,2023-02-03T19:52:10.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T19:52:10.000Z:100180
+PEN-T01,01,2023-02-03T19:53:49.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T19:53:49.000Z:100190
+PEN-T01,01,2023-02-03T19:54:00.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T19:54:00.000Z:100200
+PEN-T01,01,2023-02-03T19:54:30.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-03T19:54:30.000Z:100210
+PEN-T01,01,2023-02-03T19:54:40.000Z,2023-02-03T19:55:28.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-03T19:54:40.000Z:10
+PEN-T01,01,2023-02-03T19:54:40.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-03T19:54:40.000Z:100070
+PEN-T01,01,2023-02-03T19:55:28.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-03T19:55:28.000Z:0
+PEN-T01,01,2023-02-03T19:55:28.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T19:55:28.000Z:100130
+PEN-T01,01,2023-02-03T20:02:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T20:02:30.000Z:100180
+PEN-T01,01,2023-02-03T20:04:03.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T20:04:03.000Z:100190
+PEN-T01,01,2023-02-03T20:04:15.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T20:04:15.000Z:100200
+PEN-T01,01,2023-02-03T20:04:45.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-03T20:04:45.000Z:100210
+PEN-T01,01,2023-02-03T21:38:05.000Z,2023-02-17T21:24:06.000Z,335:46:01,Warning,warning,5000,PEN-5000,"Breakdown obstacle light",Full Performance,01:2023-02-03T21:38:05.000Z:5000
+PEN-T01,01,2023-02-03T23:09:21.000Z,2023-02-03T23:10:08.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-03T23:09:21.000Z:10
+PEN-T01,01,2023-02-03T23:09:21.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-03T23:09:21.000Z:100070
+PEN-T01,01,2023-02-03T23:10:08.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T23:10:08.000Z:100130
+PEN-T01,01,2023-02-03T23:25:06.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T23:25:06.000Z:100180
+PEN-T01,01,2023-02-03T23:26:32.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T23:26:32.000Z:100190
+PEN-T01,01,2023-02-03T23:26:43.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T23:26:43.000Z:100200
+PEN-T01,01,2023-02-03T23:27:13.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-03T23:27:13.000Z:100210
+PEN-T01,01,2023-02-03T23:36:48.000Z,2023-02-03T23:37:36.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-03T23:36:48.000Z:10
+PEN-T01,01,2023-02-03T23:36:48.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-03T23:36:48.000Z:100070
+PEN-T01,01,2023-02-03T23:37:36.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-03T23:37:36.000Z:100130
+PEN-T01,01,2023-02-03T23:46:34.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-03T23:46:34.000Z:100180
+PEN-T01,01,2023-02-03T23:48:12.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-03T23:48:12.000Z:100190
+PEN-T01,01,2023-02-03T23:48:24.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-03T23:48:24.000Z:100200
+PEN-T01,01,2023-02-03T23:48:54.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-03T23:48:54.000Z:100210
+PEN-T01,01,2023-02-05T07:17:02.000Z,2023-02-05T07:17:49.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-05T07:17:02.000Z:10
+PEN-T01,01,2023-02-05T07:17:02.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-05T07:17:02.000Z:100070
+PEN-T01,01,2023-02-05T07:17:49.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-05T07:17:49.000Z:100130
+PEN-T01,01,2023-02-05T08:42:44.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-05T08:42:44.000Z:100180
+PEN-T01,01,2023-02-05T08:44:25.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-05T08:44:25.000Z:100190
+PEN-T01,01,2023-02-05T08:44:36.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-05T08:44:36.000Z:100200
+PEN-T01,01,2023-02-05T08:45:06.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-05T08:45:06.000Z:100210
+PEN-T01,01,2023-02-05T08:46:47.000Z,2023-02-05T08:47:35.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-05T08:46:47.000Z:10
+PEN-T01,01,2023-02-05T08:46:47.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-05T08:46:47.000Z:100070
+PEN-T01,01,2023-02-05T08:47:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-05T08:47:35.000Z:100130
+PEN-T01,01,2023-02-05T08:57:16.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-05T08:57:16.000Z:100180
+PEN-T01,01,2023-02-05T09:09:17.000Z,2023-02-05T09:11:36.000Z,00:02:19,Informational,info,65,PEN-65,"Absence of wind during run-up",Out of Environmental Specification,01:2023-02-05T09:09:17.000Z:65
+PEN-T01,01,2023-02-05T09:09:17.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-05T09:09:17.000Z:100070
+PEN-T01,01,2023-02-05T09:11:36.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-05T09:11:36.000Z:100130
+PEN-T01,01,2023-02-05T09:55:49.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-05T09:55:49.000Z:100180
+PEN-T01,01,2023-02-05T09:56:52.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-05T09:56:52.000Z:100190
+PEN-T01,01,2023-02-05T09:57:03.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-05T09:57:03.000Z:100200
+PEN-T01,01,2023-02-05T09:57:33.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-05T09:57:33.000Z:100210
+PEN-T01,01,2023-02-05T14:38:01.000Z,2023-02-05T14:38:48.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-05T14:38:01.000Z:10
+PEN-T01,01,2023-02-05T14:38:01.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-05T14:38:01.000Z:100070
+PEN-T01,01,2023-02-05T14:38:48.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-05T14:38:48.000Z:100130
+PEN-T01,01,2023-02-05T14:55:22.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-05T14:55:22.000Z:100180
+PEN-T01,01,2023-02-05T14:57:21.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-05T14:57:21.000Z:100190
+PEN-T01,01,2023-02-05T14:57:32.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-05T14:57:32.000Z:100200
+PEN-T01,01,2023-02-05T14:58:02.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-05T14:58:02.000Z:100210
+PEN-T01,01,2023-02-05T15:49:27.000Z,2023-02-05T15:50:14.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-05T15:49:27.000Z:10
+PEN-T01,01,2023-02-05T15:49:27.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-05T15:49:27.000Z:100070
+PEN-T01,01,2023-02-05T15:50:14.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-05T15:50:14.000Z:100130
+PEN-T01,01,2023-02-05T17:00:33.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-05T17:00:33.000Z:100180
+PEN-T01,01,2023-02-05T17:02:07.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-05T17:02:07.000Z:100190
+PEN-T01,01,2023-02-05T17:02:18.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-05T17:02:18.000Z:100200
+PEN-T01,01,2023-02-05T17:02:48.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-05T17:02:48.000Z:100210
+PEN-T01,01,2023-02-05T22:26:42.000Z,2023-02-05T22:27:29.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-05T22:26:42.000Z:10
+PEN-T01,01,2023-02-05T22:26:42.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-05T22:26:42.000Z:100070
+PEN-T01,01,2023-02-05T22:27:29.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-05T22:27:29.000Z:100130
+PEN-T01,01,2023-02-05T22:36:12.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-05T22:36:12.000Z:100180
+PEN-T01,01,2023-02-05T22:37:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-05T22:37:17.000Z:100190
+PEN-T01,01,2023-02-05T22:37:28.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-05T22:37:28.000Z:100200
+PEN-T01,01,2023-02-05T22:37:58.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-05T22:37:58.000Z:100210
+PEN-T01,01,2023-02-06T02:38:16.000Z,2023-02-06T02:39:04.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-06T02:38:16.000Z:10
+PEN-T01,01,2023-02-06T02:38:16.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-06T02:38:16.000Z:100070
+PEN-T01,01,2023-02-06T02:39:04.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-06T02:39:04.000Z:100130
+PEN-T01,01,2023-02-06T02:45:31.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-06T02:45:31.000Z:100180
+PEN-T01,01,2023-02-06T02:46:50.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-06T02:46:50.000Z:100190
+PEN-T01,01,2023-02-06T02:47:01.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-06T02:47:01.000Z:100200
+PEN-T01,01,2023-02-06T02:47:31.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-06T02:47:31.000Z:100210
+PEN-T01,01,2023-02-06T03:59:36.000Z,2023-02-06T04:00:24.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-06T03:59:36.000Z:10
+PEN-T01,01,2023-02-06T03:59:36.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-06T03:59:36.000Z:100070
+PEN-T01,01,2023-02-06T04:00:24.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-06T04:00:24.000Z:100130
+PEN-T01,01,2023-02-06T04:46:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-06T04:46:30.000Z:100180
+PEN-T01,01,2023-02-06T04:48:27.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-06T04:48:27.000Z:100190
+PEN-T01,01,2023-02-06T04:48:38.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-06T04:48:38.000Z:100200
+PEN-T01,01,2023-02-06T04:49:08.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-06T04:49:08.000Z:100210
+PEN-T01,01,2023-02-06T06:34:13.000Z,2023-02-06T06:35:01.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-06T06:34:13.000Z:10
+PEN-T01,01,2023-02-06T06:34:13.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-06T06:34:13.000Z:100070
+PEN-T01,01,2023-02-06T06:35:01.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-06T06:35:01.000Z:100130
+PEN-T01,01,2023-02-06T06:53:47.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-06T06:53:47.000Z:100180
+PEN-T01,01,2023-02-06T06:55:13.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-06T06:55:13.000Z:100190
+PEN-T01,01,2023-02-06T06:55:24.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-06T06:55:24.000Z:100200
+PEN-T01,01,2023-02-06T06:55:54.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-06T06:55:54.000Z:100210
+PEN-T01,01,2023-02-06T07:12:03.000Z,2023-02-06T07:12:51.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-06T07:12:03.000Z:10
+PEN-T01,01,2023-02-06T07:12:03.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-06T07:12:03.000Z:100070
+PEN-T01,01,2023-02-06T07:12:51.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-06T07:12:51.000Z:100130
+PEN-T01,01,2023-02-06T07:19:42.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-06T07:19:42.000Z:100180
+PEN-T01,01,2023-02-06T07:21:07.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-06T07:21:07.000Z:100190
+PEN-T01,01,2023-02-06T07:21:17.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-06T07:21:17.000Z:100200
+PEN-T01,01,2023-02-06T07:21:47.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-06T07:21:47.000Z:100210
+PEN-T01,01,2023-02-07T16:31:35.000Z,2023-02-07T16:32:22.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-07T16:31:35.000Z:10
+PEN-T01,01,2023-02-07T16:31:35.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-07T16:31:35.000Z:100070
+PEN-T01,01,2023-02-07T16:32:22.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-07T16:32:22.000Z:100130
+PEN-T01,01,2023-02-07T19:01:44.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-07T19:01:44.000Z:100180
+PEN-T01,01,2023-02-07T19:03:04.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-07T19:03:04.000Z:100190
+PEN-T01,01,2023-02-07T19:03:15.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-07T19:03:15.000Z:100200
+PEN-T01,01,2023-02-07T19:03:45.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-07T19:03:45.000Z:100210
+PEN-T01,01,2023-02-07T21:54:37.000Z,2023-02-07T21:55:25.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-07T21:54:37.000Z:10
+PEN-T01,01,2023-02-07T21:54:37.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-07T21:54:37.000Z:100070
+PEN-T01,01,2023-02-07T21:55:25.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-07T21:55:25.000Z:100130
+PEN-T01,01,2023-02-07T22:16:39.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-07T22:16:39.000Z:100180
+PEN-T01,01,2023-02-07T22:18:00.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-07T22:18:00.000Z:100190
+PEN-T01,01,2023-02-07T22:18:11.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-07T22:18:11.000Z:100200
+PEN-T01,01,2023-02-07T22:18:41.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-07T22:18:41.000Z:100210
+PEN-T01,01,2023-02-09T08:37:00.000Z,2023-02-09T08:54:28.000Z,00:17:28,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,01:2023-02-09T08:37:00.000Z:20
+PEN-T01,01,2023-02-09T08:37:00.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,01:2023-02-09T08:37:00.000Z:100050
+PEN-T01,01,2023-02-09T08:54:28.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-09T08:54:28.000Z:100110
+PEN-T01,01,2023-02-09T08:54:33.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-09T08:54:33.000Z:100130
+PEN-T01,01,2023-02-09T08:54:36.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-09T08:54:36.000Z:100180
+PEN-T01,01,2023-02-09T08:56:31.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-09T08:56:31.000Z:100190
+PEN-T01,01,2023-02-09T08:56:42.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-09T08:56:42.000Z:100200
+PEN-T01,01,2023-02-09T08:57:12.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-09T08:57:12.000Z:100210
+PEN-T01,01,2023-02-09T08:58:38.000Z,2023-02-09T08:59:50.000Z,00:01:12,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,01:2023-02-09T08:58:38.000Z:20
+PEN-T01,01,2023-02-09T08:58:38.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,01:2023-02-09T08:58:38.000Z:100050
+PEN-T01,01,2023-02-09T08:59:50.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-09T08:59:50.000Z:100110
+PEN-T01,01,2023-02-09T08:59:55.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-09T08:59:55.000Z:100130
+PEN-T01,01,2023-02-09T08:59:57.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-09T08:59:57.000Z:100180
+PEN-T01,01,2023-02-09T09:01:58.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-09T09:01:58.000Z:100190
+PEN-T01,01,2023-02-09T09:02:09.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-09T09:02:09.000Z:100200
+PEN-T01,01,2023-02-09T09:02:39.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-09T09:02:39.000Z:100210
+PEN-T01,01,2023-02-09T09:04:06.000Z,2023-02-09T09:04:47.000Z,00:00:41,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,01:2023-02-09T09:04:06.000Z:20
+PEN-T01,01,2023-02-09T09:04:06.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,01:2023-02-09T09:04:06.000Z:100050
+PEN-T01,01,2023-02-09T09:04:47.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-09T09:04:47.000Z:100110
+PEN-T01,01,2023-02-09T09:04:52.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-09T09:04:52.000Z:100130
+PEN-T01,01,2023-02-09T09:04:54.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-09T09:04:54.000Z:100180
+PEN-T01,01,2023-02-09T09:07:05.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-09T09:07:05.000Z:100190
+PEN-T01,01,2023-02-09T09:07:16.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-09T09:07:16.000Z:100200
+PEN-T01,01,2023-02-09T09:07:46.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-09T09:07:46.000Z:100210
+PEN-T01,01,2023-02-09T09:08:54.000Z,2023-02-09T09:10:19.000Z,00:01:25,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,01:2023-02-09T09:08:54.000Z:20
+PEN-T01,01,2023-02-09T09:08:54.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,01:2023-02-09T09:08:54.000Z:100050
+PEN-T01,01,2023-02-09T09:10:19.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-09T09:10:19.000Z:100110
+PEN-T01,01,2023-02-09T09:10:24.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-09T09:10:24.000Z:100130
+PEN-T01,01,2023-02-09T09:10:26.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-09T09:10:26.000Z:100180
+PEN-T01,01,2023-02-09T09:12:10.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-09T09:12:10.000Z:100190
+PEN-T01,01,2023-02-09T09:12:21.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-09T09:12:21.000Z:100200
+PEN-T01,01,2023-02-09T09:12:51.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-09T09:12:51.000Z:100210
+PEN-T01,01,2023-02-10T02:39:43.000Z,2023-02-10T02:40:30.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-10T02:39:43.000Z:10
+PEN-T01,01,2023-02-10T02:39:43.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-10T02:39:43.000Z:100070
+PEN-T01,01,2023-02-10T02:40:30.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-10T02:40:30.000Z:100130
+PEN-T01,01,2023-02-10T02:47:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-10T02:47:13.000Z:100180
+PEN-T01,01,2023-02-10T02:48:12.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-10T02:48:12.000Z:100190
+PEN-T01,01,2023-02-10T02:48:23.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-10T02:48:23.000Z:100200
+PEN-T01,01,2023-02-10T02:48:53.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-10T02:48:53.000Z:100210
+PEN-T01,01,2023-02-11T08:08:02.000Z,2023-02-11T08:10:20.000Z,00:02:18,Stop,warning,710,PEN-710,"Battery test",Technical Standby,01:2023-02-11T08:08:02.000Z:710
+PEN-T01,01,2023-02-11T08:08:02.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,01:2023-02-11T08:08:02.000Z:100030
+PEN-T01,01,2023-02-11T08:10:20.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-11T08:10:20.000Z:100110
+PEN-T01,01,2023-02-11T08:10:24.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-11T08:10:24.000Z:100130
+PEN-T01,01,2023-02-11T08:12:27.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,01:2023-02-11T08:12:27.000Z:100140
+PEN-T01,01,2023-02-11T08:12:35.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,01:2023-02-11T08:12:35.000Z:100150
+PEN-T01,01,2023-02-11T08:12:50.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,01:2023-02-11T08:12:50.000Z:100160
+PEN-T01,01,2023-02-11T08:13:05.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-11T08:13:05.000Z:100180
+PEN-T01,01,2023-02-11T08:15:08.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-11T08:15:08.000Z:100190
+PEN-T01,01,2023-02-11T08:15:19.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-11T08:15:19.000Z:100200
+PEN-T01,01,2023-02-11T08:15:49.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-11T08:15:49.000Z:100210
+PEN-T01,01,2023-02-11T08:26:38.000Z,2023-02-11T08:27:26.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-11T08:26:38.000Z:10
+PEN-T01,01,2023-02-11T08:26:38.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-11T08:26:38.000Z:100070
+PEN-T01,01,2023-02-11T08:27:26.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-11T08:27:26.000Z:100130
+PEN-T01,01,2023-02-11T08:30:54.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-11T08:30:54.000Z:100180
+PEN-T01,01,2023-02-11T08:32:16.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-11T08:32:16.000Z:100190
+PEN-T01,01,2023-02-11T08:32:27.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-11T08:32:27.000Z:100200
+PEN-T01,01,2023-02-11T08:32:57.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-11T08:32:57.000Z:100210
+PEN-T01,01,2023-02-11T18:46:42.000Z,2023-02-11T18:47:29.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-11T18:46:42.000Z:10
+PEN-T01,01,2023-02-11T18:46:42.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-11T18:46:42.000Z:100070
+PEN-T01,01,2023-02-11T18:47:29.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-11T18:47:29.000Z:100130
+PEN-T01,01,2023-02-11T18:51:09.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-11T18:51:09.000Z:100180
+PEN-T01,01,2023-02-11T18:52:28.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-11T18:52:28.000Z:100190
+PEN-T01,01,2023-02-11T18:52:39.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-11T18:52:39.000Z:100200
+PEN-T01,01,2023-02-11T18:53:09.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-11T18:53:09.000Z:100210
+PEN-T01,01,2023-02-11T20:13:35.000Z,2023-02-11T20:14:23.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-11T20:13:35.000Z:10
+PEN-T01,01,2023-02-11T20:13:35.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-11T20:13:35.000Z:100070
+PEN-T01,01,2023-02-11T20:14:23.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-11T20:14:23.000Z:100130
+PEN-T01,01,2023-02-11T20:20:39.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-11T20:20:39.000Z:100180
+PEN-T01,01,2023-02-11T20:22:03.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-11T20:22:03.000Z:100190
+PEN-T01,01,2023-02-11T20:22:14.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-11T20:22:14.000Z:100200
+PEN-T01,01,2023-02-11T20:22:44.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-11T20:22:44.000Z:100210
+PEN-T01,01,2023-02-11T20:23:10.000Z,2023-02-11T20:23:58.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-11T20:23:10.000Z:10
+PEN-T01,01,2023-02-11T20:23:10.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-11T20:23:10.000Z:100070
+PEN-T01,01,2023-02-11T20:23:58.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-11T20:23:58.000Z:100130
+PEN-T01,01,2023-02-11T20:27:41.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-11T20:27:41.000Z:100180
+PEN-T01,01,2023-02-11T20:28:38.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-11T20:28:38.000Z:100190
+PEN-T01,01,2023-02-11T20:28:49.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-11T20:28:49.000Z:100200
+PEN-T01,01,2023-02-11T20:29:19.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-11T20:29:19.000Z:100210
+PEN-T01,01,2023-02-13T02:38:55.000Z,2023-02-13T02:39:43.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-13T02:38:55.000Z:10
+PEN-T01,01,2023-02-13T02:38:55.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-13T02:38:55.000Z:100070
+PEN-T01,01,2023-02-13T02:39:43.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-13T02:39:43.000Z:100130
+PEN-T01,01,2023-02-13T03:31:23.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-13T03:31:23.000Z:100180
+PEN-T01,01,2023-02-13T03:33:31.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-13T03:33:31.000Z:100190
+PEN-T01,01,2023-02-13T03:33:42.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-13T03:33:42.000Z:100200
+PEN-T01,01,2023-02-13T03:34:12.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-13T03:34:12.000Z:100210
+PEN-T01,01,2023-02-13T05:13:13.000Z,2023-02-13T05:14:01.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-13T05:13:13.000Z:10
+PEN-T01,01,2023-02-13T05:13:13.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-13T05:13:13.000Z:100070
+PEN-T01,01,2023-02-13T05:14:01.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-13T05:14:01.000Z:100130
+PEN-T01,01,2023-02-13T05:26:28.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-13T05:26:28.000Z:100180
+PEN-T01,01,2023-02-13T05:27:55.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-13T05:27:55.000Z:100190
+PEN-T01,01,2023-02-13T05:28:06.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-13T05:28:06.000Z:100200
+PEN-T01,01,2023-02-13T05:28:36.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-13T05:28:36.000Z:100210
+PEN-T01,01,2023-02-13T11:50:20.000Z,2023-02-13T11:51:07.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-13T11:50:20.000Z:10
+PEN-T01,01,2023-02-13T11:50:20.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-13T11:50:20.000Z:100070
+PEN-T01,01,2023-02-13T11:51:07.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-13T11:51:07.000Z:100130
+PEN-T01,01,2023-02-13T12:34:54.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-13T12:34:54.000Z:100180
+PEN-T01,01,2023-02-13T12:36:51.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-13T12:36:51.000Z:100190
+PEN-T01,01,2023-02-13T12:37:02.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-13T12:37:02.000Z:100200
+PEN-T01,01,2023-02-13T12:37:32.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-13T12:37:32.000Z:100210
+PEN-T01,01,2023-02-13T12:37:44.000Z,2023-02-13T12:38:31.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-13T12:37:44.000Z:10
+PEN-T01,01,2023-02-13T12:37:44.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-13T12:37:44.000Z:100070
+PEN-T01,01,2023-02-13T12:38:31.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-13T12:38:31.000Z:100130
+PEN-T01,01,2023-02-13T12:45:50.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-13T12:45:50.000Z:100180
+PEN-T01,01,2023-02-13T12:47:40.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-13T12:47:40.000Z:100190
+PEN-T01,01,2023-02-13T12:47:51.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-13T12:47:51.000Z:100200
+PEN-T01,01,2023-02-13T12:48:21.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-13T12:48:21.000Z:100210
+PEN-T01,01,2023-02-13T13:49:15.000Z,2023-02-13T13:50:02.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-13T13:49:15.000Z:10
+PEN-T01,01,2023-02-13T13:49:15.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-13T13:49:15.000Z:100070
+PEN-T01,01,2023-02-13T13:50:02.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-13T13:50:02.000Z:100130
+PEN-T01,01,2023-02-13T17:11:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-13T17:11:13.000Z:100180
+PEN-T01,01,2023-02-13T17:13:00.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-13T17:13:00.000Z:100190
+PEN-T01,01,2023-02-13T17:13:11.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-13T17:13:11.000Z:100200
+PEN-T01,01,2023-02-13T17:13:41.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-13T17:13:41.000Z:100210
+PEN-T01,01,2023-02-16T10:23:36.000Z,2023-02-16T10:24:23.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-16T10:23:36.000Z:10
+PEN-T01,01,2023-02-16T10:23:36.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-16T10:23:36.000Z:100070
+PEN-T01,01,2023-02-16T10:24:23.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-16T10:24:23.000Z:100130
+PEN-T01,01,2023-02-16T10:26:45.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-16T10:26:45.000Z:100180
+PEN-T01,01,2023-02-16T10:28:13.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-16T10:28:13.000Z:100190
+PEN-T01,01,2023-02-16T10:28:24.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-16T10:28:24.000Z:100200
+PEN-T01,01,2023-02-16T10:28:54.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-16T10:28:54.000Z:100210
+PEN-T01,01,2023-02-16T10:51:58.000Z,2023-02-16T10:52:46.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-16T10:51:58.000Z:10
+PEN-T01,01,2023-02-16T10:51:58.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-16T10:51:58.000Z:100070
+PEN-T01,01,2023-02-16T10:52:46.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-16T10:52:46.000Z:100130
+PEN-T01,01,2023-02-16T11:02:35.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-16T11:02:35.000Z:100180
+PEN-T01,01,2023-02-16T11:05:03.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-16T11:05:03.000Z:100190
+PEN-T01,01,2023-02-16T11:05:15.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-16T11:05:15.000Z:100200
+PEN-T01,01,2023-02-16T11:05:45.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-16T11:05:45.000Z:100210
+PEN-T01,01,2023-02-16T16:10:45.000Z,2023-02-16T16:11:33.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-16T16:10:45.000Z:10
+PEN-T01,01,2023-02-16T16:10:45.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-16T16:10:45.000Z:100070
+PEN-T01,01,2023-02-16T16:11:33.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-16T16:11:33.000Z:100130
+PEN-T01,01,2023-02-16T16:35:54.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-16T16:35:54.000Z:100180
+PEN-T01,01,2023-02-16T16:38:03.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-16T16:38:03.000Z:100190
+PEN-T01,01,2023-02-16T16:38:14.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-16T16:38:14.000Z:100200
+PEN-T01,01,2023-02-16T16:38:44.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-16T16:38:44.000Z:100210
+PEN-T01,01,2023-02-17T04:19:08.000Z,2023-02-17T04:29:46.000Z,00:10:38,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-17T04:19:08.000Z:64
+PEN-T01,01,2023-02-17T04:19:08.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-17T04:19:08.000Z:100060
+PEN-T01,01,2023-02-17T04:29:46.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-17T04:29:46.000Z:100130
+PEN-T01,01,2023-02-17T04:31:48.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-17T04:31:48.000Z:100180
+PEN-T01,01,2023-02-17T04:33:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-17T04:33:17.000Z:100190
+PEN-T01,01,2023-02-17T04:33:28.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-17T04:33:28.000Z:100200
+PEN-T01,01,2023-02-17T04:33:58.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-17T04:33:58.000Z:100210
+PEN-T01,01,2023-02-17T04:34:36.000Z,2023-02-17T05:13:20.000Z,00:38:44,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-17T04:34:36.000Z:64
+PEN-T01,01,2023-02-17T04:34:36.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-17T04:34:36.000Z:100060
+PEN-T01,01,2023-02-17T05:13:20.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-17T05:13:20.000Z:100130
+PEN-T01,01,2023-02-17T05:15:29.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-17T05:15:29.000Z:100180
+PEN-T01,01,2023-02-17T05:17:09.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-17T05:17:09.000Z:100190
+PEN-T01,01,2023-02-17T05:17:20.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-17T05:17:20.000Z:100200
+PEN-T01,01,2023-02-17T05:17:50.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-17T05:17:50.000Z:100210
+PEN-T01,01,2023-02-17T05:19:13.000Z,2023-02-17T06:32:59.000Z,01:13:46,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-17T05:19:13.000Z:64
+PEN-T01,01,2023-02-17T05:19:13.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-17T05:19:13.000Z:100060
+PEN-T01,01,2023-02-17T06:32:59.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-17T06:32:59.000Z:100130
+PEN-T01,01,2023-02-17T06:35:00.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-17T06:35:00.000Z:100180
+PEN-T01,01,2023-02-17T06:36:33.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-17T06:36:33.000Z:100190
+PEN-T01,01,2023-02-17T06:36:44.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-17T06:36:44.000Z:100200
+PEN-T01,01,2023-02-17T06:37:14.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-17T06:37:14.000Z:100210
+PEN-T01,01,2023-02-17T06:38:09.000Z,2023-02-17T10:04:39.000Z,03:26:30,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-17T06:38:09.000Z:64
+PEN-T01,01,2023-02-17T06:38:09.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-17T06:38:09.000Z:100060
+PEN-T01,01,2023-02-17T10:04:39.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-17T10:04:39.000Z:100130
+PEN-T01,01,2023-02-17T10:06:39.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-17T10:06:39.000Z:100180
+PEN-T01,01,2023-02-17T10:07:36.000Z,2023-02-17T10:36:56.000Z,00:29:20,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,01:2023-02-17T10:07:36.000Z:64
+PEN-T01,01,2023-02-17T10:07:36.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-17T10:07:36.000Z:100060
+PEN-T01,01,2023-02-17T10:36:56.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-17T10:36:56.000Z:100130
+PEN-T01,01,2023-02-17T10:39:11.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-17T10:39:11.000Z:100180
+PEN-T01,01,2023-02-17T10:40:40.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-17T10:40:40.000Z:100190
+PEN-T01,01,2023-02-17T10:40:51.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-17T10:40:51.000Z:100200
+PEN-T01,01,2023-02-17T10:41:21.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-17T10:41:21.000Z:100210
+PEN-T01,01,2023-02-17T10:45:55.000Z,2023-02-17T10:47:35.000Z,00:01:40,Stop,warning,1550,PEN-1550,"Missing gear oil (high rpm)",Forced outage,01:2023-02-17T10:45:55.000Z:1550
+PEN-T01,01,2023-02-17T10:45:55.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-17T10:45:55.000Z:100060
+PEN-T01,01,2023-02-17T10:47:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-17T10:47:35.000Z:100130
+PEN-T01,01,2023-02-17T10:49:54.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-17T10:49:54.000Z:100180
+PEN-T01,01,2023-02-17T10:51:35.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-17T10:51:35.000Z:100190
+PEN-T01,01,2023-02-17T10:51:46.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-17T10:51:46.000Z:100200
+PEN-T01,01,2023-02-17T10:52:16.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-17T10:52:16.000Z:100210
+PEN-T01,01,2023-02-17T21:18:01.000Z,2023-02-17T21:18:48.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-17T21:18:01.000Z:10
+PEN-T01,01,2023-02-17T21:18:01.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-17T21:18:01.000Z:100070
+PEN-T01,01,2023-02-17T21:18:48.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-17T21:18:48.000Z:100130
+PEN-T01,01,2023-02-17T21:24:06.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-17T21:24:06.000Z:0
+PEN-T01,01,2023-02-17T22:28:50.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-17T22:28:50.000Z:100180
+PEN-T01,01,2023-02-17T22:30:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-17T22:30:17.000Z:100190
+PEN-T01,01,2023-02-17T22:30:28.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-17T22:30:28.000Z:100200
+PEN-T01,01,2023-02-17T22:30:58.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-17T22:30:58.000Z:100210
+PEN-T01,01,2023-02-18T08:08:14.000Z,2023-02-18T08:10:32.000Z,00:02:18,Stop,warning,710,PEN-710,"Battery test",Technical Standby,01:2023-02-18T08:08:14.000Z:710
+PEN-T01,01,2023-02-18T08:08:14.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,01:2023-02-18T08:08:14.000Z:100030
+PEN-T01,01,2023-02-18T08:10:32.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T08:10:32.000Z:0
+PEN-T01,01,2023-02-18T08:10:32.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-18T08:10:32.000Z:100110
+PEN-T01,01,2023-02-18T08:10:36.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T08:10:36.000Z:100130
+PEN-T01,01,2023-02-18T08:13:01.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,01:2023-02-18T08:13:01.000Z:100140
+PEN-T01,01,2023-02-18T08:13:09.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,01:2023-02-18T08:13:09.000Z:100150
+PEN-T01,01,2023-02-18T08:13:24.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,01:2023-02-18T08:13:24.000Z:100160
+PEN-T01,01,2023-02-18T08:13:39.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T08:13:39.000Z:100180
+PEN-T01,01,2023-02-18T08:15:49.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T08:15:49.000Z:100190
+PEN-T01,01,2023-02-18T08:16:00.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T08:16:00.000Z:100200
+PEN-T01,01,2023-02-18T08:16:30.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T08:16:30.000Z:100210
+PEN-T01,01,2023-02-18T11:40:29.000Z,2023-02-18T11:41:16.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-18T11:40:29.000Z:10
+PEN-T01,01,2023-02-18T11:40:29.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-18T11:40:29.000Z:100070
+PEN-T01,01,2023-02-18T11:41:16.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T11:41:16.000Z:0
+PEN-T01,01,2023-02-18T11:41:16.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T11:41:16.000Z:100130
+PEN-T01,01,2023-02-18T14:11:26.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T14:11:26.000Z:100180
+PEN-T01,01,2023-02-18T14:12:56.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T14:12:56.000Z:100190
+PEN-T01,01,2023-02-18T14:13:07.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T14:13:07.000Z:100200
+PEN-T01,01,2023-02-18T14:13:37.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T14:13:37.000Z:100210
+PEN-T01,01,2023-02-18T14:19:22.000Z,2023-02-18T14:20:10.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-18T14:19:22.000Z:10
+PEN-T01,01,2023-02-18T14:19:22.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-18T14:19:22.000Z:100070
+PEN-T01,01,2023-02-18T14:20:10.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T14:20:10.000Z:0
+PEN-T01,01,2023-02-18T14:20:10.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T14:20:10.000Z:100130
+PEN-T01,01,2023-02-18T14:23:05.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T14:23:05.000Z:100180
+PEN-T01,01,2023-02-18T14:24:37.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T14:24:37.000Z:100190
+PEN-T01,01,2023-02-18T14:24:48.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T14:24:48.000Z:100200
+PEN-T01,01,2023-02-18T14:25:18.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T14:25:18.000Z:100210
+PEN-T01,01,2023-02-18T14:33:13.000Z,2023-02-18T14:34:01.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-18T14:33:13.000Z:10
+PEN-T01,01,2023-02-18T14:33:13.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-18T14:33:13.000Z:100070
+PEN-T01,01,2023-02-18T14:34:01.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T14:34:01.000Z:0
+PEN-T01,01,2023-02-18T14:34:01.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T14:34:01.000Z:100130
+PEN-T01,01,2023-02-18T14:57:00.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T14:57:00.000Z:100180
+PEN-T01,01,2023-02-18T14:59:18.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T14:59:18.000Z:100190
+PEN-T01,01,2023-02-18T14:59:29.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T14:59:29.000Z:100200
+PEN-T01,01,2023-02-18T14:59:59.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T14:59:59.000Z:100210
+PEN-T01,01,2023-02-18T15:18:16.000Z,2023-02-18T15:19:03.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-18T15:18:16.000Z:10
+PEN-T01,01,2023-02-18T15:18:16.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-18T15:18:16.000Z:100070
+PEN-T01,01,2023-02-18T15:19:03.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T15:19:03.000Z:0
+PEN-T01,01,2023-02-18T15:19:03.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T15:19:03.000Z:100130
+PEN-T01,01,2023-02-18T15:36:48.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T15:36:48.000Z:100180
+PEN-T01,01,2023-02-18T15:38:23.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T15:38:23.000Z:100190
+PEN-T01,01,2023-02-18T15:38:34.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T15:38:34.000Z:100200
+PEN-T01,01,2023-02-18T15:39:04.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T15:39:04.000Z:100210
+PEN-T01,01,2023-02-18T18:55:53.000Z,2023-02-18T18:56:40.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-18T18:55:53.000Z:10
+PEN-T01,01,2023-02-18T18:55:53.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-18T18:55:53.000Z:100070
+PEN-T01,01,2023-02-18T18:56:40.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T18:56:40.000Z:0
+PEN-T01,01,2023-02-18T18:56:40.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T18:56:40.000Z:100130
+PEN-T01,01,2023-02-18T19:25:49.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T19:25:49.000Z:100180
+PEN-T01,01,2023-02-18T19:27:45.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T19:27:45.000Z:100190
+PEN-T01,01,2023-02-18T19:27:56.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T19:27:56.000Z:100200
+PEN-T01,01,2023-02-18T19:28:26.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T19:28:26.000Z:100210
+PEN-T01,01,2023-02-18T19:39:56.000Z,2023-02-18T19:40:43.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-18T19:39:56.000Z:10
+PEN-T01,01,2023-02-18T19:39:56.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-18T19:39:56.000Z:100070
+PEN-T01,01,2023-02-18T19:40:43.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T19:40:43.000Z:0
+PEN-T01,01,2023-02-18T19:40:43.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T19:40:43.000Z:100130
+PEN-T01,01,2023-02-18T19:46:17.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T19:46:17.000Z:100180
+PEN-T01,01,2023-02-18T19:48:03.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T19:48:03.000Z:100190
+PEN-T01,01,2023-02-18T19:48:14.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T19:48:14.000Z:100200
+PEN-T01,01,2023-02-18T19:48:44.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T19:48:44.000Z:100210
+PEN-T01,01,2023-02-18T19:53:54.000Z,2023-02-18T19:54:41.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-18T19:53:54.000Z:10
+PEN-T01,01,2023-02-18T19:53:54.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-18T19:53:54.000Z:100070
+PEN-T01,01,2023-02-18T19:54:41.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-18T19:54:41.000Z:0
+PEN-T01,01,2023-02-18T19:54:41.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-18T19:54:41.000Z:100130
+PEN-T01,01,2023-02-18T19:58:49.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-18T19:58:49.000Z:100180
+PEN-T01,01,2023-02-18T20:00:13.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-18T20:00:13.000Z:100190
+PEN-T01,01,2023-02-18T20:00:24.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-18T20:00:24.000Z:100200
+PEN-T01,01,2023-02-18T20:00:54.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-18T20:00:54.000Z:100210
+PEN-T01,01,2023-02-19T01:44:17.000Z,2023-02-19T01:45:04.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-19T01:44:17.000Z:10
+PEN-T01,01,2023-02-19T01:44:17.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-19T01:44:17.000Z:100070
+PEN-T01,01,2023-02-19T01:45:04.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-19T01:45:04.000Z:0
+PEN-T01,01,2023-02-19T01:45:04.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-19T01:45:04.000Z:100130
+PEN-T01,01,2023-02-19T01:48:27.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-19T01:48:27.000Z:100180
+PEN-T01,01,2023-02-19T01:49:47.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-19T01:49:47.000Z:100190
+PEN-T01,01,2023-02-19T01:49:58.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-19T01:49:58.000Z:100200
+PEN-T01,01,2023-02-19T01:50:28.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-19T01:50:28.000Z:100210
+PEN-T01,01,2023-02-19T05:18:38.000Z,2023-02-19T05:19:26.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-19T05:18:38.000Z:10
+PEN-T01,01,2023-02-19T05:18:38.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-19T05:18:38.000Z:100070
+PEN-T01,01,2023-02-19T05:19:26.000Z,,,Informational,info,0,PEN-0,"System OK",Full Performance,01:2023-02-19T05:19:26.000Z:0
+PEN-T01,01,2023-02-19T05:19:26.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-19T05:19:26.000Z:100130
+PEN-T01,01,2023-02-19T05:42:40.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-19T05:42:40.000Z:100180
+PEN-T01,01,2023-02-19T05:43:44.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-19T05:43:44.000Z:100190
+PEN-T01,01,2023-02-19T05:43:55.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-19T05:43:55.000Z:100200
+PEN-T01,01,2023-02-19T05:44:25.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-19T05:44:25.000Z:100210
+PEN-T01,01,2023-02-19T21:23:18.000Z,2023-03-23T14:41:42.000Z,761:18:24,Warning,warning,5000,PEN-5000,"Breakdown obstacle light",Full Performance,01:2023-02-19T21:23:18.000Z:5000
+PEN-T01,01,2023-02-21T07:25:29.000Z,2023-02-21T07:26:17.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-21T07:25:29.000Z:10
+PEN-T01,01,2023-02-21T07:25:29.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-21T07:25:29.000Z:100070
+PEN-T01,01,2023-02-21T07:26:17.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-21T07:26:17.000Z:100130
+PEN-T01,01,2023-02-21T07:37:16.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-21T07:37:16.000Z:100180
+PEN-T01,01,2023-02-21T07:38:44.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-21T07:38:44.000Z:100190
+PEN-T01,01,2023-02-21T07:38:55.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-21T07:38:55.000Z:100200
+PEN-T01,01,2023-02-21T07:39:25.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-21T07:39:25.000Z:100210
+PEN-T01,01,2023-02-21T20:10:07.000Z,2023-02-21T20:10:54.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-21T20:10:07.000Z:10
+PEN-T01,01,2023-02-21T20:10:07.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-21T20:10:07.000Z:100070
+PEN-T01,01,2023-02-21T20:10:54.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-21T20:10:54.000Z:100130
+PEN-T01,01,2023-02-21T20:14:06.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-21T20:14:06.000Z:100180
+PEN-T01,01,2023-02-21T20:15:02.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-21T20:15:02.000Z:100190
+PEN-T01,01,2023-02-21T20:15:13.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-21T20:15:13.000Z:100200
+PEN-T01,01,2023-02-21T20:15:43.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-21T20:15:43.000Z:100210
+PEN-T01,01,2023-02-21T20:34:47.000Z,2023-02-21T20:35:35.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-21T20:34:47.000Z:10
+PEN-T01,01,2023-02-21T20:34:47.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-21T20:34:47.000Z:100070
+PEN-T01,01,2023-02-21T20:35:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-21T20:35:35.000Z:100130
+PEN-T01,01,2023-02-21T20:42:43.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-21T20:42:43.000Z:100180
+PEN-T01,01,2023-02-21T20:43:48.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-21T20:43:48.000Z:100190
+PEN-T01,01,2023-02-21T20:43:59.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-21T20:43:59.000Z:100200
+PEN-T01,01,2023-02-21T20:44:29.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-21T20:44:29.000Z:100210
+PEN-T01,01,2023-02-21T21:14:54.000Z,2023-02-21T21:15:42.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-21T21:14:54.000Z:10
+PEN-T01,01,2023-02-21T21:14:54.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-21T21:14:54.000Z:100070
+PEN-T01,01,2023-02-21T21:15:42.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-21T21:15:42.000Z:100130
+PEN-T01,01,2023-02-21T21:22:58.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-21T21:22:58.000Z:100180
+PEN-T01,01,2023-02-21T21:24:38.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-21T21:24:38.000Z:100190
+PEN-T01,01,2023-02-21T21:24:49.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-21T21:24:49.000Z:100200
+PEN-T01,01,2023-02-21T21:25:19.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-21T21:25:19.000Z:100210
+PEN-T01,01,2023-02-21T22:12:57.000Z,2023-02-21T22:13:44.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-21T22:12:57.000Z:10
+PEN-T01,01,2023-02-21T22:12:57.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-21T22:12:57.000Z:100070
+PEN-T01,01,2023-02-21T22:12:57.000Z,2023-02-21T22:22:58.000Z,00:10:01,Stop,warning,5760,PEN-5760,"Hydraulic oil flushing operation",Technical Standby,01:2023-02-21T22:12:57.000Z:5760
+PEN-T01,01,2023-02-21T22:12:57.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,01:2023-02-21T22:12:57.000Z:100060
+PEN-T01,01,2023-02-21T22:22:58.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-21T22:22:58.000Z:100130
+PEN-T01,01,2023-02-21T22:25:23.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-21T22:25:23.000Z:100180
+PEN-T01,01,2023-02-21T22:27:16.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-21T22:27:16.000Z:100190
+PEN-T01,01,2023-02-21T22:27:27.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-21T22:27:27.000Z:100200
+PEN-T01,01,2023-02-21T22:27:57.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-21T22:27:57.000Z:100210
+PEN-T01,01,2023-02-21T23:03:32.000Z,2023-02-21T23:04:20.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-21T23:03:32.000Z:10
+PEN-T01,01,2023-02-21T23:03:32.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-21T23:03:32.000Z:100070
+PEN-T01,01,2023-02-21T23:04:20.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-21T23:04:20.000Z:100130
+PEN-T01,01,2023-02-21T23:13:46.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-21T23:13:46.000Z:100180
+PEN-T01,01,2023-02-21T23:15:18.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-21T23:15:18.000Z:100190
+PEN-T01,01,2023-02-21T23:15:30.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-21T23:15:30.000Z:100200
+PEN-T01,01,2023-02-21T23:16:00.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-21T23:16:00.000Z:100210
+PEN-T01,01,2023-02-21T23:46:16.000Z,2023-02-21T23:47:03.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-21T23:46:16.000Z:10
+PEN-T01,01,2023-02-21T23:46:16.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-21T23:46:16.000Z:100070
+PEN-T01,01,2023-02-21T23:47:03.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-21T23:47:03.000Z:100130
+PEN-T01,01,2023-02-21T23:49:52.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-21T23:49:52.000Z:100180
+PEN-T01,01,2023-02-21T23:51:33.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-21T23:51:33.000Z:100190
+PEN-T01,01,2023-02-21T23:51:44.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-21T23:51:44.000Z:100200
+PEN-T01,01,2023-02-21T23:52:14.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-21T23:52:14.000Z:100210
+PEN-T01,01,2023-02-22T05:25:43.000Z,2023-02-22T05:26:30.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-22T05:25:43.000Z:10
+PEN-T01,01,2023-02-22T05:25:43.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-22T05:25:43.000Z:100070
+PEN-T01,01,2023-02-22T05:26:30.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-22T05:26:30.000Z:100130
+PEN-T01,01,2023-02-22T05:36:04.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-22T05:36:04.000Z:100180
+PEN-T01,01,2023-02-22T05:37:21.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-22T05:37:21.000Z:100190
+PEN-T01,01,2023-02-22T05:37:32.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-22T05:37:32.000Z:100200
+PEN-T01,01,2023-02-22T05:38:02.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-22T05:38:02.000Z:100210
+PEN-T01,01,2023-02-26T05:24:21.000Z,2023-02-26T05:25:09.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-26T05:24:21.000Z:10
+PEN-T01,01,2023-02-26T05:24:21.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-26T05:24:21.000Z:100070
+PEN-T01,01,2023-02-26T05:25:09.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-26T05:25:09.000Z:100130
+PEN-T01,01,2023-02-26T05:27:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-26T05:27:13.000Z:100180
+PEN-T01,01,2023-02-26T05:28:08.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-26T05:28:08.000Z:100190
+PEN-T01,01,2023-02-26T05:28:19.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-26T05:28:19.000Z:100200
+PEN-T01,01,2023-02-26T05:28:49.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-26T05:28:49.000Z:100210
+PEN-T01,01,2023-02-26T07:06:22.000Z,2023-02-26T07:08:40.000Z,00:02:18,Stop,warning,710,PEN-710,"Battery test",Technical Standby,01:2023-02-26T07:06:22.000Z:710
+PEN-T01,01,2023-02-26T07:06:22.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,01:2023-02-26T07:06:22.000Z:100030
+PEN-T01,01,2023-02-26T07:08:40.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,01:2023-02-26T07:08:40.000Z:100110
+PEN-T01,01,2023-02-26T07:08:44.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-26T07:08:44.000Z:100130
+PEN-T01,01,2023-02-26T07:10:57.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,01:2023-02-26T07:10:57.000Z:100140
+PEN-T01,01,2023-02-26T07:11:04.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,01:2023-02-26T07:11:04.000Z:100150
+PEN-T01,01,2023-02-26T07:11:19.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,01:2023-02-26T07:11:19.000Z:100160
+PEN-T01,01,2023-02-26T07:11:34.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-26T07:11:34.000Z:100180
+PEN-T01,01,2023-02-26T07:13:29.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-26T07:13:29.000Z:100190
+PEN-T01,01,2023-02-26T07:13:40.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-26T07:13:40.000Z:100200
+PEN-T01,01,2023-02-26T07:14:10.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-26T07:14:10.000Z:100210
+PEN-T01,01,2023-02-26T14:22:34.000Z,2023-02-26T14:23:21.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-26T14:22:34.000Z:10
+PEN-T01,01,2023-02-26T14:22:34.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-26T14:22:34.000Z:100070
+PEN-T01,01,2023-02-26T14:23:21.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-26T14:23:21.000Z:100130
+PEN-T01,01,2023-02-26T14:26:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-26T14:26:13.000Z:100180
+PEN-T01,01,2023-02-26T14:28:56.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-26T14:28:56.000Z:100190
+PEN-T01,01,2023-02-26T14:29:07.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-26T14:29:07.000Z:100200
+PEN-T01,01,2023-02-26T14:29:37.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-26T14:29:37.000Z:100210
+PEN-T01,01,2023-02-26T14:31:51.000Z,2023-02-26T14:32:39.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-26T14:31:51.000Z:10
+PEN-T01,01,2023-02-26T14:31:51.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-26T14:31:51.000Z:100070
+PEN-T01,01,2023-02-26T14:32:39.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-26T14:32:39.000Z:100130
+PEN-T01,01,2023-02-26T16:48:44.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-26T16:48:44.000Z:100180
+PEN-T01,01,2023-02-26T17:00:45.000Z,2023-02-26T17:03:04.000Z,00:02:19,Informational,info,65,PEN-65,"Absence of wind during run-up",Out of Environmental Specification,01:2023-02-26T17:00:45.000Z:65
+PEN-T01,01,2023-02-26T17:00:45.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-26T17:00:45.000Z:100070
+PEN-T01,01,2023-02-26T17:03:04.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-26T17:03:04.000Z:100130
+PEN-T01,01,2023-02-26T17:09:25.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-26T17:09:25.000Z:100180
+PEN-T01,01,2023-02-26T17:11:13.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-26T17:11:13.000Z:100190
+PEN-T01,01,2023-02-26T17:11:24.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-26T17:11:24.000Z:100200
+PEN-T01,01,2023-02-26T17:11:54.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-26T17:11:54.000Z:100210
+PEN-T01,01,2023-02-26T19:29:56.000Z,2023-02-26T19:30:43.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-26T19:29:56.000Z:10
+PEN-T01,01,2023-02-26T19:29:56.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-26T19:29:56.000Z:100070
+PEN-T01,01,2023-02-26T19:30:43.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-26T19:30:43.000Z:100130
+PEN-T01,01,2023-02-26T20:07:21.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-26T20:07:21.000Z:100180
+PEN-T01,01,2023-02-26T20:08:43.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-26T20:08:43.000Z:100190
+PEN-T01,01,2023-02-26T20:08:54.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-26T20:08:54.000Z:100200
+PEN-T01,01,2023-02-26T20:09:24.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-26T20:09:24.000Z:100210
+PEN-T01,01,2023-02-27T01:33:09.000Z,2023-02-27T01:33:56.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-27T01:33:09.000Z:10
+PEN-T01,01,2023-02-27T01:33:09.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-27T01:33:09.000Z:100070
+PEN-T01,01,2023-02-27T01:33:56.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-27T01:33:56.000Z:100130
+PEN-T01,01,2023-02-27T01:39:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-27T01:39:13.000Z:100180
+PEN-T01,01,2023-02-27T01:40:53.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-27T01:40:53.000Z:100190
+PEN-T01,01,2023-02-27T01:41:04.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-27T01:41:04.000Z:100200
+PEN-T01,01,2023-02-27T01:41:34.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-27T01:41:34.000Z:100210
+PEN-T01,01,2023-02-27T07:32:22.000Z,2023-02-27T07:33:09.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,01:2023-02-27T07:32:22.000Z:10
+PEN-T01,01,2023-02-27T07:32:22.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,01:2023-02-27T07:32:22.000Z:100070
+PEN-T01,01,2023-02-27T07:33:09.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,01:2023-02-27T07:33:09.000Z:100130
+PEN-T01,01,2023-02-27T07:35:09.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,01:2023-02-27T07:35:09.000Z:100180
+PEN-T01,01,2023-02-27T07:36:10.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,01:2023-02-27T07:36:10.000Z:100190
+PEN-T01,01,2023-02-27T07:36:21.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,01:2023-02-27T07:36:21.000Z:100200
+PEN-T01,01,2023-02-27T07:36:51.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,01:2023-02-27T07:36:51.000Z:100210
+PEN-T02,02,2023-01-18T16:52:07.000Z,2023-02-18T10:11:23.000Z,737:19:16,Warning,warning,7016,PEN-7016,"Parameter outside limits",,02:2023-01-18T16:52:07.000Z:7016
+PEN-T02,02,2023-01-24T12:43:16.000Z,2023-04-16T08:36:51.000Z,1963:53:35,Warning,warning,7057,PEN-7057,"Heating/fan top box faulty",,02:2023-01-24T12:43:16.000Z:7057
+PEN-T02,02,2023-02-01T18:32:28.000Z,2023-02-01T18:33:16.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-01T18:32:28.000Z:10
+PEN-T02,02,2023-02-01T18:32:28.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-01T18:32:28.000Z:100070
+PEN-T02,02,2023-02-01T18:33:16.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-01T18:33:16.000Z:100130
+PEN-T02,02,2023-02-01T18:45:04.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-01T18:45:04.000Z:100180
+PEN-T02,02,2023-02-01T18:46:16.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-01T18:46:16.000Z:100190
+PEN-T02,02,2023-02-01T18:46:27.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-01T18:46:27.000Z:100200
+PEN-T02,02,2023-02-01T18:46:57.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-01T18:46:57.000Z:100210
+PEN-T02,02,2023-02-01T19:06:47.000Z,2023-02-01T19:07:35.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-01T19:06:47.000Z:10
+PEN-T02,02,2023-02-01T19:06:47.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-01T19:06:47.000Z:100070
+PEN-T02,02,2023-02-01T19:07:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-01T19:07:35.000Z:100130
+PEN-T02,02,2023-02-01T19:59:05.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-01T19:59:05.000Z:100180
+PEN-T02,02,2023-02-01T20:00:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-01T20:00:17.000Z:100190
+PEN-T02,02,2023-02-01T20:00:28.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-01T20:00:28.000Z:100200
+PEN-T02,02,2023-02-01T20:00:58.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-01T20:00:58.000Z:100210
+PEN-T02,02,2023-02-02T20:50:41.000Z,2023-02-02T21:05:53.000Z,00:15:12,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,02:2023-02-02T20:50:41.000Z:64
+PEN-T02,02,2023-02-02T20:50:41.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-02T20:50:41.000Z:100060
+PEN-T02,02,2023-02-02T21:05:53.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-02T21:05:53.000Z:100130
+PEN-T02,02,2023-02-02T21:07:53.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-02T21:07:53.000Z:100180
+PEN-T02,02,2023-02-02T21:09:20.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-02T21:09:20.000Z:100190
+PEN-T02,02,2023-02-02T21:09:31.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-02T21:09:31.000Z:100200
+PEN-T02,02,2023-02-02T21:10:01.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-02T21:10:01.000Z:100210
+PEN-T02,02,2023-02-02T21:22:03.000Z,2023-02-02T21:37:27.000Z,00:15:24,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,02:2023-02-02T21:22:03.000Z:64
+PEN-T02,02,2023-02-02T21:22:03.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-02T21:22:03.000Z:100060
+PEN-T02,02,2023-02-02T21:37:27.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-02T21:37:27.000Z:100130
+PEN-T02,02,2023-02-02T21:39:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-02T21:39:30.000Z:100180
+PEN-T02,02,2023-02-02T21:41:08.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-02T21:41:08.000Z:100190
+PEN-T02,02,2023-02-02T21:41:15.000Z,2023-02-02T21:51:50.000Z,00:10:35,Stop,warning,4520,PEN-4520,"Tower oscillation X level 1",Forced outage,02:2023-02-02T21:41:15.000Z:4520
+PEN-T02,02,2023-02-02T21:41:15.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-02T21:41:15.000Z:100060
+PEN-T02,02,2023-02-02T21:51:50.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-02T21:51:50.000Z:100130
+PEN-T02,02,2023-02-02T21:53:50.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-02T21:53:50.000Z:100180
+PEN-T02,02,2023-02-02T21:55:15.000Z,2023-02-03T00:31:26.000Z,02:36:11,Stop,warning,4510,PEN-4510,"Tower oscillation Y level 1",Forced outage,02:2023-02-02T21:55:15.000Z:4510
+PEN-T02,02,2023-02-02T21:55:15.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-02T21:55:15.000Z:100060
+PEN-T02,02,2023-02-03T00:31:26.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T00:31:26.000Z:100130
+PEN-T02,02,2023-02-03T00:33:33.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T00:33:33.000Z:100180
+PEN-T02,02,2023-02-03T00:34:52.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-03T00:34:52.000Z:100190
+PEN-T02,02,2023-02-03T00:35:02.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-03T00:35:02.000Z:100200
+PEN-T02,02,2023-02-03T00:35:02.000Z,2023-02-03T02:09:45.000Z,01:34:43,Stop,warning,4520,PEN-4520,"Tower oscillation X level 1",Forced outage,02:2023-02-03T00:35:02.000Z:4520
+PEN-T02,02,2023-02-03T00:35:02.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-03T00:35:02.000Z:100060
+PEN-T02,02,2023-02-03T02:09:45.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T02:09:45.000Z:100130
+PEN-T02,02,2023-02-03T02:11:45.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T02:11:45.000Z:100180
+PEN-T02,02,2023-02-03T02:12:26.000Z,2023-02-03T02:33:32.000Z,00:21:06,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,02:2023-02-03T02:12:26.000Z:64
+PEN-T02,02,2023-02-03T02:12:26.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-03T02:12:26.000Z:100060
+PEN-T02,02,2023-02-03T02:33:32.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T02:33:32.000Z:100130
+PEN-T02,02,2023-02-03T02:35:43.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T02:35:43.000Z:100180
+PEN-T02,02,2023-02-03T02:37:27.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-03T02:37:27.000Z:100190
+PEN-T02,02,2023-02-03T02:37:38.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-03T02:37:38.000Z:100200
+PEN-T02,02,2023-02-03T02:38:08.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-03T02:38:08.000Z:100210
+PEN-T02,02,2023-02-03T02:44:29.000Z,2023-02-03T02:55:07.000Z,00:10:38,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,02:2023-02-03T02:44:29.000Z:64
+PEN-T02,02,2023-02-03T02:44:29.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-03T02:44:29.000Z:100060
+PEN-T02,02,2023-02-03T02:55:07.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T02:55:07.000Z:100130
+PEN-T02,02,2023-02-03T02:57:07.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T02:57:07.000Z:100180
+PEN-T02,02,2023-02-03T02:58:43.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-03T02:58:43.000Z:100190
+PEN-T02,02,2023-02-03T02:58:54.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-03T02:58:54.000Z:100200
+PEN-T02,02,2023-02-03T02:59:24.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-03T02:59:24.000Z:100210
+PEN-T02,02,2023-02-03T06:25:21.000Z,2023-02-03T06:27:39.000Z,00:02:18,Stop,warning,710,PEN-710,"Battery test",Technical Standby,02:2023-02-03T06:25:21.000Z:710
+PEN-T02,02,2023-02-03T06:25:21.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,02:2023-02-03T06:25:21.000Z:100030
+PEN-T02,02,2023-02-03T06:27:39.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-03T06:27:39.000Z:100110
+PEN-T02,02,2023-02-03T06:27:44.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T06:27:44.000Z:100130
+PEN-T02,02,2023-02-03T06:29:52.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,02:2023-02-03T06:29:52.000Z:100140
+PEN-T02,02,2023-02-03T06:30:00.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,02:2023-02-03T06:30:00.000Z:100150
+PEN-T02,02,2023-02-03T06:30:15.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,02:2023-02-03T06:30:15.000Z:100160
+PEN-T02,02,2023-02-03T06:30:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T06:30:30.000Z:100180
+PEN-T02,02,2023-02-03T06:32:21.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-03T06:32:21.000Z:100190
+PEN-T02,02,2023-02-03T06:32:32.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-03T06:32:32.000Z:100200
+PEN-T02,02,2023-02-03T06:33:02.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-03T06:33:02.000Z:100210
+PEN-T02,02,2023-02-03T19:07:17.000Z,2023-02-03T19:08:05.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-03T19:07:17.000Z:10
+PEN-T02,02,2023-02-03T19:07:17.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-03T19:07:17.000Z:100070
+PEN-T02,02,2023-02-03T19:08:05.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T19:08:05.000Z:100130
+PEN-T02,02,2023-02-03T19:21:11.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T19:21:11.000Z:100180
+PEN-T02,02,2023-02-03T19:22:27.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-03T19:22:27.000Z:100190
+PEN-T02,02,2023-02-03T19:22:38.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-03T19:22:38.000Z:100200
+PEN-T02,02,2023-02-03T19:23:08.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-03T19:23:08.000Z:100210
+PEN-T02,02,2023-02-03T19:49:47.000Z,2023-02-03T19:50:34.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-03T19:49:47.000Z:10
+PEN-T02,02,2023-02-03T19:49:47.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-03T19:49:47.000Z:100070
+PEN-T02,02,2023-02-03T19:50:34.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T19:50:34.000Z:100130
+PEN-T02,02,2023-02-03T20:05:10.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T20:05:10.000Z:100180
+PEN-T02,02,2023-02-03T20:06:25.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-03T20:06:25.000Z:100190
+PEN-T02,02,2023-02-03T20:06:36.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-03T20:06:36.000Z:100200
+PEN-T02,02,2023-02-03T20:07:06.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-03T20:07:06.000Z:100210
+PEN-T02,02,2023-02-03T23:05:01.000Z,2023-02-03T23:05:48.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-03T23:05:01.000Z:10
+PEN-T02,02,2023-02-03T23:05:01.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-03T23:05:01.000Z:100070
+PEN-T02,02,2023-02-03T23:05:48.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-03T23:05:48.000Z:100130
+PEN-T02,02,2023-02-03T23:26:55.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-03T23:26:55.000Z:100180
+PEN-T02,02,2023-02-03T23:28:32.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-03T23:28:32.000Z:100190
+PEN-T02,02,2023-02-03T23:28:43.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-03T23:28:43.000Z:100200
+PEN-T02,02,2023-02-03T23:29:13.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-03T23:29:13.000Z:100210
+PEN-T02,02,2023-02-05T07:14:35.000Z,2023-02-05T07:15:22.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-05T07:14:35.000Z:10
+PEN-T02,02,2023-02-05T07:14:35.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-05T07:14:35.000Z:100070
+PEN-T02,02,2023-02-05T07:15:22.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-05T07:15:22.000Z:100130
+PEN-T02,02,2023-02-05T08:39:31.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-05T08:39:31.000Z:100180
+PEN-T02,02,2023-02-05T08:40:49.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-05T08:40:49.000Z:100190
+PEN-T02,02,2023-02-05T08:41:00.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-05T08:41:00.000Z:100200
+PEN-T02,02,2023-02-05T08:41:30.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-05T08:41:30.000Z:100210
+PEN-T02,02,2023-02-05T08:48:16.000Z,2023-02-05T08:49:04.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-05T08:48:16.000Z:10
+PEN-T02,02,2023-02-05T08:48:16.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-05T08:48:16.000Z:100070
+PEN-T02,02,2023-02-05T08:49:04.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-05T08:49:04.000Z:100130
+PEN-T02,02,2023-02-05T09:42:26.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-05T09:42:26.000Z:100180
+PEN-T02,02,2023-02-05T09:46:47.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-05T09:46:47.000Z:100190
+PEN-T02,02,2023-02-05T09:46:58.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-05T09:46:58.000Z:100200
+PEN-T02,02,2023-02-05T09:47:28.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-05T09:47:28.000Z:100210
+PEN-T02,02,2023-02-05T15:52:11.000Z,2023-02-05T15:52:59.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-05T15:52:11.000Z:10
+PEN-T02,02,2023-02-05T15:52:11.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-05T15:52:11.000Z:100070
+PEN-T02,02,2023-02-05T15:52:59.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-05T15:52:59.000Z:100130
+PEN-T02,02,2023-02-05T16:59:45.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-05T16:59:45.000Z:100180
+PEN-T02,02,2023-02-05T17:01:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-05T17:01:17.000Z:100190
+PEN-T02,02,2023-02-05T17:01:28.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-05T17:01:28.000Z:100200
+PEN-T02,02,2023-02-05T17:01:58.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-05T17:01:58.000Z:100210
+PEN-T02,02,2023-02-05T20:32:41.000Z,2023-02-05T20:33:29.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-05T20:32:41.000Z:10
+PEN-T02,02,2023-02-05T20:32:41.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-05T20:32:41.000Z:100070
+PEN-T02,02,2023-02-05T20:33:29.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-05T20:33:29.000Z:100130
+PEN-T02,02,2023-02-05T20:35:39.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-05T20:35:39.000Z:100180
+PEN-T02,02,2023-02-05T20:37:05.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-05T20:37:05.000Z:100190
+PEN-T02,02,2023-02-05T20:37:16.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-05T20:37:16.000Z:100200
+PEN-T02,02,2023-02-05T20:37:46.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-05T20:37:46.000Z:100210
+PEN-T02,02,2023-02-06T03:55:18.000Z,2023-02-06T03:56:06.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-06T03:55:18.000Z:10
+PEN-T02,02,2023-02-06T03:55:18.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-06T03:55:18.000Z:100070
+PEN-T02,02,2023-02-06T03:56:06.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-06T03:56:06.000Z:100130
+PEN-T02,02,2023-02-06T04:53:41.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-06T04:53:41.000Z:100180
+PEN-T02,02,2023-02-06T04:56:12.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-06T04:56:12.000Z:100190
+PEN-T02,02,2023-02-06T04:56:23.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-06T04:56:23.000Z:100200
+PEN-T02,02,2023-02-06T04:56:53.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-06T04:56:53.000Z:100210
+PEN-T02,02,2023-02-07T08:10:51.000Z,2023-02-07T08:11:38.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-07T08:10:51.000Z:10
+PEN-T02,02,2023-02-07T08:10:51.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-07T08:10:51.000Z:100070
+PEN-T02,02,2023-02-07T08:11:38.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-07T08:11:38.000Z:100130
+PEN-T02,02,2023-02-07T08:17:23.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-07T08:17:23.000Z:100180
+PEN-T02,02,2023-02-07T08:18:39.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-07T08:18:39.000Z:100190
+PEN-T02,02,2023-02-07T08:18:50.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-07T08:18:50.000Z:100200
+PEN-T02,02,2023-02-07T08:19:20.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-07T08:19:20.000Z:100210
+PEN-T02,02,2023-02-07T12:44:16.000Z,2023-02-07T12:45:03.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-07T12:44:16.000Z:10
+PEN-T02,02,2023-02-07T12:44:16.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-07T12:44:16.000Z:100070
+PEN-T02,02,2023-02-07T12:45:03.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-07T12:45:03.000Z:100130
+PEN-T02,02,2023-02-07T12:54:51.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-07T12:54:51.000Z:100180
+PEN-T02,02,2023-02-07T12:56:16.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-07T12:56:16.000Z:100190
+PEN-T02,02,2023-02-07T12:56:27.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-07T12:56:27.000Z:100200
+PEN-T02,02,2023-02-07T12:56:57.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-07T12:56:57.000Z:100210
+PEN-T02,02,2023-02-07T17:19:12.000Z,2023-02-07T17:19:59.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-07T17:19:12.000Z:10
+PEN-T02,02,2023-02-07T17:19:12.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-07T17:19:12.000Z:100070
+PEN-T02,02,2023-02-07T17:19:59.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-07T17:19:59.000Z:100130
+PEN-T02,02,2023-02-07T18:59:54.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-07T18:59:54.000Z:100180
+PEN-T02,02,2023-02-07T19:01:23.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-07T19:01:23.000Z:100190
+PEN-T02,02,2023-02-07T19:01:34.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-07T19:01:34.000Z:100200
+PEN-T02,02,2023-02-07T19:02:04.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-07T19:02:04.000Z:100210
+PEN-T02,02,2023-02-07T21:56:30.000Z,2023-02-07T21:57:18.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-07T21:56:30.000Z:10
+PEN-T02,02,2023-02-07T21:56:30.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-07T21:56:30.000Z:100070
+PEN-T02,02,2023-02-07T21:57:18.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-07T21:57:18.000Z:100130
+PEN-T02,02,2023-02-07T22:22:36.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-07T22:22:36.000Z:100180
+PEN-T02,02,2023-02-07T22:23:51.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-07T22:23:51.000Z:100190
+PEN-T02,02,2023-02-07T22:24:02.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-07T22:24:02.000Z:100200
+PEN-T02,02,2023-02-07T22:24:32.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-07T22:24:32.000Z:100210
+PEN-T02,02,2023-02-09T09:25:05.000Z,2023-02-09T09:26:23.000Z,00:01:18,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,02:2023-02-09T09:25:05.000Z:20
+PEN-T02,02,2023-02-09T09:25:05.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,02:2023-02-09T09:25:05.000Z:100050
+PEN-T02,02,2023-02-09T09:26:23.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-09T09:26:23.000Z:100110
+PEN-T02,02,2023-02-09T09:26:28.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-09T09:26:28.000Z:100130
+PEN-T02,02,2023-02-09T09:26:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-09T09:26:30.000Z:100180
+PEN-T02,02,2023-02-09T09:28:29.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-09T09:28:29.000Z:100190
+PEN-T02,02,2023-02-09T09:28:40.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-09T09:28:40.000Z:100200
+PEN-T02,02,2023-02-09T09:29:10.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-09T09:29:10.000Z:100210
+PEN-T02,02,2023-02-09T09:30:18.000Z,2023-02-09T09:31:15.000Z,00:00:57,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,02:2023-02-09T09:30:18.000Z:20
+PEN-T02,02,2023-02-09T09:30:18.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,02:2023-02-09T09:30:18.000Z:100050
+PEN-T02,02,2023-02-09T09:31:15.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-09T09:31:15.000Z:100110
+PEN-T02,02,2023-02-09T09:31:20.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-09T09:31:20.000Z:100130
+PEN-T02,02,2023-02-09T09:31:23.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-09T09:31:23.000Z:100180
+PEN-T02,02,2023-02-09T09:33:13.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-09T09:33:13.000Z:100190
+PEN-T02,02,2023-02-09T09:33:23.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-09T09:33:23.000Z:100200
+PEN-T02,02,2023-02-09T09:33:53.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-09T09:33:53.000Z:100210
+PEN-T02,02,2023-02-09T09:35:11.000Z,2023-02-09T09:35:58.000Z,00:00:47,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,02:2023-02-09T09:35:11.000Z:20
+PEN-T02,02,2023-02-09T09:35:11.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,02:2023-02-09T09:35:11.000Z:100050
+PEN-T02,02,2023-02-09T09:35:58.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-09T09:35:58.000Z:100110
+PEN-T02,02,2023-02-09T09:36:03.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-09T09:36:03.000Z:100130
+PEN-T02,02,2023-02-09T09:36:03.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-09T09:36:03.000Z:100180
+PEN-T02,02,2023-02-09T09:38:00.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-09T09:38:00.000Z:100190
+PEN-T02,02,2023-02-09T09:38:11.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-09T09:38:11.000Z:100200
+PEN-T02,02,2023-02-09T09:38:41.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-09T09:38:41.000Z:100210
+PEN-T02,02,2023-02-09T09:40:15.000Z,2023-02-09T09:41:12.000Z,00:00:57,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,02:2023-02-09T09:40:15.000Z:20
+PEN-T02,02,2023-02-09T09:40:15.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,02:2023-02-09T09:40:15.000Z:100050
+PEN-T02,02,2023-02-09T09:41:12.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-09T09:41:12.000Z:100110
+PEN-T02,02,2023-02-09T09:41:17.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-09T09:41:17.000Z:100130
+PEN-T02,02,2023-02-09T09:41:19.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-09T09:41:19.000Z:100180
+PEN-T02,02,2023-02-09T09:43:14.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-09T09:43:14.000Z:100190
+PEN-T02,02,2023-02-09T09:43:25.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-09T09:43:25.000Z:100200
+PEN-T02,02,2023-02-09T09:43:55.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-09T09:43:55.000Z:100210
+PEN-T02,02,2023-02-10T02:34:53.000Z,2023-02-10T02:35:41.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-10T02:34:53.000Z:10
+PEN-T02,02,2023-02-10T02:34:53.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-10T02:34:53.000Z:100070
+PEN-T02,02,2023-02-10T02:35:41.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-10T02:35:41.000Z:100130
+PEN-T02,02,2023-02-10T02:43:05.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-10T02:43:05.000Z:100180
+PEN-T02,02,2023-02-10T02:44:04.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-10T02:44:04.000Z:100190
+PEN-T02,02,2023-02-10T02:44:15.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-10T02:44:15.000Z:100200
+PEN-T02,02,2023-02-10T02:44:45.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-10T02:44:45.000Z:100210
+PEN-T02,02,2023-02-10T02:56:47.000Z,2023-02-10T02:57:34.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-10T02:56:47.000Z:10
+PEN-T02,02,2023-02-10T02:56:47.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-10T02:56:47.000Z:100070
+PEN-T02,02,2023-02-10T02:57:34.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-10T02:57:34.000Z:100130
+PEN-T02,02,2023-02-10T03:01:35.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-10T03:01:35.000Z:100180
+PEN-T02,02,2023-02-10T03:02:33.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-10T03:02:33.000Z:100190
+PEN-T02,02,2023-02-10T03:02:44.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-10T03:02:44.000Z:100200
+PEN-T02,02,2023-02-10T03:03:14.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-10T03:03:14.000Z:100210
+PEN-T02,02,2023-02-11T06:46:17.000Z,2023-02-11T06:48:35.000Z,00:02:18,Stop,warning,710,PEN-710,"Battery test",Technical Standby,02:2023-02-11T06:46:17.000Z:710
+PEN-T02,02,2023-02-11T06:46:17.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,02:2023-02-11T06:46:17.000Z:100030
+PEN-T02,02,2023-02-11T06:48:35.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-11T06:48:35.000Z:100110
+PEN-T02,02,2023-02-11T06:48:40.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-11T06:48:40.000Z:100130
+PEN-T02,02,2023-02-11T06:50:44.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,02:2023-02-11T06:50:44.000Z:100140
+PEN-T02,02,2023-02-11T06:50:49.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,02:2023-02-11T06:50:49.000Z:100150
+PEN-T02,02,2023-02-11T06:51:04.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,02:2023-02-11T06:51:04.000Z:100160
+PEN-T02,02,2023-02-11T06:51:19.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-11T06:51:19.000Z:100180
+PEN-T02,02,2023-02-11T06:53:14.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-11T06:53:14.000Z:100190
+PEN-T02,02,2023-02-11T06:53:25.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-11T06:53:25.000Z:100200
+PEN-T02,02,2023-02-11T06:53:55.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-11T06:53:55.000Z:100210
+PEN-T02,02,2023-02-11T08:24:49.000Z,2023-02-11T08:25:37.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-11T08:24:49.000Z:10
+PEN-T02,02,2023-02-11T08:24:49.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-11T08:24:49.000Z:100070
+PEN-T02,02,2023-02-11T08:25:37.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-11T08:25:37.000Z:100130
+PEN-T02,02,2023-02-11T08:42:45.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-11T08:42:45.000Z:100180
+PEN-T02,02,2023-02-11T08:44:11.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-11T08:44:11.000Z:100190
+PEN-T02,02,2023-02-11T08:44:22.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-11T08:44:22.000Z:100200
+PEN-T02,02,2023-02-11T08:44:52.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-11T08:44:52.000Z:100210
+PEN-T02,02,2023-02-11T19:22:50.000Z,2023-02-11T19:23:38.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-11T19:22:50.000Z:10
+PEN-T02,02,2023-02-11T19:22:50.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-11T19:22:50.000Z:100070
+PEN-T02,02,2023-02-11T19:23:38.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-11T19:23:38.000Z:100130
+PEN-T02,02,2023-02-11T20:01:34.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-11T20:01:34.000Z:100180
+PEN-T02,02,2023-02-11T20:02:58.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-11T20:02:58.000Z:100190
+PEN-T02,02,2023-02-11T20:03:09.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-11T20:03:09.000Z:100200
+PEN-T02,02,2023-02-11T20:03:39.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-11T20:03:39.000Z:100210
+PEN-T02,02,2023-02-11T20:13:51.000Z,2023-02-11T20:14:39.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-11T20:13:51.000Z:10
+PEN-T02,02,2023-02-11T20:13:51.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-11T20:13:51.000Z:100070
+PEN-T02,02,2023-02-11T20:14:39.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-11T20:14:39.000Z:100130
+PEN-T02,02,2023-02-11T20:35:12.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-11T20:35:12.000Z:100180
+PEN-T02,02,2023-02-11T20:36:32.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-11T20:36:32.000Z:100190
+PEN-T02,02,2023-02-11T20:36:43.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-11T20:36:43.000Z:100200
+PEN-T02,02,2023-02-11T20:37:13.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-11T20:37:13.000Z:100210
+PEN-T02,02,2023-02-12T11:15:21.000Z,2023-02-12T11:16:09.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-12T11:15:21.000Z:10
+PEN-T02,02,2023-02-12T11:15:21.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-12T11:15:21.000Z:100070
+PEN-T02,02,2023-02-12T11:16:09.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-12T11:16:09.000Z:100130
+PEN-T02,02,2023-02-12T11:49:49.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-12T11:49:49.000Z:100180
+PEN-T02,02,2023-02-12T11:51:31.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-12T11:51:31.000Z:100190
+PEN-T02,02,2023-02-12T11:51:42.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-12T11:51:42.000Z:100200
+PEN-T02,02,2023-02-12T11:52:12.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-12T11:52:12.000Z:100210
+PEN-T02,02,2023-02-13T02:34:56.000Z,2023-02-13T02:35:43.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-13T02:34:56.000Z:10
+PEN-T02,02,2023-02-13T02:34:56.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-13T02:34:56.000Z:100070
+PEN-T02,02,2023-02-13T02:35:43.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-13T02:35:43.000Z:100130
+PEN-T02,02,2023-02-13T04:02:45.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-13T04:02:45.000Z:100180
+PEN-T02,02,2023-02-13T04:04:38.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-13T04:04:38.000Z:100190
+PEN-T02,02,2023-02-13T04:04:49.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-13T04:04:49.000Z:100200
+PEN-T02,02,2023-02-13T04:05:19.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-13T04:05:19.000Z:100210
+PEN-T02,02,2023-02-13T05:06:09.000Z,2023-02-13T05:06:57.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-13T05:06:09.000Z:10
+PEN-T02,02,2023-02-13T05:06:09.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-13T05:06:09.000Z:100070
+PEN-T02,02,2023-02-13T05:06:57.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-13T05:06:57.000Z:100130
+PEN-T02,02,2023-02-13T05:23:28.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-13T05:23:28.000Z:100180
+PEN-T02,02,2023-02-13T05:25:00.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-13T05:25:00.000Z:100190
+PEN-T02,02,2023-02-13T05:25:10.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-13T05:25:10.000Z:100200
+PEN-T02,02,2023-02-13T05:25:40.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-13T05:25:40.000Z:100210
+PEN-T02,02,2023-02-13T05:31:31.000Z,2023-02-13T05:32:18.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-13T05:31:31.000Z:10
+PEN-T02,02,2023-02-13T05:31:31.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-13T05:31:31.000Z:100070
+PEN-T02,02,2023-02-13T05:32:18.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-13T05:32:18.000Z:100130
+PEN-T02,02,2023-02-13T06:20:28.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-13T06:20:28.000Z:100180
+PEN-T02,02,2023-02-13T06:21:50.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-13T06:21:50.000Z:100190
+PEN-T02,02,2023-02-13T06:22:01.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-13T06:22:01.000Z:100200
+PEN-T02,02,2023-02-13T06:22:31.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-13T06:22:31.000Z:100210
+PEN-T02,02,2023-02-13T11:47:40.000Z,2023-02-13T11:48:28.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-13T11:47:40.000Z:10
+PEN-T02,02,2023-02-13T11:47:40.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-13T11:47:40.000Z:100070
+PEN-T02,02,2023-02-13T11:48:28.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-13T11:48:28.000Z:100130
+PEN-T02,02,2023-02-13T12:55:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-13T12:55:13.000Z:100180
+PEN-T02,02,2023-02-13T12:56:57.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-13T12:56:57.000Z:100190
+PEN-T02,02,2023-02-13T12:57:08.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-13T12:57:08.000Z:100200
+PEN-T02,02,2023-02-13T12:57:38.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-13T12:57:38.000Z:100210
+PEN-T02,02,2023-02-13T13:52:20.000Z,2023-02-13T13:53:08.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-13T13:52:20.000Z:10
+PEN-T02,02,2023-02-13T13:52:20.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-13T13:52:20.000Z:100070
+PEN-T02,02,2023-02-13T13:53:08.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-13T13:53:08.000Z:100130
+PEN-T02,02,2023-02-13T17:08:18.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-13T17:08:18.000Z:100180
+PEN-T02,02,2023-02-13T17:09:59.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-13T17:09:59.000Z:100190
+PEN-T02,02,2023-02-13T17:10:10.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-13T17:10:10.000Z:100200
+PEN-T02,02,2023-02-13T17:10:40.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-13T17:10:40.000Z:100210
+PEN-T02,02,2023-02-14T03:15:46.000Z,2023-02-14T03:16:34.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-14T03:15:46.000Z:10
+PEN-T02,02,2023-02-14T03:15:46.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-14T03:15:46.000Z:100070
+PEN-T02,02,2023-02-14T03:16:34.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-14T03:16:34.000Z:100130
+PEN-T02,02,2023-02-14T03:28:37.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-14T03:28:37.000Z:100180
+PEN-T02,02,2023-02-14T03:29:48.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-14T03:29:48.000Z:100190
+PEN-T02,02,2023-02-14T03:29:59.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-14T03:29:59.000Z:100200
+PEN-T02,02,2023-02-14T03:30:29.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-14T03:30:29.000Z:100210
+PEN-T02,02,2023-02-14T05:28:10.000Z,2023-02-14T05:28:58.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-14T05:28:10.000Z:10
+PEN-T02,02,2023-02-14T05:28:10.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-14T05:28:10.000Z:100070
+PEN-T02,02,2023-02-14T05:28:58.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-14T05:28:58.000Z:100130
+PEN-T02,02,2023-02-14T05:32:52.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-14T05:32:52.000Z:100180
+PEN-T02,02,2023-02-14T05:34:11.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-14T05:34:11.000Z:100190
+PEN-T02,02,2023-02-14T05:34:21.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-14T05:34:21.000Z:100200
+PEN-T02,02,2023-02-14T05:34:51.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-14T05:34:51.000Z:100210
+PEN-T02,02,2023-02-14T07:46:35.000Z,2023-02-14T07:47:23.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-14T07:46:35.000Z:10
+PEN-T02,02,2023-02-14T07:46:35.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-14T07:46:35.000Z:100070
+PEN-T02,02,2023-02-14T07:47:23.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-14T07:47:23.000Z:100130
+PEN-T02,02,2023-02-14T07:53:05.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-14T07:53:05.000Z:100180
+PEN-T02,02,2023-02-14T07:54:20.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-14T07:54:20.000Z:100190
+PEN-T02,02,2023-02-14T07:54:31.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-14T07:54:31.000Z:100200
+PEN-T02,02,2023-02-14T07:55:01.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-14T07:55:01.000Z:100210
+PEN-T02,02,2023-02-16T09:57:26.000Z,2023-02-16T09:58:14.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-16T09:57:26.000Z:10
+PEN-T02,02,2023-02-16T09:57:26.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-16T09:57:26.000Z:100070
+PEN-T02,02,2023-02-16T09:58:14.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-16T09:58:14.000Z:100130
+PEN-T02,02,2023-02-16T10:12:39.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-16T10:12:39.000Z:100180
+PEN-T02,02,2023-02-16T10:14:24.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-16T10:14:24.000Z:100190
+PEN-T02,02,2023-02-16T10:14:35.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-16T10:14:35.000Z:100200
+PEN-T02,02,2023-02-16T10:15:05.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-16T10:15:05.000Z:100210
+PEN-T02,02,2023-02-16T16:20:09.000Z,2023-02-16T16:20:57.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-16T16:20:09.000Z:10
+PEN-T02,02,2023-02-16T16:20:09.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-16T16:20:09.000Z:100070
+PEN-T02,02,2023-02-16T16:20:57.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-16T16:20:57.000Z:100130
+PEN-T02,02,2023-02-16T16:36:06.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-16T16:36:06.000Z:100180
+PEN-T02,02,2023-02-16T16:37:15.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-16T16:37:15.000Z:100190
+PEN-T02,02,2023-02-16T16:37:26.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-16T16:37:26.000Z:100200
+PEN-T02,02,2023-02-16T16:37:56.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-16T16:37:56.000Z:100210
+PEN-T02,02,2023-02-17T04:39:19.000Z,2023-02-17T05:00:39.000Z,00:21:20,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,02:2023-02-17T04:39:19.000Z:64
+PEN-T02,02,2023-02-17T04:39:19.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-17T04:39:19.000Z:100060
+PEN-T02,02,2023-02-17T05:00:39.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-17T05:00:39.000Z:100130
+PEN-T02,02,2023-02-17T05:02:39.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-17T05:02:39.000Z:100180
+PEN-T02,02,2023-02-17T05:03:35.000Z,2023-02-17T05:19:04.000Z,00:15:29,Stop,warning,4530,PEN-4530,"Tower oscillation Y level 2",Forced outage,02:2023-02-17T05:03:35.000Z:4530
+PEN-T02,02,2023-02-17T05:03:35.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-17T05:03:35.000Z:100060
+PEN-T02,02,2023-02-17T05:19:04.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-17T05:19:04.000Z:100130
+PEN-T02,02,2023-02-17T05:21:07.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-17T05:21:07.000Z:100180
+PEN-T02,02,2023-02-17T05:22:07.000Z,2023-02-17T09:56:24.000Z,04:34:17,Stop,warning,4530,PEN-4530,"Tower oscillation Y level 2",Forced outage,02:2023-02-17T05:22:07.000Z:4530
+PEN-T02,02,2023-02-17T05:22:07.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-17T05:22:07.000Z:100060
+PEN-T02,02,2023-02-17T09:56:24.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-17T09:56:24.000Z:100130
+PEN-T02,02,2023-02-17T09:58:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-17T09:58:30.000Z:100180
+PEN-T02,02,2023-02-17T09:59:21.000Z,2023-02-17T10:18:30.000Z,00:19:09,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,02:2023-02-17T09:59:21.000Z:64
+PEN-T02,02,2023-02-17T09:59:21.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-17T09:59:21.000Z:100060
+PEN-T02,02,2023-02-17T10:18:30.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-17T10:18:30.000Z:100130
+PEN-T02,02,2023-02-17T10:20:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-17T10:20:30.000Z:100180
+PEN-T02,02,2023-02-17T10:21:52.000Z,2023-02-17T10:32:23.000Z,00:10:31,Stop,warning,64,PEN-64,"Max. wind speed",Out of Environmental Specification,02:2023-02-17T10:21:52.000Z:64
+PEN-T02,02,2023-02-17T10:21:52.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-17T10:21:52.000Z:100060
+PEN-T02,02,2023-02-17T10:32:23.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-17T10:32:23.000Z:100130
+PEN-T02,02,2023-02-17T10:34:36.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-17T10:34:36.000Z:100180
+PEN-T02,02,2023-02-17T10:36:15.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-17T10:36:15.000Z:100190
+PEN-T02,02,2023-02-17T10:36:25.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-17T10:36:25.000Z:100200
+PEN-T02,02,2023-02-17T10:36:55.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-17T10:36:55.000Z:100210
+PEN-T02,02,2023-02-17T10:42:07.000Z,2023-02-17T10:43:46.000Z,00:01:39,Stop,warning,1550,PEN-1550,"Missing gear oil (high rpm)",Forced outage,02:2023-02-17T10:42:07.000Z:1550
+PEN-T02,02,2023-02-17T10:42:07.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-17T10:42:07.000Z:100060
+PEN-T02,02,2023-02-17T10:43:46.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-17T10:43:46.000Z:100130
+PEN-T02,02,2023-02-17T10:45:46.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-17T10:45:46.000Z:100180
+PEN-T02,02,2023-02-17T10:47:30.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-17T10:47:30.000Z:100190
+PEN-T02,02,2023-02-17T10:47:41.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-17T10:47:41.000Z:100200
+PEN-T02,02,2023-02-17T10:48:11.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-17T10:48:11.000Z:100210
+PEN-T02,02,2023-02-17T21:06:34.000Z,2023-02-17T21:07:21.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-17T21:06:34.000Z:10
+PEN-T02,02,2023-02-17T21:06:34.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-17T21:06:34.000Z:100070
+PEN-T02,02,2023-02-17T21:06:34.000Z,2023-02-17T21:16:35.000Z,00:10:01,Stop,warning,5760,PEN-5760,"Hydraulic oil flushing operation",Technical Standby,02:2023-02-17T21:06:34.000Z:5760
+PEN-T02,02,2023-02-17T21:06:34.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-17T21:06:34.000Z:100060
+PEN-T02,02,2023-02-17T21:16:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-17T21:16:35.000Z:100130
+PEN-T02,02,2023-02-17T22:13:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-17T22:13:13.000Z:100180
+PEN-T02,02,2023-02-17T22:15:41.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-17T22:15:41.000Z:100190
+PEN-T02,02,2023-02-17T22:15:51.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-17T22:15:51.000Z:100200
+PEN-T02,02,2023-02-17T22:16:21.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-17T22:16:21.000Z:100210
+PEN-T02,02,2023-02-18T06:46:49.000Z,2023-02-18T06:49:07.000Z,00:02:18,Stop,warning,710,PEN-710,"Battery test",Technical Standby,02:2023-02-18T06:46:49.000Z:710
+PEN-T02,02,2023-02-18T06:46:49.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,02:2023-02-18T06:46:49.000Z:100030
+PEN-T02,02,2023-02-18T06:49:07.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-18T06:49:07.000Z:100110
+PEN-T02,02,2023-02-18T06:49:12.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T06:49:12.000Z:100130
+PEN-T02,02,2023-02-18T06:51:12.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,02:2023-02-18T06:51:12.000Z:100140
+PEN-T02,02,2023-02-18T06:51:21.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,02:2023-02-18T06:51:21.000Z:100150
+PEN-T02,02,2023-02-18T06:51:36.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,02:2023-02-18T06:51:36.000Z:100160
+PEN-T02,02,2023-02-18T06:51:51.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T06:51:51.000Z:100180
+PEN-T02,02,2023-02-18T06:53:40.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T06:53:40.000Z:100190
+PEN-T02,02,2023-02-18T06:53:51.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T06:53:51.000Z:100200
+PEN-T02,02,2023-02-18T06:54:21.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T06:54:21.000Z:100210
+PEN-T02,02,2023-02-18T09:53:51.000Z,2023-02-18T11:09:05.000Z,01:15:14,Stop,warning,20,PEN-20,"Manual stop - on site",Scheduled Maintenance,02:2023-02-18T09:53:51.000Z:20
+PEN-T02,02,2023-02-18T09:53:51.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,02:2023-02-18T09:53:51.000Z:100050
+PEN-T02,02,2023-02-18T09:54:34.000Z,2023-02-18T11:08:56.000Z,01:14:22,Informational,info,6410,PEN-6410,"Manual yaw",Full Performance,02:2023-02-18T09:54:34.000Z:6410
+PEN-T02,02,2023-02-18T10:29:34.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,02:2023-02-18T10:29:34.000Z:100050
+PEN-T02,02,2023-02-18T10:29:34.000Z,,,Informational,info,100010,PEN-100010,"Brake program 200",Full Performance,02:2023-02-18T10:29:34.000Z:100010
+PEN-T02,02,2023-02-18T10:31:20.000Z,,,Informational,info,100050,PEN-100050,"Brake program 60",Technical Standby,02:2023-02-18T10:31:20.000Z:100050
+PEN-T02,02,2023-02-18T11:09:05.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-18T11:09:05.000Z:100110
+PEN-T02,02,2023-02-18T11:09:10.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T11:09:10.000Z:100130
+PEN-T02,02,2023-02-18T11:09:30.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,02:2023-02-18T11:09:30.000Z:100140
+PEN-T02,02,2023-02-18T11:09:38.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,02:2023-02-18T11:09:38.000Z:100150
+PEN-T02,02,2023-02-18T11:09:53.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,02:2023-02-18T11:09:53.000Z:100160
+PEN-T02,02,2023-02-18T11:10:08.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T11:10:08.000Z:100180
+PEN-T02,02,2023-02-18T11:12:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T11:12:17.000Z:100190
+PEN-T02,02,2023-02-18T11:12:27.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T11:12:27.000Z:100200
+PEN-T02,02,2023-02-18T11:12:57.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T11:12:57.000Z:100210
+PEN-T02,02,2023-02-18T11:31:02.000Z,2023-02-18T11:31:50.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T11:31:02.000Z:10
+PEN-T02,02,2023-02-18T11:31:02.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T11:31:02.000Z:100070
+PEN-T02,02,2023-02-18T11:31:50.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T11:31:50.000Z:100130
+PEN-T02,02,2023-02-18T11:35:20.000Z,2023-02-18T11:56:01.000Z,00:20:41,Stop,warning,6200,PEN-6200,"Cable autounwind",Technical Standby,02:2023-02-18T11:35:20.000Z:6200
+PEN-T02,02,2023-02-18T11:35:20.000Z,,,Informational,info,100060,PEN-100060,"Brake program 52",Full Performance,02:2023-02-18T11:35:20.000Z:100060
+PEN-T02,02,2023-02-18T11:56:01.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T11:56:01.000Z:100130
+PEN-T02,02,2023-02-18T14:00:37.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T14:00:37.000Z:100180
+PEN-T02,02,2023-02-18T14:03:07.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T14:03:07.000Z:100190
+PEN-T02,02,2023-02-18T14:03:18.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T14:03:18.000Z:100200
+PEN-T02,02,2023-02-18T14:03:48.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T14:03:48.000Z:100210
+PEN-T02,02,2023-02-18T14:45:10.000Z,2023-02-18T14:45:58.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T14:45:10.000Z:10
+PEN-T02,02,2023-02-18T14:45:10.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T14:45:10.000Z:100070
+PEN-T02,02,2023-02-18T14:45:58.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T14:45:58.000Z:100130
+PEN-T02,02,2023-02-18T14:52:11.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T14:52:11.000Z:100180
+PEN-T02,02,2023-02-18T14:53:53.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T14:53:53.000Z:100190
+PEN-T02,02,2023-02-18T14:54:04.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T14:54:04.000Z:100200
+PEN-T02,02,2023-02-18T14:54:34.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T14:54:34.000Z:100210
+PEN-T02,02,2023-02-18T15:00:42.000Z,2023-02-18T15:01:30.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T15:00:42.000Z:10
+PEN-T02,02,2023-02-18T15:00:42.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T15:00:42.000Z:100070
+PEN-T02,02,2023-02-18T15:01:30.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T15:01:30.000Z:100130
+PEN-T02,02,2023-02-18T15:05:09.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T15:05:09.000Z:100180
+PEN-T02,02,2023-02-18T15:06:28.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T15:06:28.000Z:100190
+PEN-T02,02,2023-02-18T15:06:39.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T15:06:39.000Z:100200
+PEN-T02,02,2023-02-18T15:07:09.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T15:07:09.000Z:100210
+PEN-T02,02,2023-02-18T16:18:37.000Z,2023-02-18T16:19:25.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T16:18:37.000Z:10
+PEN-T02,02,2023-02-18T16:18:37.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T16:18:37.000Z:100070
+PEN-T02,02,2023-02-18T16:19:25.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T16:19:25.000Z:100130
+PEN-T02,02,2023-02-18T16:22:42.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T16:22:42.000Z:100180
+PEN-T02,02,2023-02-18T16:23:54.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T16:23:54.000Z:100190
+PEN-T02,02,2023-02-18T16:24:05.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T16:24:05.000Z:100200
+PEN-T02,02,2023-02-18T16:24:35.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T16:24:35.000Z:100210
+PEN-T02,02,2023-02-18T18:59:36.000Z,2023-02-18T19:00:23.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T18:59:36.000Z:10
+PEN-T02,02,2023-02-18T18:59:36.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T18:59:36.000Z:100070
+PEN-T02,02,2023-02-18T19:00:23.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T19:00:23.000Z:100130
+PEN-T02,02,2023-02-18T19:19:53.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T19:19:53.000Z:100180
+PEN-T02,02,2023-02-18T19:21:33.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T19:21:33.000Z:100190
+PEN-T02,02,2023-02-18T19:21:44.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T19:21:44.000Z:100200
+PEN-T02,02,2023-02-18T19:22:14.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T19:22:14.000Z:100210
+PEN-T02,02,2023-02-18T19:38:55.000Z,2023-02-18T19:39:42.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T19:38:55.000Z:10
+PEN-T02,02,2023-02-18T19:38:55.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T19:38:55.000Z:100070
+PEN-T02,02,2023-02-18T19:39:42.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T19:39:42.000Z:100130
+PEN-T02,02,2023-02-18T19:45:58.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T19:45:58.000Z:100180
+PEN-T02,02,2023-02-18T19:48:07.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T19:48:07.000Z:100190
+PEN-T02,02,2023-02-18T19:48:18.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T19:48:18.000Z:100200
+PEN-T02,02,2023-02-18T19:48:48.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T19:48:48.000Z:100210
+PEN-T02,02,2023-02-18T19:52:13.000Z,2023-02-18T19:53:01.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T19:52:13.000Z:10
+PEN-T02,02,2023-02-18T19:52:13.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T19:52:13.000Z:100070
+PEN-T02,02,2023-02-18T19:53:01.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T19:53:01.000Z:100130
+PEN-T02,02,2023-02-18T20:03:58.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T20:03:58.000Z:100180
+PEN-T02,02,2023-02-18T20:05:23.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T20:05:23.000Z:100190
+PEN-T02,02,2023-02-18T20:05:34.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T20:05:34.000Z:100200
+PEN-T02,02,2023-02-18T20:06:04.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T20:06:04.000Z:100210
+PEN-T02,02,2023-02-18T22:24:20.000Z,2023-02-18T22:25:08.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-18T22:24:20.000Z:10
+PEN-T02,02,2023-02-18T22:24:20.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-18T22:24:20.000Z:100070
+PEN-T02,02,2023-02-18T22:25:08.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-18T22:25:08.000Z:100130
+PEN-T02,02,2023-02-18T22:30:28.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-18T22:30:28.000Z:100180
+PEN-T02,02,2023-02-18T22:32:11.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-18T22:32:11.000Z:100190
+PEN-T02,02,2023-02-18T22:32:22.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-18T22:32:22.000Z:100200
+PEN-T02,02,2023-02-18T22:32:52.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-18T22:32:52.000Z:100210
+PEN-T02,02,2023-02-19T01:11:30.000Z,2023-02-19T01:12:17.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-19T01:11:30.000Z:10
+PEN-T02,02,2023-02-19T01:11:30.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-19T01:11:30.000Z:100070
+PEN-T02,02,2023-02-19T01:12:17.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-19T01:12:17.000Z:100130
+PEN-T02,02,2023-02-19T01:29:09.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-19T01:29:09.000Z:100180
+PEN-T02,02,2023-02-19T01:31:19.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-19T01:31:19.000Z:100190
+PEN-T02,02,2023-02-19T01:31:30.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-19T01:31:30.000Z:100200
+PEN-T02,02,2023-02-19T01:32:00.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-19T01:32:00.000Z:100210
+PEN-T02,02,2023-02-19T01:43:06.000Z,2023-02-19T01:43:53.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-19T01:43:06.000Z:10
+PEN-T02,02,2023-02-19T01:43:06.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-19T01:43:06.000Z:100070
+PEN-T02,02,2023-02-19T01:43:53.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-19T01:43:53.000Z:100130
+PEN-T02,02,2023-02-19T01:48:27.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-19T01:48:27.000Z:100180
+PEN-T02,02,2023-02-19T01:49:38.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-19T01:49:38.000Z:100190
+PEN-T02,02,2023-02-19T01:49:48.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-19T01:49:48.000Z:100200
+PEN-T02,02,2023-02-19T01:50:18.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-19T01:50:18.000Z:100210
+PEN-T02,02,2023-02-19T03:27:56.000Z,2023-02-19T03:28:43.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-19T03:27:56.000Z:10
+PEN-T02,02,2023-02-19T03:27:56.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-19T03:27:56.000Z:100070
+PEN-T02,02,2023-02-19T03:28:43.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-19T03:28:43.000Z:100130
+PEN-T02,02,2023-02-19T03:31:57.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-19T03:31:57.000Z:100180
+PEN-T02,02,2023-02-19T03:33:24.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-19T03:33:24.000Z:100190
+PEN-T02,02,2023-02-19T03:33:34.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-19T03:33:34.000Z:100200
+PEN-T02,02,2023-02-19T03:34:04.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-19T03:34:04.000Z:100210
+PEN-T02,02,2023-02-19T04:06:12.000Z,2023-02-19T04:06:59.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-19T04:06:12.000Z:10
+PEN-T02,02,2023-02-19T04:06:12.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-19T04:06:12.000Z:100070
+PEN-T02,02,2023-02-19T04:06:59.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-19T04:06:59.000Z:100130
+PEN-T02,02,2023-02-19T04:16:43.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-19T04:16:43.000Z:100180
+PEN-T02,02,2023-02-19T04:18:17.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-19T04:18:17.000Z:100190
+PEN-T02,02,2023-02-19T04:18:28.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-19T04:18:28.000Z:100200
+PEN-T02,02,2023-02-19T04:18:58.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-19T04:18:58.000Z:100210
+PEN-T02,02,2023-02-19T04:32:11.000Z,2023-02-19T04:32:59.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-19T04:32:11.000Z:10
+PEN-T02,02,2023-02-19T04:32:11.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-19T04:32:11.000Z:100070
+PEN-T02,02,2023-02-19T04:32:59.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-19T04:32:59.000Z:100130
+PEN-T02,02,2023-02-19T05:08:02.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-19T05:08:02.000Z:100180
+PEN-T02,02,2023-02-19T05:09:28.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-19T05:09:28.000Z:100190
+PEN-T02,02,2023-02-19T05:09:38.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-19T05:09:38.000Z:100200
+PEN-T02,02,2023-02-19T05:10:08.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-19T05:10:08.000Z:100210
+PEN-T02,02,2023-02-19T05:16:03.000Z,2023-02-19T05:16:50.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-19T05:16:03.000Z:10
+PEN-T02,02,2023-02-19T05:16:03.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-19T05:16:03.000Z:100070
+PEN-T02,02,2023-02-19T05:16:50.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-19T05:16:50.000Z:100130
+PEN-T02,02,2023-02-19T05:48:24.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-19T05:48:24.000Z:100180
+PEN-T02,02,2023-02-19T05:49:18.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-19T05:49:18.000Z:100190
+PEN-T02,02,2023-02-19T05:49:29.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-19T05:49:29.000Z:100200
+PEN-T02,02,2023-02-19T05:49:59.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-19T05:49:59.000Z:100210
+PEN-T02,02,2023-02-19T09:04:50.000Z,2023-02-19T09:05:37.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-19T09:04:50.000Z:10
+PEN-T02,02,2023-02-19T09:04:50.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-19T09:04:50.000Z:100070
+PEN-T02,02,2023-02-19T09:05:37.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-19T09:05:37.000Z:100130
+PEN-T02,02,2023-02-19T09:08:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-19T09:08:13.000Z:100180
+PEN-T02,02,2023-02-19T09:10:31.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-19T09:10:31.000Z:100190
+PEN-T02,02,2023-02-19T09:10:42.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-19T09:10:42.000Z:100200
+PEN-T02,02,2023-02-19T09:11:12.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-19T09:11:12.000Z:100210
+PEN-T02,02,2023-02-21T07:20:35.000Z,2023-02-21T07:21:23.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-21T07:20:35.000Z:10
+PEN-T02,02,2023-02-21T07:20:35.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-21T07:20:35.000Z:100070
+PEN-T02,02,2023-02-21T07:21:23.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-21T07:21:23.000Z:100130
+PEN-T02,02,2023-02-21T07:27:14.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-21T07:27:14.000Z:100180
+PEN-T02,02,2023-02-21T07:28:55.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-21T07:28:55.000Z:100190
+PEN-T02,02,2023-02-21T07:29:06.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-21T07:29:06.000Z:100200
+PEN-T02,02,2023-02-21T07:29:36.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-21T07:29:36.000Z:100210
+PEN-T02,02,2023-02-21T20:29:59.000Z,2023-02-21T20:30:47.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-21T20:29:59.000Z:10
+PEN-T02,02,2023-02-21T20:29:59.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-21T20:29:59.000Z:100070
+PEN-T02,02,2023-02-21T20:30:47.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-21T20:30:47.000Z:100130
+PEN-T02,02,2023-02-21T20:37:28.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-21T20:37:28.000Z:100180
+PEN-T02,02,2023-02-21T20:38:27.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-21T20:38:27.000Z:100190
+PEN-T02,02,2023-02-21T20:38:38.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-21T20:38:38.000Z:100200
+PEN-T02,02,2023-02-21T20:39:08.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-21T20:39:08.000Z:100210
+PEN-T02,02,2023-02-21T21:01:53.000Z,2023-02-21T21:02:41.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-21T21:01:53.000Z:10
+PEN-T02,02,2023-02-21T21:01:53.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-21T21:01:53.000Z:100070
+PEN-T02,02,2023-02-21T21:02:41.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-21T21:02:41.000Z:100130
+PEN-T02,02,2023-02-21T21:10:19.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-21T21:10:19.000Z:100180
+PEN-T02,02,2023-02-21T21:11:55.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-21T21:11:55.000Z:100190
+PEN-T02,02,2023-02-21T21:12:06.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-21T21:12:06.000Z:100200
+PEN-T02,02,2023-02-21T21:12:36.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-21T21:12:36.000Z:100210
+PEN-T02,02,2023-02-21T22:59:47.000Z,2023-02-21T23:00:35.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-21T22:59:47.000Z:10
+PEN-T02,02,2023-02-21T22:59:47.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-21T22:59:47.000Z:100070
+PEN-T02,02,2023-02-21T23:00:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-21T23:00:35.000Z:100130
+PEN-T02,02,2023-02-21T23:12:41.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-21T23:12:41.000Z:100180
+PEN-T02,02,2023-02-21T23:13:41.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-21T23:13:41.000Z:100190
+PEN-T02,02,2023-02-21T23:13:51.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-21T23:13:51.000Z:100200
+PEN-T02,02,2023-02-21T23:14:21.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-21T23:14:21.000Z:100210
+PEN-T02,02,2023-02-21T23:24:02.000Z,2023-02-21T23:24:49.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-21T23:24:02.000Z:10
+PEN-T02,02,2023-02-21T23:24:02.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-21T23:24:02.000Z:100070
+PEN-T02,02,2023-02-21T23:24:49.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-21T23:24:49.000Z:100130
+PEN-T02,02,2023-02-21T23:38:13.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-21T23:38:13.000Z:100180
+PEN-T02,02,2023-02-21T23:39:30.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-21T23:39:30.000Z:100190
+PEN-T02,02,2023-02-21T23:39:41.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-21T23:39:41.000Z:100200
+PEN-T02,02,2023-02-21T23:40:11.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-21T23:40:11.000Z:100210
+PEN-T02,02,2023-02-22T05:25:36.000Z,2023-02-22T05:26:24.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-22T05:25:36.000Z:10
+PEN-T02,02,2023-02-22T05:25:36.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-22T05:25:36.000Z:100070
+PEN-T02,02,2023-02-22T05:26:24.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-22T05:26:24.000Z:100130
+PEN-T02,02,2023-02-22T05:35:30.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-22T05:35:30.000Z:100180
+PEN-T02,02,2023-02-22T05:36:56.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-22T05:36:56.000Z:100190
+PEN-T02,02,2023-02-22T05:37:07.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-22T05:37:07.000Z:100200
+PEN-T02,02,2023-02-22T05:37:37.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-22T05:37:37.000Z:100210
+PEN-T02,02,2023-02-22T06:05:27.000Z,2023-02-22T06:06:14.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-22T06:05:27.000Z:10
+PEN-T02,02,2023-02-22T06:05:27.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-22T06:05:27.000Z:100070
+PEN-T02,02,2023-02-22T06:06:14.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-22T06:06:14.000Z:100130
+PEN-T02,02,2023-02-22T06:14:18.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-22T06:14:18.000Z:100180
+PEN-T02,02,2023-02-22T06:15:54.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-22T06:15:54.000Z:100190
+PEN-T02,02,2023-02-22T06:16:05.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-22T06:16:05.000Z:100200
+PEN-T02,02,2023-02-22T06:16:35.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-22T06:16:35.000Z:100210
+PEN-T02,02,2023-02-26T06:18:05.000Z,2023-02-26T06:20:24.000Z,00:02:19,Stop,warning,710,PEN-710,"Battery test",Technical Standby,02:2023-02-26T06:18:05.000Z:710
+PEN-T02,02,2023-02-26T06:18:05.000Z,,,Informational,info,100030,PEN-100030,"Brake program 180",Technical Standby,02:2023-02-26T06:18:05.000Z:100030
+PEN-T02,02,2023-02-26T06:18:08.000Z,2023-02-26T08:18:17.000Z,02:00:09,Warning,warning,785,PEN-785,"Error brake resistor CHP",Full Performance,02:2023-02-26T06:18:08.000Z:785
+PEN-T02,02,2023-02-26T06:20:24.000Z,,,Informational,info,100110,PEN-100110,"Bypass limit switches",Full Performance,02:2023-02-26T06:20:24.000Z:100110
+PEN-T02,02,2023-02-26T06:20:29.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-26T06:20:29.000Z:100130
+PEN-T02,02,2023-02-26T06:22:30.000Z,,,Informational,info,100140,PEN-100140,"System test 1",Technical Standby,02:2023-02-26T06:22:30.000Z:100140
+PEN-T02,02,2023-02-26T06:22:38.000Z,,,Informational,info,100150,PEN-100150,"System test 2",Technical Standby,02:2023-02-26T06:22:38.000Z:100150
+PEN-T02,02,2023-02-26T06:22:53.000Z,,,Informational,info,100160,PEN-100160,"System test 3",Technical Standby,02:2023-02-26T06:22:53.000Z:100160
+PEN-T02,02,2023-02-26T06:23:08.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-26T06:23:08.000Z:100180
+PEN-T02,02,2023-02-26T06:25:00.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-26T06:25:00.000Z:100190
+PEN-T02,02,2023-02-26T06:25:11.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-26T06:25:11.000Z:100200
+PEN-T02,02,2023-02-26T06:25:41.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-26T06:25:41.000Z:100210
+PEN-T02,02,2023-02-26T14:33:38.000Z,2023-02-26T14:34:26.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-26T14:33:38.000Z:10
+PEN-T02,02,2023-02-26T14:33:38.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-26T14:33:38.000Z:100070
+PEN-T02,02,2023-02-26T14:34:26.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-26T14:34:26.000Z:100130
+PEN-T02,02,2023-02-26T16:44:20.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-26T16:44:20.000Z:100180
+PEN-T02,02,2023-02-26T16:45:47.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-26T16:45:47.000Z:100190
+PEN-T02,02,2023-02-26T16:45:58.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-26T16:45:58.000Z:100200
+PEN-T02,02,2023-02-26T16:46:28.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-26T16:46:28.000Z:100210
+PEN-T02,02,2023-02-26T16:49:06.000Z,2023-02-26T16:49:53.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-26T16:49:06.000Z:10
+PEN-T02,02,2023-02-26T16:49:06.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-26T16:49:06.000Z:100070
+PEN-T02,02,2023-02-26T16:49:53.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-26T16:49:53.000Z:100130
+PEN-T02,02,2023-02-26T17:19:48.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-26T17:19:48.000Z:100180
+PEN-T02,02,2023-02-26T17:21:30.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-26T17:21:30.000Z:100190
+PEN-T02,02,2023-02-26T17:21:41.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-26T17:21:41.000Z:100200
+PEN-T02,02,2023-02-26T17:22:11.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-26T17:22:11.000Z:100210
+PEN-T02,02,2023-02-26T18:55:27.000Z,2023-02-26T18:56:14.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-26T18:55:27.000Z:10
+PEN-T02,02,2023-02-26T18:55:27.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-26T18:55:27.000Z:100070
+PEN-T02,02,2023-02-26T18:56:14.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-26T18:56:14.000Z:100130
+PEN-T02,02,2023-02-26T19:04:07.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-26T19:04:07.000Z:100180
+PEN-T02,02,2023-02-26T19:05:30.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-26T19:05:30.000Z:100190
+PEN-T02,02,2023-02-26T19:05:41.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-26T19:05:41.000Z:100200
+PEN-T02,02,2023-02-26T19:06:11.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-26T19:06:11.000Z:100210
+PEN-T02,02,2023-02-26T19:25:11.000Z,2023-02-26T19:25:58.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-26T19:25:11.000Z:10
+PEN-T02,02,2023-02-26T19:25:11.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-26T19:25:11.000Z:100070
+PEN-T02,02,2023-02-26T19:25:58.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-26T19:25:58.000Z:100130
+PEN-T02,02,2023-02-26T19:45:10.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-26T19:45:10.000Z:100180
+PEN-T02,02,2023-02-26T19:51:00.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-26T19:51:00.000Z:100190
+PEN-T02,02,2023-02-26T19:51:10.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-26T19:51:10.000Z:100200
+PEN-T02,02,2023-02-26T19:51:40.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-26T19:51:40.000Z:100210
+PEN-T02,02,2023-02-26T20:04:33.000Z,2023-02-26T20:05:21.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-26T20:04:33.000Z:10
+PEN-T02,02,2023-02-26T20:04:33.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-26T20:04:33.000Z:100070
+PEN-T02,02,2023-02-26T20:05:21.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-26T20:05:21.000Z:100130
+PEN-T02,02,2023-02-26T20:11:27.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-26T20:11:27.000Z:100180
+PEN-T02,02,2023-02-26T20:12:56.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-26T20:12:56.000Z:100190
+PEN-T02,02,2023-02-26T20:13:07.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-26T20:13:07.000Z:100200
+PEN-T02,02,2023-02-26T20:13:37.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-26T20:13:37.000Z:100210
+PEN-T02,02,2023-02-27T00:56:48.000Z,2023-02-27T00:57:35.000Z,00:00:47,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-27T00:56:48.000Z:10
+PEN-T02,02,2023-02-27T00:56:48.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-27T00:56:48.000Z:100070
+PEN-T02,02,2023-02-27T00:57:35.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-27T00:57:35.000Z:100130
+PEN-T02,02,2023-02-27T01:02:58.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-27T01:02:58.000Z:100180
+PEN-T02,02,2023-02-27T01:04:01.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-27T01:04:01.000Z:100190
+PEN-T02,02,2023-02-27T01:04:12.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-27T01:04:12.000Z:100200
+PEN-T02,02,2023-02-27T01:04:42.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-27T01:04:42.000Z:100210
+PEN-T02,02,2023-02-27T01:29:33.000Z,2023-02-27T01:30:21.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-27T01:29:33.000Z:10
+PEN-T02,02,2023-02-27T01:29:33.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-27T01:29:33.000Z:100070
+PEN-T02,02,2023-02-27T01:30:21.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-27T01:30:21.000Z:100130
+PEN-T02,02,2023-02-27T01:35:44.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-27T01:35:44.000Z:100180
+PEN-T02,02,2023-02-27T01:37:14.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-27T01:37:14.000Z:100190
+PEN-T02,02,2023-02-27T01:37:24.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-27T01:37:24.000Z:100200
+PEN-T02,02,2023-02-27T01:37:54.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-27T01:37:54.000Z:100210
+PEN-T02,02,2023-02-27T07:12:56.000Z,2023-02-27T07:13:44.000Z,00:00:48,Informational,info,10,PEN-10,"Wind < start wind",Out of Environmental Specification,02:2023-02-27T07:12:56.000Z:10
+PEN-T02,02,2023-02-27T07:12:56.000Z,,,Informational,info,100070,PEN-100070,"Brake program 50",Out of Environmental Specification,02:2023-02-27T07:12:56.000Z:100070
+PEN-T02,02,2023-02-27T07:13:44.000Z,,,Informational,info,100130,PEN-100130,"Automatic start-up",Full Performance,02:2023-02-27T07:13:44.000Z:100130
+PEN-T02,02,2023-02-27T07:18:57.000Z,,,Informational,info,100180,PEN-100180,"Run-up",Technical Standby,02:2023-02-27T07:18:57.000Z:100180
+PEN-T02,02,2023-02-27T07:19:52.000Z,,,Informational,info,100190,PEN-100190,"Mains connection",Full Performance,02:2023-02-27T07:19:52.000Z:100190
+PEN-T02,02,2023-02-27T07:20:03.000Z,,,Informational,info,100200,PEN-100200,"Mains run-up",Full Performance,02:2023-02-27T07:20:03.000Z:100200
+PEN-T02,02,2023-02-27T07:20:33.000Z,,,Informational,info,100210,PEN-100210,"Mains operation",Full Performance,02:2023-02-27T07:20:33.000Z:100210

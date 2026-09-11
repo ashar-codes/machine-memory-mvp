@@ -1,3 +1,7 @@
+> Historical foundation design notes. Later live checks and outstanding gates are recorded in
+> [REMEDIATION_STATUS.md](REMEDIATION_STATUS.md) and the [current checkpoint table](../PROJECT_CONTEXT.md).
+> References below to unverified seed/schema work describe the original foundation stage.
+
 # Seed and provenance contract
 
 `supabase/seed/demo.sql` is a transactional, repeatable seed. Every row is explicitly synthetic_demo. Stable UUIDs plus `ON CONFLICT(id) DO NOTHING` preserve existing records on rerun. The seed is not a reset; modifying seed text does not overwrite previously inserted rows.

@@ -4,9 +4,23 @@ import type {
   Intent, InvestigateResponse, ListResponse, ResolutionRequest, ResolutionResponse, TimelineItem,
 } from '@machine-memory/shared';
 import { failureText, get, post } from './api';
+import { CopilotView } from './copilot';
+import { DataHub } from './datahub';
+import { FleetDashboard } from './fleet';
 import { AnswerCard, InvestigationPanel, ResolutionDrawer } from './investigation';
+import { KnowledgeBase } from './knowledge';
 import { AssetHeader, AssetRail, EvidencePanel, TimelinePanel } from './panels';
+import { EventSummaryPanel } from './publicdata';
+import { ScadaSimulator } from './scada';
+import { ScenarioLab } from './scenario';
 import { Empty, Failure, Loading } from './ui';
+
+const VIEWS = ['fleet', 'memory', 'copilot', 'scada', 'data', 'knowledge', 'scenario'] as const;
+type View = typeof VIEWS[number];
+const VIEW_LABELS: Record<View, string> = {
+  fleet: 'Fleet', memory: 'Machine Memory', copilot: 'AI Copilot', scada: 'SCADA Simulator',
+  data: 'Data Hub', knowledge: 'Knowledge Base', scenario: 'Scenario Lab',
+};
 
 export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -29,10 +43,12 @@ export default function App() {
   const [investigationError, setInvestigationError] = useState('');
   const [activeProbe, setActiveProbe] = useState<string | null>(null);
   const lastRequest = useRef<{ intent: Intent; question: string; probeId: string | null } | null>(null);
+  const investigationRequest = useRef<AbortController | null>(null);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [savedNotice, setSavedNotice] = useState<{ id: string; summary: string } | null>(null);
 
+  const [view, setView] = useState<View>('memory');
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const evidenceRefs = useRef(new Map<string, HTMLLIElement>());
   const registerRef = useCallback((id: string, node: HTMLLIElement | null) => {
@@ -78,6 +94,7 @@ export default function App() {
       get<ListResponse<TimelineItem>>(`${path}/timeline?limit=50`, controller.signal),
     ])
       .then(([detail, current, history]) => {
+        if (controller.signal.aborted) return;
         setAsset(detail.asset);
         setEvent(current.event);
         setTimeline(history.items);
@@ -89,7 +106,14 @@ export default function App() {
 
   /* --------------------------------------------------------- asset switching */
   const chooseAsset = (assetCode: string) => {
+    if (assetCode === selected) return;
+    investigationRequest.current?.abort();
+    setRunning(false);
     setSelected(assetCode);
+    setAsset(null);
+    setEvent(null);
+    setTimeline([]);
+    setDrawerOpen(false);
     // An answer belongs to the asset it was asked about; never carry it across a selection change.
     setResult(null);
     setEvidence([]);
@@ -99,29 +123,50 @@ export default function App() {
     lastRequest.current = null;
   };
 
+  useEffect(() => {
+    setResult(null);
+    setEvidence([]);
+    setRunning(false);
+    return () => { investigationRequest.current?.abort(); };
+  }, [selected, view]);
+
+  const chooseView = (next: View) => {
+    if (next === view) return;
+    investigationRequest.current?.abort();
+    setEvidence([]);
+    setView(next);
+  };
+
   /* ------------------------------------------------------------ investigation */
   const runInvestigation = useCallback(async (intent: Intent, question: string, probeId: string | null) => {
     if (!selected) return;
+    investigationRequest.current?.abort();
+    const controller = new AbortController();
+    investigationRequest.current = controller;
     lastRequest.current = { intent, question, probeId };
     setRunning(true);
     setInvestigationError('');
     setActiveProbe(probeId);
     setHighlighted(null);
+    setResult(null);
+    setEvidence([]);
     try {
       const response = await post<InvestigateResponse>('/investigate', {
         assetCode: selected,
         ...(event?.eventCode ? { eventCode: event.eventCode } : {}),
         intent,
         question,
-      });
+      }, controller.signal);
+      if (controller.signal.aborted) return;
       setResult(response);
       setEvidence(response.evidence);
     } catch (error) {
+      if (controller.signal.aborted) return;
       setResult(null);
       setEvidence([]);
       setInvestigationError(failureText(error) || 'The investigation could not be completed. Retry.');
     } finally {
-      setRunning(false);
+      if (!controller.signal.aborted) setRunning(false);
     }
   }, [selected, event?.eventCode]);
 
@@ -168,17 +213,65 @@ export default function App() {
         </div>
       </header>
 
-      <div className="workspace">
-        <AssetRail
-          assets={assets}
-          selected={selected}
-          onSelect={chooseAsset}
-          loading={assetsLoading}
-          error={assetsError}
-          onRetry={() => setReload((value) => value + 1)}
-        />
+      <nav className="mainnav" aria-label="Sections">
+        {VIEWS.map((item) => (
+          <button key={item} type="button" className={`navlink ${view === item ? 'active' : ''}`}
+            aria-current={view === item ? 'page' : undefined} onClick={() => chooseView(item)}>
+            {VIEW_LABELS[item]}
+          </button>
+        ))}
+      </nav>
+
+      {/* The grid keeps three fixed tracks, so a view without the rail and evidence panel must
+          collapse to a single full-width track rather than rendering inside the rail's column. */}
+      <div className={`workspace${view === 'memory' || view === 'copilot' ? '' : ' full'}`}>
+        {(view === 'memory' || view === 'copilot') && (
+          <AssetRail
+            assets={assets}
+            selected={selected}
+            onSelect={chooseAsset}
+            loading={assetsLoading}
+            error={assetsError}
+            onRetry={() => setReload((value) => value + 1)}
+          />
+        )}
 
         <main className="column centre">
+          {view === 'fleet' && (
+            <FleetDashboard onOpenAsset={(assetCode) => { chooseAsset(assetCode); setView('memory'); }} />
+          )}
+          {view === 'copilot' && (
+            <CopilotView key={selected} assetCode={selected || null}
+              eventCode={asset?.assetCode === selected ? event?.eventCode ?? null : null} onEvidence={setEvidence} />
+          )}
+          {view === 'data' && (
+            <DataHub onImported={(report) => {
+              setReload((value) => value + 1);
+              setDetailReload((value) => value + 1);
+              if (report.assetsTouched.length) chooseAsset(report.assetsTouched[0]);
+            }} />
+          )}
+          {view === 'scada' && (
+            <ScadaSimulator
+              assets={assets}
+              onFault={(faultAsset) => {
+                // The fault is already recorded; refresh so the rail, status and timeline agree.
+                setReload((value) => value + 1);
+                chooseAsset(faultAsset);
+                setDetailReload((value) => value + 1);
+              }}
+              onInvestigate={(faultAsset) => { chooseAsset(faultAsset); setView('memory'); setDetailReload((value) => value + 1); }}
+            />
+          )}
+          {view === 'knowledge' && <KnowledgeBase onIndexed={() => setReload((value) => value + 1)} />}
+          {view === 'scenario' && (
+            <ScenarioLab
+              assets={assets}
+              onAssetCreated={(created) => { setReload((value) => value + 1); chooseAsset(created.assetCode); }}
+              onEventCreated={(assetCode) => { setReload((value) => value + 1); chooseAsset(assetCode); setDetailReload((value) => value + 1); }}
+            />
+          )}
+          {view === 'memory' && <>
           {health?.llm !== 'configured_unverified' && databaseState === 'connected' && (
             <p className="notice">
               No model key is configured. Investigations still run: evidence is retrieved from the
@@ -226,6 +319,7 @@ export default function App() {
                   onCite={jumpToEvidence}
                 />
               </div>
+              <EventSummaryPanel assetCode={asset.assetCode} reload={detailReload} />
               <TimelinePanel
                 items={timeline}
                 loading={false}
@@ -241,9 +335,12 @@ export default function App() {
               </p>
             </>
           )}
+          </>}
         </main>
 
-        <EvidencePanel evidence={evidence} highlighted={highlighted} registerRef={registerRef} />
+        {(view === 'memory' || view === 'copilot') && (
+          <EvidencePanel evidence={evidence} highlighted={highlighted} registerRef={registerRef} />
+        )}
       </div>
 
       {drawerOpen && asset && event?.eventCode && (

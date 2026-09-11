@@ -2,7 +2,7 @@ import { createHash } from 'node:crypto';
 import { z } from 'zod';
 
 export const MAX_FILE_BYTES = 2 * 1024 * 1024;
-export const EMBEDDING_MODEL = 'text-embedding-3-small';
+export const EMBEDDING_MODEL = 'gemini-embedding-001';
 export const EMBEDDING_DIMENSIONS = 1536;
 
 const label = z.string().trim().min(1).max(1000);
@@ -38,7 +38,7 @@ export const ingestionSchema = z.object({
 
 export type IngestionDocument = z.infer<typeof ingestionSchema>;
 
-/** Pure validation: does not load credentials, connect to DB or call OpenAI. */
+/** Pure validation: does not load credentials, connect to DB or call Gemini. */
 export function validateManifest(input: unknown): IngestionDocument {
   return ingestionSchema.parse(input);
 }
@@ -52,6 +52,17 @@ export function documentIdentity(document: IngestionDocument): { id: string; sha
     id: `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`,
     sha256,
   };
+}
+
+/**
+ * gemini-embedding-001 returns unit-length vectors only at its native 3072 dimensions. A truncated
+ * output dimensionality must be renormalized before it is stored or compared.
+ */
+export function normalizeVector(vector: number[]): number[] | null {
+  const norm = Math.hypot(...vector);
+  if (!Number.isFinite(norm) || norm === 0) return null;
+  const unit = vector.map((value) => value / norm);
+  return unit.every((value) => Number.isFinite(value)) ? unit : null;
 }
 
 export function validateEmbedding(value: unknown): value is number[] {

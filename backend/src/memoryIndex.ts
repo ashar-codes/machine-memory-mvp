@@ -41,7 +41,7 @@ export async function indexResolution(
 ): Promise<boolean> {
   if (!llm) return false;
   const content = resolutionNarrative(input);
-  const embedding = await llm.embed(content);
+  const embedding = await llm.embed(content, 'RETRIEVAL_DOCUMENT');
   if (!embedding || embedding.length !== input.embeddingDimensions) return false;
 
   const metadata = {

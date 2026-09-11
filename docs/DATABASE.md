@@ -1,3 +1,7 @@
+> Historical foundation design notes. Later live checks and outstanding gates are recorded in
+> [REMEDIATION_STATUS.md](REMEDIATION_STATUS.md) and the [current checkpoint table](../PROJECT_CONTEXT.md).
+> References below to unverified seed/schema work describe the original foundation stage.
+
 # Database contract
 
 The migration in `supabase/migrations/` defines the 12 tables requested by the brief in PostgreSQL `public`. UUID primary keys default to `gen_random_uuid()`. Dates are `timestamptz`; generated timestamps use `now()`. The migration and seed each run within a transaction. No live database has been changed.
@@ -25,7 +29,7 @@ Public document origins require an HTTPS source URL. Synthetic/user documents ma
 
 ## Retrieval
 
-Embedding storage is `extensions.vector(1536)` for text-embedding-3-small default output. Embeddings remain nullable until actual API ingestion succeeds; fake vectors are prohibited. Prefer explicit operators/casts with direct pg SQL:
+Embedding storage is `extensions.vector(1536)`, matching gemini-embedding-001 requested at `outputDimensionality` 1536 and renormalized to unit length. Embeddings remain nullable until actual API ingestion succeeds; fake vectors are prohibited. Prefer explicit operators/casts with direct pg SQL:
 
 ```sql
 select c.id, c.content, d.title,

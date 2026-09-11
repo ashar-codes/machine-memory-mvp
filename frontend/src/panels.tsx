@@ -1,7 +1,13 @@
-import type { Asset, AssetEvent, Evidence, TimelineItem } from '@machine-memory/shared';
+import type { Asset, AssetEvent, Evidence, RecordOrigin, TimelineItem } from '@machine-memory/shared';
 import { Empty, Failure, Loading, Origin, Severity, evidenceClass, stamp } from './ui';
 
 /* ---------------------------------------------------------------- asset rail */
+
+/** Short provenance word for the rail. A turbine a user onboarded is not demonstration data. */
+const RAIL_ORIGIN: Partial<Record<RecordOrigin, string>> = {
+  public_data: 'public', public_reference: 'public', synthetic_demo: 'demo',
+  user_demo: 'demo', user_import: 'imported', simulation: 'simulated',
+};
 
 export function AssetRail({ assets, selected, onSelect, loading, error, onRetry }: {
   assets: Asset[];
@@ -32,7 +38,12 @@ export function AssetRail({ assets, selected, onSelect, loading, error, onRetry 
       {[...sites.entries()].map(([key, group]) => (
         <section className="site-group" key={key}>
           <div className="site-name">
-            <span>{group[0].recordOrigin === 'public_data' ? 'Public wind farm' : 'Demonstration wind farm'}</span>
+            {/* The real site name, so a public farm is identifiable and not just "public". */}
+            <span>{group[0].siteName
+              ?? (group[0].recordOrigin === 'public_data' ? 'Public wind farm'
+                : group[0].recordOrigin === 'user_import' ? 'Onboarded turbines'
+                : 'Demonstration wind farm')}</span>
+            <Origin value={group[0].recordOrigin} />
             <em>{group.length}</em>
           </div>
           <ul>
@@ -49,7 +60,7 @@ export function AssetRail({ assets, selected, onSelect, loading, error, onRetry 
                     <span className="asset-code">{asset.assetCode}</span>
                     <span className="asset-sub">{asset.status} · {asset.model ?? asset.assetType}</span>
                   </span>
-                  <span className="count">{asset.recordOrigin === 'public_data' ? 'public' : 'demo'}</span>
+                  <span className="count">{RAIL_ORIGIN[asset.recordOrigin] ?? 'demo'}</span>
                 </button>
               </li>
             ))}

@@ -1,0 +1,21 @@
+Demo Wind OEM — Gearbox Thermal Management Reference (fictional demonstration document)
+
+Purpose and status of this document
+
+This is a fictional reference written for a university demonstration of the Machine Memory system. It is not a real OEM manual and it does not authorize any maintenance work. It exists so that a newly uploaded technical document can be shown becoming searchable.
+
+Gearbox oil temperature excursions on the Demo 2MW platform
+
+On the fictional Demo 2MW platform, gearbox oil temperature excursions are most frequently associated with degraded heat rejection in the oil cooling circuit rather than with gear tooth damage. The three contributors seen most often in this fictional fleet are a fouled cooler matrix, a failing cooler fan controller, and an oil grade that no longer matches the ambient temperature band at the site.
+
+Cooler matrix fouling
+
+Airborne debris accumulating on the cooler matrix reduces effective surface area. The fictional maintenance record for this platform describes cleaning the matrix during scheduled service. A temperature excursion that repeats shortly after a cooler service suggests the service did not restore heat rejection, and the cooler fan controller should be examined before the gearbox itself is suspected.
+
+Yaw position sensor deviation
+
+Yaw position deviation between redundant encoders on this fictional platform is usually an encoder mounting or wiring issue rather than a yaw drive fault. The deviation is reported when the two encoders disagree beyond the configured tolerance.
+
+Applicability limits
+
+Nothing in this document establishes a safe procedure, a torque value, a pressure limit or an isolation sequence. Any real maintenance action must follow the site energy control programme and the actual equipment manufacturer's approved documentation.
