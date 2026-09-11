@@ -277,6 +277,68 @@ No migrations added/applied during remediation. Live fixture writes and their cl
 are recorded in individual checkpoints above. Unit tests must not call paid providers. Live verification must be separate and preserve
 public_data, public_reference and synthetic_demo. Do not run broad reset over user data.
 
+## RAG acceptance remediation (independent Codex RAG test)
+
+Eight reproduced defects, each fixed at its cause rather than in prompt wording, with a
+regression test that fails without the fix. Checkpoints: `a092cf5`, `93a5666`, `a843fba`,
+`7aae245`, `efd5fd9`, `439ef7f`, `8b484a8`.
+
+- **Intent routing** — a flat first-match keyword chain let any incidental word decide the
+  intent; "maintenance" alone sent a research question into the machine's change window.
+  Replaced by `backend/src/routing.ts`, which decides on the shape of the request: whether it
+  names a code, speaks about this machine, asks for a count, or asks about the whole turbine.
+  Deterministic and provider-free. 49 paraphrase-based cases in
+  `tests/integration/routing.test.ts`.
+- **Named event codes** — a code named in the question now outranks the event selected in the
+  interface. Two different codes in one question produce a clarification rather than a silent
+  choice. Extraction requires a digit, so "lockout-tagout" is not read as a code.
+- **Asset-wide scope** — an asset-wide question is answered from the asset's own SQL totals
+  instead of being narrowed to the selected code. `QueryScope` carries that decision from
+  routing into retrieval.
+- **Dynamically uploaded knowledge** — a retrieved but unreviewed document is now quoted and
+  cited behind an explicit unverified label, instead of being retrieved and then omitted.
+- **Evidence identity** — the deduplication key excluded the retrieval role, so one work order
+  reached through two roles survived as two items and an answer reported four maintenance
+  records where the database held two. Records are keyed on their database identity.
+- **Aggregate facts** — an exact total is proved by a computed aggregate admitted to the
+  evidence set ahead of the rows it summarises. Ranked as an ordinary candidate it scored below
+  those rows and was evicted by the candidate cap, leaving an exact figure with nothing citable
+  behind it.
+- **Evidence strength** — scoring is intent-aware. It answers "how strongly does the retrieved
+  evidence support this question", not "how much authoritative material is in the bundle".
+  Unrelated machine history can no longer raise a research question, and unrelated references
+  can no longer raise a machine question. Matrix in `tests/integration/strength.test.ts`.
+- **Latency** — stage timings (routing, embedding, retrieval, generation, total) travel in
+  `structuredFacts`. Retrieval's independent queries now overlap instead of running one at a
+  time; the pool was widened to match that fan-out; a provider that failed on quota, rate limit
+  or authorization is skipped for ten minutes instead of being re-probed per request; startup
+  warms database connections and the embedding client.
+
+Two defects were found while verifying, not reported by the test, and are fixed:
+
+- Overlapping the retrieval queries introduced an unhandled-rejection crash — a query started
+  but never read, or still in flight when an earlier await threw, terminated the process. Every
+  eagerly started query is now observed at creation. The regression test fails without the fix.
+- A pool-acquisition timeout was reported as HTTP 500 "The request could not be completed",
+  blaming the application for a slow database link. It is now a 503, and 5xx responses log their
+  shape (status, error name, driver code — never a message, query or connection detail).
+
+Acceptance: 18 live checks across routing, code precedence, scope, upload answering, reference
+quoting, aggregate grounding, strength, safety refusal, asset isolation and fleet scope — all
+passing, with every citation resolving and every number in a summary present in a cited excerpt.
+Latency median 3.8s, p90 6.2s, max 9.9s, none over 15s. Protected fingerprints unchanged before
+and after: 1177 asset events (1172 `public_data`, 5 `synthetic_demo`), 3 `public_reference`
+documents, 21 chunks, 17 assets, 1 synthetic resolution, and zero `user_demo`/`user_import` rows
+after the acceptance document was removed.
+
+Both model providers' free-tier quotas were exhausted during this work, so the acceptance run
+answered entirely on the deterministic path — which passed every grounding check. Live Groq
+generation was observed earlier in the same session with resolving citations and no invented
+identifiers. Gemini generation success remains unestablished on this key.
+
+Not addressed, by scope: deployment, authentication, reverse proxies, production hosting, UI
+redesign, framework/database/vector-store replacement, and additional model providers.
+
 ## Continuation
 
 Completed: A–C, D1–D3, local E controls and F documentation. The remaining scoped exception
