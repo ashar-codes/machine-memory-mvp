@@ -205,12 +205,13 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
             embeddingModel, embeddingDimensions: EMBEDDING_DIMENSIONS,
           });
           if (!indexed) console.warn('Resolution saved; semantic indexing skipped. Structured retrieval is unaffected.');
-        } catch {
-          console.warn('Resolution saved; semantic indexing failed. Structured retrieval is unaffected.');
         } finally {
           client.release();
         }
-      })();
+      })().catch(() => {
+        // Includes acquisition (also after pool shutdown), indexing and release failures.
+        console.warn('Resolution saved; semantic indexing failed. Structured retrieval is unaffected.');
+      });
     }
   });
   app.post('/api/copilot', aiLimit, express.json({ limit: '64kb', strict: true }), async (req,res) => {

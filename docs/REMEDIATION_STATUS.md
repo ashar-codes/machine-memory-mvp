@@ -28,13 +28,25 @@ Archive-only commit left a clean tree before creating remediation branch.
 | C / P2-08 | VERIFIED | Explicit document embedding role propagates through Gemini-only wrapper; fixed model/dimensions enforced; incompatible chunk metadata gets no cosine comparison. |
 | D / P2-07 | VERIFIED | Relevance admission and ordering precede candidate cap; authority remains provenance, not topical relevance. |
 | D / P2-09 | VERIFIED | HTTP/SSE use persisted payload; duplicate snapshots omitted; provenance conflicts return 409. |
-| D / P2-11 | NOT_STARTED | Detached pool acquisition outside catch. |
+| D / P2-11 | VERIFIED | Entire detached indexing promise is caught, including acquisition and release. |
 | D / P2-10 | NOT_STARTED | Parent not rechecked after embedding; reset leaves derived status. Only fix if small/safe. |
 | E / P1-04 | NOT_STARTED | No global bounded expensive-job admission / slow-consumer handling. |
 | F / false claims | NOT_STARTED | Correct only demonstrated overclaims outside archived audit. |
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### D3 — contain detached indexing failures
+
+- Reproduced unhandled connection-acquisition rejection after a successful structured save.
+  The detached promise now has an outer catch covering acquisition, indexing and release.
+  Error output remains fixed/sanitized; only acquired clients are released.
+- Four injected HTTP regressions PASS: connection rejection, query failure, provider timeout
+  rejection and closed-pool-style acquisition rejection. Structured COMMIT and 201/pending
+  response remain intact, with no rollback or unhandled rejection.
+- These are injected failures, not a live DB outage or process shutdown test. No provider
+  calls or live writes. Gates: 370 tests, lint/typecheck/build/diff check PASS.
+- D2 checkpoint: `8bd2b64`.
 
 ### D2 — persisted SCADA replay payload
 
