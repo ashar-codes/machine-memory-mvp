@@ -95,7 +95,16 @@ or unusable.
   the parsed origin (scheme, host, port), never a substring, so neither
   `https://<service>.onrender.com.example.com` nor `https://evil.example/?x=<service>.onrender.com`
   matches. There is no wildcard and no allowlist of convenience origins.
-- **Cross-site** — a request carrying `Sec-Fetch-Site: cross-site` is still rejected.
+- **Cross-site** — a top-level document navigation is allowed through to the credential gate, so
+  a link to the demo from email, a chat message, a university LMS or any other page works; the
+  visitor still gets the Basic challenge before anything is served. Everything else carrying
+  `Sec-Fetch-Site: cross-site` is still rejected: background fetches, XHR, uploads, event streams
+  and every POST/PUT/PATCH/DELETE. That distinction is the one that matters, because the browser
+  attaches the cached Basic credential to cross-site requests by itself, so an allowed cross-site
+  API call would be a working CSRF path. The exemption needs `Sec-Fetch-Mode: navigate` **and**
+  `Sec-Fetch-Dest: document` **and** GET/HEAD — method alone would let a malicious cross-site
+  `fetch` through, and these two headers are forbidden header names that page script cannot set.
+  It covers `/api/health` and no other API path, and it applies only in demo mode.
 - **Credential** — checked before body parsing, rate limiting and every route, so an
   unauthenticated request costs one hash comparison and never reaches the database or a provider.
   Username and password are compared in constant time over SHA-256 digests, and both comparisons
