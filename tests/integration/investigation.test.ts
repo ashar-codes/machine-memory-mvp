@@ -156,6 +156,7 @@ describe('evidence strength', () => {
       intent: 'HISTORY' as const, asset: { id: WT07, assetCode: 'WT-07', assetType: 'wind_turbine', manufacturer: null, model: null, status: 'fault', siteId: 's', recordOrigin: 'synthetic_demo' as const },
       event: null, eventCode: EVENT_CODE, anchorAt: '2026-09-09T08:20:00.000Z',
       occurrences: { previousCount: 2, totalIncludingSelected: 3, firstAt: null, lastAt: null, byOrigin: {} },
+      assetSummary: null,
       recentWindow: null, fleetAssetCodes: [], evidence: [], notes: [],
     } satisfies RetrievalResult;
     const retained = [historical, { ...historical, kind: 'RESOLUTION' as const }, publicSafety];

@@ -31,8 +31,19 @@ const PRIMARY_ROLES: Record<Intent, EvidenceRole[]> = {
   SAFETY: ['SAFETY_REFERENCE'],
 };
 
+/**
+ * Canonical identity of the underlying record.
+ *
+ * Deliberately excludes `role`: a role is the reason a record was retrieved, not a record. Keying
+ * on it meant one work order reached through two retrieval roles survived as two evidence items,
+ * and an answer then reported four maintenance records where the database held two.
+ *
+ * Records without a database identity (aggregates, and any future synthesized item) fall back to
+ * their content, which is still role-independent.
+ */
 function fingerprint(item: RawEvidence): string {
-  return [item.kind, item.role, item.assetCode ?? '', item.timestamp ?? '', item.title, item.excerpt].join('|');
+  return item.sourceId
+    ?? [item.kind, item.assetCode ?? '', item.timestamp ?? '', item.title, item.excerpt].join('|');
 }
 
 /**
@@ -65,14 +76,17 @@ export function fuseEvidence(result: RetrievalResult, limit = MAX_EVIDENCE_ITEMS
   evidence: Evidence[];
   raw: RawEvidence[];
 } {
-  const seen = new Set<string>();
-  const unique: RawEvidence[] = [];
+  // Same record, two roles: keep the one that ranks higher for this intent, so deduplicating
+  // never costs the record its most relevant framing.
+  const best = new Map<string, RawEvidence>();
   for (const item of result.evidence) {
     const key = fingerprint(item);
-    if (seen.has(key)) continue;
-    seen.add(key);
-    unique.push(item);
+    const existing = best.get(key);
+    if (!existing || rankScore(item, result.intent, result.asset) > rankScore(existing, result.intent, result.asset)) {
+      best.set(key, item);
+    }
   }
+  const unique = [...best.values()];
   const scored = unique
     .map((item, index) => ({ item, index, score: rankScore(item, result.intent, result.asset) }))
     // Stable: equal scores keep retrieval order, which is already deterministic newest-first.

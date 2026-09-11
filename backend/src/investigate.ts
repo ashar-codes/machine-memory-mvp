@@ -19,6 +19,13 @@ import {
 } from './retrieval.js';
 import { buildBundle, deterministicAnswer, groundModelAnswer, parseModelAnswer, type DraftAnswer } from './synthesis.js';
 
+export interface InvestigateOverrides {
+  /** What the question is about; keeps an asset-wide question from narrowing to one event. */
+  scope?: 'CURRENT_EVENT' | 'EVENT_CODE' | 'ASSET_WIDE' | 'FLEET';
+  /** True when the question asks for a total, which must be answered from aggregate facts. */
+  aggregate?: boolean;
+}
+
 export interface InvestigateDeps {
   db: Queryable;
   llm?: LlmClient | null;
@@ -27,6 +34,8 @@ export interface InvestigateDeps {
   onDegraded?: (stage: 'embedding' | 'synthesis' | 'validation') => void;
   /** Reports which generation provider produced the answer. Diagnostics only. */
   onGeneration?: (provider: GenerationProvider) => void;
+  /** Routing decisions made upstream by routeQuery. */
+  routing?: InvestigateOverrides;
 }
 
 export type InvestigateOutcome =
@@ -84,7 +93,7 @@ export async function investigate(input: InvestigateRequest, deps: InvestigateDe
 
   const result = await retrieveEvidence(deps.db, {
     intent: input.intent, assetCode: input.assetCode, eventCode: input.eventCode,
-    question: input.question, embedding, now: deps.now,
+    question: input.question, embedding, now: deps.now, scope: deps.routing?.scope,
   });
   if (!result) return { status: 'asset_not_found' };
 

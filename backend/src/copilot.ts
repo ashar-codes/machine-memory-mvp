@@ -19,6 +19,7 @@ import {
 import { DEFAULT_RECURRENCE_MINIMUM, DEFAULT_WINDOW_DAYS, FLEET_OPERATIONS, runPlan, validatePlan } from './fleet.js';
 import type { GenerationProvider, GenerationTrace } from './provider.js';
 import type { Queryable } from './retrieval.js';
+import { extractEventCodes, routeQuery, type RoutedQuery } from './routing.js';
 import { isQualitativeCommentary } from './synthesis.js';
 
 export const MAX_HISTORY_MESSAGES = 6;
@@ -217,12 +218,40 @@ export async function runAssetCopilot(
 ): Promise<CopilotResponse | { status: 'asset_not_found' }> {
   const history = boundHistory(input.history);
   const question = resolveFollowUp(input.question, history);
-  // Classification happens after the rewrite, so a follow-up is graded on its resolved meaning.
-  const intent = classifyIntent(question);
+  // Routing happens after the rewrite, so a follow-up is graded on its resolved meaning.
+  //
+  // Known codes are looked up only when the question actually contains a code-shaped token, and
+  // never for a request that will be refused: the fail-closed safety gate must reach its refusal
+  // without touching the database, and most questions need no lookup at all.
+  const refusable = detectUnsafeRequest(question) || requiresOperationalAuthorization(question);
+  const knownEventCodes: string[] = [];
+  if (!refusable && extractEventCodes(question).length > 0) {
+    const known = await deps.db.query(
+      `select distinct e.event_code from public.asset_events e
+         join public.assets a on a.id = e.asset_id where a.asset_code = $1 limit 500`, [input.assetCode]);
+    knownEventCodes.push(...known.rows.map((row) => String(row.event_code)));
+  }
+  const routed: RoutedQuery = routeQuery(question, {
+    currentEventCode: input.eventCode ?? null, knownEventCodes,
+  });
+  const intent = routed.intent;
+  // An ambiguous request is refused rather than silently answered about one of the codes.
+  if (routed.clarification) {
+    return {
+      answer: {
+        summary: routed.clarification, findings: [], evidenceStrength: 'INSUFFICIENT',
+        uncertainties: ['No investigation was run, because the question could be read more than one way.'],
+        safetyStatus: 'INSUFFICIENT',
+      },
+      evidence: [], scope: 'asset', assetCode: input.assetCode, plan: null,
+      structuredFacts: { resolvedIntent: intent, resolvedQuestion: question, clarificationRequired: true,
+        generationProvider: 'deterministic', generationDegraded: true },
+    };
+  }
 
   // A turbine onboarded a minute ago has nothing to retrieve. Say that plainly rather than
   // returning a generic insufficiency that reads like a failure.
-  if (!detectUnsafeRequest(question) && !requiresOperationalAuthorization(question)) {
+  if (!refusable) {
     const counts = await deps.db.query(`select
       (select count(*)::int from public.asset_events e join public.assets a on a.id=e.asset_id where a.asset_code=$1) as events,
       (select count(*)::int from public.maintenance_events m join public.assets a on a.id=m.asset_id where a.asset_code=$1) as maintenance,
@@ -244,9 +273,11 @@ export async function runAssetCopilot(
 
   const generation: { provider: GenerationProvider } = { provider: 'deterministic' };
   const outcome = await investigate(
-    { assetCode: input.assetCode, eventCode: input.eventCode, intent, question },
+    // The code named in the question wins over the selected one.
+    { assetCode: input.assetCode, eventCode: routed.eventCode ?? undefined, intent, question },
     {
       db: deps.db, llm: deps.llm, now: deps.now, onDegraded: deps.onDegraded,
+      routing: { scope: routed.scope, aggregate: routed.aggregate },
       onGeneration: (provider) => { generation.provider = provider; deps.onGeneration?.(provider); },
     },
   );
@@ -263,6 +294,8 @@ export async function runAssetCopilot(
     plan: null,
     structuredFacts: {
       resolvedIntent: intent, resolvedQuestion: question, historyTurnsUsed: history.length,
+      resolvedScope: routed.scope, resolvedEventCode: routed.eventCode,
+      aggregateRequested: routed.aggregate, routingReason: routed.reason,
       generationProvider: generation.provider, generationDegraded: generation.provider !== 'gemini',
     },
   };

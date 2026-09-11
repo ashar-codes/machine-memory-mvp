@@ -28,15 +28,25 @@ export const MIN_KEYWORD_RANK = 0.01;
 
 export type EvidenceRole =
   | 'SAME_ASSET_HISTORY' | 'FLEET_EXACT_CODE' | 'FLEET_SEMANTIC'
-  | 'RECENT_CHANGE' | 'TECHNICAL_REFERENCE' | 'SAFETY_REFERENCE' | 'CONTEXT';
+  | 'RECENT_CHANGE' | 'TECHNICAL_REFERENCE' | 'SAFETY_REFERENCE' | 'CONTEXT'
+  | 'AGGREGATE_FACT';
 
 export type EvidenceKind =
   | 'ASSET_EVENT' | 'INCIDENT' | 'WORK_ORDER' | 'RESOLUTION'
-  | 'TECHNICIAN_NOTE' | 'MAINTENANCE' | 'COMPONENT' | 'KNOWLEDGE';
+  | 'TECHNICIAN_NOTE' | 'MAINTENANCE' | 'COMPONENT' | 'KNOWLEDGE'
+  | 'AGGREGATE';
 
 export interface RawEvidence {
   kind: EvidenceKind;
   role: EvidenceRole;
+  /**
+   * Canonical identity of the underlying record: `kind:primaryKey`.
+   *
+   * A role is a reason a record was retrieved, not a record. The same work order reached through
+   * two retrieval roles is still one work order, and counting it twice inflated "maintenance
+   * records" in answers. Fusion deduplicates on this, never on the role.
+   */
+  sourceId?: string;
   title: string;
   excerpt: string;
   assetCode: string | null;
@@ -84,6 +94,8 @@ export interface RetrievalResult {
   eventCode: string | null;
   anchorAt: string;
   occurrences: OccurrenceStats | null;
+  /** Present for asset-wide questions; the source of truth for turbine-level totals. */
+  assetSummary: AssetEventSummaryStats | null;
   recentWindow: { startIso: string; endIso: string } | null;
   fleetAssetCodes: string[];
   evidence: RawEvidence[];
@@ -189,6 +201,72 @@ export async function countPreviousOccurrences(
   };
 }
 
+/**
+ * Asset-wide totals, computed entirely in SQL.
+ *
+ * These exist so a turbine-level answer never asks a model to add up sampled rows: the number the
+ * answer states is the number the database returned.
+ */
+export async function assetEventSummary(db: Queryable, assetId: string): Promise<AssetEventSummaryStats> {
+  const totals = await db.query(
+    `select count(*)::int as total, count(distinct event_code)::int as codes,
+            min(occurred_at) as first_at, max(occurred_at) as last_at
+       from public.asset_events where asset_id = $1`, [assetId]);
+  const top = await db.query(
+    `select event_code, count(*)::int as occurrences, max(title) as title
+       from public.asset_events where asset_id = $1
+      group by event_code order by count(*) desc, event_code limit 8`, [assetId]);
+  const row = totals.rows[0] ?? {};
+  return {
+    totalEvents: count(row.total), distinctEventCodes: count(row.codes),
+    firstAt: iso(row.first_at), lastAt: iso(row.last_at),
+    topCodes: top.rows.map((item) => ({
+      eventCode: text(item.event_code), occurrences: count(item.occurrences), title: nullableText(item.title),
+    })),
+  };
+}
+
+/** Most recent events across every code on the asset, for asset-wide questions. */
+async function assetWideRecentEvents(db: Queryable, assetCode: string, assetId: string): Promise<RawEvidence[]> {
+  const result = await db.query(
+    `select id, event_code, title, severity, occurred_at, cleared_at, description, record_origin
+       from public.asset_events where asset_id = $1
+      order by occurred_at desc, id desc limit ${MAX_STRUCTURED_ROWS}`, [assetId]);
+  return result.rows.map((row) => ({
+    kind: 'ASSET_EVENT' as const, role: 'SAME_ASSET_HISTORY' as const, sourceId: `ASSET_EVENT:${text(row.id)}`,
+    title: `${text(row.event_code)} — ${text(row.title)}`,
+    excerpt: excerpt(text(row.description), `Severity ${text(row.severity)}`, row.cleared_at ? 'Cleared' : 'Not cleared'),
+    assetCode, timestamp: iso(row.occurred_at), recordOrigin: origin(row.record_origin),
+    authorityClass: 'HISTORICAL' as const, sourceType: 'ASSET_EVENT', sourceUrl: null,
+    similarity: null, keywordRank: null,
+    applicability: { assetType: null, manufacturer: null, model: null }, procedural: false,
+  }));
+}
+
+/**
+ * Turns a computed total into a citable evidence record.
+ *
+ * An exact claim must cite something that actually contains the number. Citing three sample events
+ * as proof of "71 occurrences" is not grounding, so the aggregate itself becomes evidence and the
+ * excerpt states the figure in words the citation validator can be checked against.
+ */
+function aggregateEvidence(options: {
+  sourceId: string; assetCode: string; title: string; excerpt: string; timestamp: string | null;
+  recordOrigin: RecordOrigin;
+}): RawEvidence {
+  return {
+    kind: 'AGGREGATE', role: 'AGGREGATE_FACT', sourceId: options.sourceId,
+    title: options.title, excerpt: options.excerpt,
+    assetCode: options.assetCode, timestamp: options.timestamp,
+    recordOrigin: options.recordOrigin,
+    // A count of records is a database fact, not a reviewed reference; it carries no authority to
+    // license a procedure, and `procedural` stays false so it can never satisfy the safety gate.
+    authorityClass: 'HISTORICAL', sourceType: 'AGGREGATE', sourceUrl: null,
+    similarity: null, keywordRank: null,
+    applicability: { assetType: null, manufacturer: null, model: null }, procedural: false,
+  };
+}
+
 /** Same asset, same code, strictly earlier than the selected occurrence. */
 async function sameAssetHistory(
   db: Queryable, assetCode: string, assetId: string, eventCode: string,
@@ -203,7 +281,7 @@ async function sameAssetHistory(
       order by occurred_at desc, id desc
       limit ${MAX_STRUCTURED_ROWS}`, [assetId, eventCode, selectedEventId, anchorAt]);
   return result.rows.map((row) => ({
-    kind: 'ASSET_EVENT' as const, role: 'SAME_ASSET_HISTORY' as const,
+    kind: 'ASSET_EVENT' as const, role: 'SAME_ASSET_HISTORY' as const, sourceId: `ASSET_EVENT:${text(row.id)}`,
     title: `${text(row.event_code)} — ${text(row.title)}`,
     excerpt: excerpt(text(row.description), `Severity ${text(row.severity)}`,
       row.cleared_at ? 'Cleared' : 'Not cleared'),
@@ -249,7 +327,7 @@ async function assetMaintenanceHistory(
 
   return [
     ...incidents.rows.map((row) => ({
-      ...base, kind: 'INCIDENT' as const, role: 'SAME_ASSET_HISTORY' as const,
+      ...base, kind: 'INCIDENT' as const, role: 'SAME_ASSET_HISTORY' as const, sourceId: `INCIDENT:${text(row.id)}`,
       title: `Incident — ${text(row.event_code)}`,
       excerpt: excerpt(text(row.symptoms), nullableText(row.root_cause) && `Recorded cause: ${text(row.root_cause)}`,
         nullableText(row.resolution_summary) && `Recorded outcome: ${text(row.resolution_summary)}`),
@@ -257,7 +335,7 @@ async function assetMaintenanceHistory(
       authorityClass: 'HISTORICAL' as const, sourceType: 'INCIDENT', sourceUrl: null,
     })),
     ...workOrders.rows.map((row) => ({
-      ...base, kind: 'WORK_ORDER' as const, role: 'SAME_ASSET_HISTORY' as const,
+      ...base, kind: 'WORK_ORDER' as const, role: 'SAME_ASSET_HISTORY' as const, sourceId: `WORK_ORDER:${text(row.id)}`,
       recordedAccount: { rootCause: nullableText(row.root_cause), outcome: nullableText(row.resolution), component: null, downtimeMinutes: null },
       title: `Work order — ${text(row.summary)}`,
       excerpt: excerpt(nullableText(row.root_cause) && `Recorded cause: ${text(row.root_cause)}`,
@@ -266,7 +344,7 @@ async function assetMaintenanceHistory(
       authorityClass: 'HISTORICAL' as const, sourceType: 'WORK_ORDER', sourceUrl: null,
     })),
     ...resolutions.rows.map((row) => ({
-      ...base, kind: 'RESOLUTION' as const, role: 'SAME_ASSET_HISTORY' as const,
+      ...base, kind: 'RESOLUTION' as const, role: 'SAME_ASSET_HISTORY' as const, sourceId: `RESOLUTION:${text(row.id)}`,
       recordedAccount: { rootCause: nullableText(row.root_cause), outcome: nullableText(row.resolution_summary),
         component: nullableText(row.component), downtimeMinutes: count(row.downtime_minutes) },
       title: `Logged resolution — ${text(row.event_code)}`,
@@ -277,7 +355,7 @@ async function assetMaintenanceHistory(
       authorityClass: 'HISTORICAL' as const, sourceType: 'RESOLUTION', sourceUrl: null,
     })),
     ...notes.rows.map((row) => ({
-      ...base, kind: 'TECHNICIAN_NOTE' as const, role: 'SAME_ASSET_HISTORY' as const,
+      ...base, kind: 'TECHNICIAN_NOTE' as const, role: 'SAME_ASSET_HISTORY' as const, sourceId: `TECHNICIAN_NOTE:${text(row.id)}`,
       title: 'Technician note', excerpt: excerpt(text(row.content)),
       timestamp: iso(row.created_at), recordOrigin: origin(row.record_origin),
       authorityClass: 'UNVERIFIED' as const, sourceType: 'TECHNICIAN_NOTE', sourceUrl: null,
@@ -307,7 +385,7 @@ async function fleetMatches(
   return {
     assetCodes,
     evidence: result.rows.map((row) => ({
-      kind: 'ASSET_EVENT' as const, role: 'FLEET_EXACT_CODE' as const,
+      kind: 'ASSET_EVENT' as const, role: 'FLEET_EXACT_CODE' as const, sourceId: `ASSET_EVENT:${text(row.id)}`,
       title: `${text(row.asset_code)} — ${text(row.event_code)}`,
       excerpt: excerpt(text(row.description), nullableText(row.symptoms) && `Symptoms: ${text(row.symptoms)}`,
         nullableText(row.root_cause) && `Recorded cause: ${text(row.root_cause)}`,
@@ -350,6 +428,8 @@ async function recentChanges(
      limit ${MAX_STRUCTURED_ROWS}`, [assetId, startIso, endIso]);
   return result.rows.map((row) => ({
     kind: text(row.kind) as EvidenceKind, role: 'RECENT_CHANGE' as const,
+    // The union query already tags each row with its own table, so identity is that table's key.
+    sourceId: `${text(row.kind)}:${text(row.id)}`,
     title: text(row.title), excerpt: excerpt(text(row.description)),
     assetCode, timestamp: iso(row.at), recordOrigin: origin(row.record_origin),
     authorityClass: 'HISTORICAL' as const, sourceType: text(row.kind), sourceUrl: null,
@@ -408,6 +488,8 @@ export async function searchKnowledge(
     const keywordRank = row.keyword_rank == null ? null : Number(row.keyword_rank);
     return {
       kind: 'KNOWLEDGE' as const,
+      // One chunk reached by both keyword and vector search is still one chunk.
+      sourceId: `KNOWLEDGE:${text(row.id)}`,
       role: text(row.source_type) === 'SAFETY_REFERENCE' ? 'SAFETY_REFERENCE' as const : filter.role,
       title: `${text(row.title)}${row.section ? ` — ${text(row.section)}` : ''}`,
       sourceKey: text(row.title),
@@ -449,10 +531,24 @@ const NARRATIVE_FILTER = (asset: AssetContext): KnowledgeFilter => ({
   manufacturer: asset.manufacturer, model: asset.model, role: 'FLEET_SEMANTIC',
 });
 
+/** Deterministic asset-wide totals. Computed in SQL so no total is ever inferred from samples. */
+export interface AssetEventSummaryStats {
+  totalEvents: number;
+  distinctEventCodes: number;
+  firstAt: string | null;
+  lastAt: string | null;
+  topCodes: { eventCode: string; occurrences: number; title: string | null }[];
+}
+
 export interface RetrieveOptions {
   intent: Intent;
   assetCode: string;
   eventCode?: string;
+  /**
+   * What the question is about. `ASSET_WIDE` must not be narrowed to the selected event, which is
+   * how "summarize this turbine's event history" ended up describing one code.
+   */
+  scope?: 'CURRENT_EVENT' | 'EVENT_CODE' | 'ASSET_WIDE' | 'FLEET';
   question: string;
   /** Question embedding, or null when no embedding service is configured. */
   embedding: number[] | null;
@@ -471,6 +567,7 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
   const notes: string[] = [];
   const evidence: RawEvidence[] = [];
   let occurrences: OccurrenceStats | null = null;
+  let assetSummary: AssetEventSummaryStats | null = null;
   let recentWindow: RetrievalResult['recentWindow'] = null;
   let fleetAssetCodes: string[] = [];
 
@@ -483,13 +580,47 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
   const wantsTechnical = ['TECHNICAL_GUIDANCE', 'GENERAL'].includes(options.intent);
   const wantsSafety = ['SAFETY', 'TECHNICAL_GUIDANCE', 'GENERAL'].includes(options.intent);
 
-  if (eventCode && (wantsHistory || options.intent === 'RECENT_CHANGES')) {
-    occurrences = await countPreviousOccurrences(db, asset.id, eventCode, event?.id ?? null, anchorAt);
+  // An asset-wide question is about the turbine, not the selected event. Answer it from the
+  // asset's own totals rather than narrowing to one code.
+  const assetWide = options.scope === 'ASSET_WIDE';
+  if (assetWide && wantsHistory) {
+    assetSummary = await assetEventSummary(db, asset.id);
+    evidence.push(...await assetWideRecentEvents(db, asset.assetCode, asset.id));
+    if (assetSummary.totalEvents > 0) {
+      const period = assetSummary.firstAt && assetSummary.lastAt
+        ? ` between ${assetSummary.firstAt.slice(0, 10)} and ${assetSummary.lastAt.slice(0, 10)}`
+        : '';
+      const frequent = assetSummary.topCodes.slice(0, 5)
+        .map((code) => `${code.eventCode} (${code.occurrences})`).join(', ');
+      evidence.push(aggregateEvidence({
+        sourceId: `AGGREGATE:asset-summary:${asset.id}`,
+        assetCode: asset.assetCode,
+        title: `Recorded event totals for ${asset.assetCode}`,
+        excerpt: `${asset.assetCode} has ${assetSummary.totalEvents} recorded events across ${assetSummary.distinctEventCodes} distinct event codes${period}. Most frequent codes: ${frequent}. Counted in SQL over stored rows.`,
+        timestamp: assetSummary.lastAt, recordOrigin: asset.recordOrigin,
+      }));
+    }
   }
-  if (eventCode && options.intent === 'HISTORY') {
+
+  if (!assetWide && eventCode && (wantsHistory || options.intent === 'RECENT_CHANGES')) {
+    occurrences = await countPreviousOccurrences(db, asset.id, eventCode, event?.id ?? null, anchorAt);
+    if (occurrences.previousCount > 0 || event) {
+      const span = occurrences.firstAt && occurrences.lastAt
+        ? ` The earliest was ${occurrences.firstAt.slice(0, 10)} and the latest ${occurrences.lastAt.slice(0, 10)}.`
+        : '';
+      evidence.push(aggregateEvidence({
+        sourceId: `AGGREGATE:recurrence:${asset.id}:${eventCode}`,
+        assetCode: asset.assetCode,
+        title: `Recurrence total for ${eventCode} on ${asset.assetCode}`,
+        excerpt: `${eventCode} has ${occurrences.totalIncludingSelected} recorded occurrence${occurrences.totalIncludingSelected === 1 ? '' : 's'} on ${asset.assetCode}, of which ${occurrences.previousCount} ${occurrences.previousCount === 1 ? 'is' : 'are'} previous to the selected occurrence.${span} Counted in SQL over stored rows.`,
+        timestamp: occurrences.lastAt, recordOrigin: asset.recordOrigin,
+      }));
+    }
+  }
+  if (!assetWide && eventCode && options.intent === 'HISTORY') {
     evidence.push(...await sameAssetHistory(db, asset.assetCode, asset.id, eventCode, event?.id ?? null, anchorAt));
   }
-  if (eventCode && (options.intent === 'HISTORY' || options.intent === 'PREVIOUS_RESOLUTION' || generalMachineContext)) {
+  if (!assetWide && eventCode && (options.intent === 'HISTORY' || options.intent === 'PREVIOUS_RESOLUTION' || generalMachineContext)) {
     evidence.push(...await assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode));
   }
   if (eventCode && wantsFleet) {
@@ -530,7 +661,7 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
     notes.push('Semantic ranking used keyword signals only; no embedding service was configured for this request.');
   }
 
-  return { intent: options.intent, asset, event, eventCode, anchorAt, occurrences, recentWindow, fleetAssetCodes, evidence, notes };
+  return { intent: options.intent, asset, event, eventCode, anchorAt, occurrences, assetSummary, recentWindow, fleetAssetCodes, evidence, notes };
 }
 
 /** Safety references retrieved for a refusal, so a refusal can still cite authority when available. */
