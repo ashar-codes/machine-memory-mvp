@@ -210,6 +210,8 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     const held = deps.previews.get(input.dataSourceId);
     if (!held || held.expiresAt < Date.now()) {
       deps.previews.delete(input.dataSourceId);
+      const source = await q().query('select status from public.data_sources where id=$1', [input.dataSourceId]);
+      if (source.rows[0]?.status === 'imported') throw new RouteError(409, 'IMPORT_ALREADY_COMMITTED', 'This preview was already committed; its records were not imported again.');
       throw new RouteError(410, 'PREVIEW_EXPIRED', 'The uploaded file is no longer held for import. Upload it again.');
     }
     if (held.importType !== input.importType) throw new RouteError(400, 'IMPORT_TYPE_MISMATCH', 'The import type does not match the uploaded file.');
@@ -220,6 +222,12 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
     const client = await db().connect();
     try {
       await client.query('BEGIN');
+      // Atomic row claim: competing processes wait on this UPDATE and recheck its predicate
+      // after the winner commits. A failed import rolls the claim back with its rows.
+      const claim = await client.query(`update public.data_sources set status='imported'
+        where id=$1 and source_type=$2 and record_origin='user_import' and status in ('received','mapped')
+        returning id`, [input.dataSourceId, input.importType]);
+      if (!claim.rowCount) throw new RouteError(409, 'IMPORT_ALREADY_COMMITTED', 'This preview is already committed or unavailable; its records were not imported again.');
       const batch = await client.query(
         `insert into public.import_batches (data_source_id, import_type, mapping_json, status)
          values ($1,$2,$3::jsonb,'pending') returning id`,
@@ -233,7 +241,6 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
         `update public.import_batches set rows_received=$2, rows_imported=$3, rows_rejected=$4,
            rejection_sample=$5::jsonb, status='committed' where id=$1`,
         [batchId, result.rowsReceived, result.rowsImported, result.rowsRejected, JSON.stringify(result.rejections)]);
-      await client.query(`update public.data_sources set status='imported' where id=$1`, [input.dataSourceId]);
       await client.query('COMMIT');
       deps.previews.delete(input.dataSourceId);
       const report: ImportReport = {

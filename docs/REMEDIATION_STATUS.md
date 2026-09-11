@@ -24,7 +24,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | B / P2-06 | VERIFIED | Local components format datetime defaults; preserved default instant across DST fold; real calendar validation rejects impossible dates. |
 | C / P2-03 | VERIFIED | Uses installed PDFParse v2 getText and finally destroy; textless PDFs rejected without indexing synthetic page labels. |
 | C / P2-04 | VERIFIED | Missing event CSV description normalizes to empty text, matching recordEvent; required-only imports pass actual PostgreSQL constraints. |
-| C / P2-05 | NOT_STARTED | Concurrent preview commits have no atomic DB claim. |
+| C / P2-05 | VERIFIED | Transactional data-source UPDATE claims preview atomically; competing commit and response-loss retry return 409 without duplicate rows. |
 | C / P2-08 | NOT_STARTED | Runtime documents use query task; model-space compatibility unenforced. |
 | D / P2-07 | NOT_STARTED | Candidate cap before relevance; authority creates admission. |
 | D / P2-09 | NOT_STARTED | Replay payload combines stored ID with incoming fields. |
@@ -35,6 +35,22 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### C3 — concurrent CSV commit
+
+- Reproduced over real HTTP/PostgreSQL: same preview committed concurrently returned
+  `[201,201]` and stored two events. Fixed by conditional source-row UPDATE inside the same
+  transaction as batch/record inserts; PostgreSQL serializes/rechecks the claim across clients.
+  Rollback restores source availability. No migration or process-local mutex required.
+- Files: `backend/src/routes.ts`, `scripts/verify/import-concurrency.ts`.
+- Live regression PASS: `[201,409]`, exactly one event and batch; repeat after successful
+  commit returns 409 `IMPORT_ALREADY_COMMITTED`. Preview with no description also commits
+  through real API and stores empty text. This is not cross-server preview storage: another
+  process without the preview still cannot import it, but cannot duplicate an existing commit.
+- Existing safe reset removed uniquely named test asset/site/source/history; 13 protected-table
+  fingerprints unchanged after reproduction and fixed verification. No public data modified.
+- Gates: lint/typecheck/build/diff check PASS; **358 tests PASS** plus live regression script.
+- C2 checkpoint: `06ef03d`. C3 checkpoint: this commit (`fix: claim CSV previews atomically in PostgreSQL`).
 
 ### C2 — optional CSV description
 
