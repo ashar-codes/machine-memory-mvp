@@ -27,7 +27,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | C / P2-05 | VERIFIED | Transactional data-source UPDATE claims preview atomically; competing commit and response-loss retry return 409 without duplicate rows. |
 | C / P2-08 | VERIFIED | Explicit document embedding role propagates through Gemini-only wrapper; fixed model/dimensions enforced; incompatible chunk metadata gets no cosine comparison. |
 | D / P2-07 | VERIFIED | Relevance admission and ordering precede candidate cap; authority remains provenance, not topical relevance. |
-| D / P2-09 | NOT_STARTED | Replay payload combines stored ID with incoming fields. |
+| D / P2-09 | VERIFIED | HTTP/SSE use persisted payload; duplicate snapshots omitted; provenance conflicts return 409. |
 | D / P2-11 | NOT_STARTED | Detached pool acquisition outside catch. |
 | D / P2-10 | NOT_STARTED | Parent not rechecked after embedding; reset leaves derived status. Only fix if small/safe. |
 | E / P1-04 | NOT_STARTED | No global bounded expensive-job admission / slow-consumer handling. |
@@ -35,6 +35,19 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### D2 — persisted SCADA replay payload
+
+- Reproduced changed asset/code/title/severity/description contaminating the stored event ID.
+  Responses and stream payloads now use returned database fields and stored asset identity.
+  Duplicate signals are empty because snapshots are not persisted; duplicate events do not
+  trigger analysis. Conflicting non-simulation origin returns 409 EVENT_IDENTITY_CONFLICT.
+- Two HTTP/router + stream regressions PASS. Live PostgreSQL conflicting replay PASS:
+  original WT-07 event returned despite PEN-T01/new payload replay; exactly one event row.
+  `scripts/verify/replay.ts` rolls back both event and derived-status changes.
+- Existing unique-index concurrency mechanism unchanged; concurrent HTTP replay was not
+  separately rerun. No schema/shared type change.
+- Gates: 366 tests, lint/typecheck/build/diff check PASS. D1 checkpoint: `7625bbd`.
 
 ### D1 — relevance before authority and candidate cap
 
@@ -216,8 +229,7 @@ public_data, public_reference and synthetic_demo. Do not run broad reset over us
 
 ## Continuation
 
-Phases A–C and D1/P2-07 are complete. Next: D2/P2-09 (conflicting SCADA replay),
-then P2-11 detached indexing failure, P2-10 reset coordination if small/safe,
+Phases A–C and D1–D2 are complete. Next: P2-11 detached indexing failure, P2-10 reset coordination if small/safe,
 E/P1-04 resource admission, and F demonstrated documentation overclaims.
 Use the ledger and checkpoint entries above; older checkpoints describe historical gates.
 Keep the archived audit unchanged and commit each verified section.

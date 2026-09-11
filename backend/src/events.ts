@@ -72,12 +72,14 @@ export async function recordEvent(db: Queryable, input: RecordEventInput): Promi
     // The index rejected it: this exact upstream event is already recorded. Return the stored row
     // so the caller can report the event without creating a second copy of the same fault.
     const existing = await db.query(
-      `select ${EVENT_FIELDS} from public.asset_events
+      `select ${eventFields('e')}, a.asset_code from public.asset_events e
+         join public.assets a on a.id = e.asset_id
         where event_source = $1 and external_event_id = $2`,
       [input.source, input.externalEventId]);
-    return { status: 'duplicate', event: existing.rows[0] ?? {} };
+    if (!existing.rows[0]) throw new Error('Replayed event is no longer available.');
+    return { status: 'duplicate', event: existing.rows[0] };
   }
 
   await refreshAssetStatus(db, [input.assetCode]);
-  return { status: 'created', event: inserted.rows[0] };
+  return { status: 'created', event: { ...inserted.rows[0], asset_code: input.assetCode } };
 }

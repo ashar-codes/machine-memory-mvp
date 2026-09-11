@@ -37,15 +37,16 @@ export interface ScadaDeps {
 }
 
 function toPayload(row: Record<string, unknown>, event: NormalizedScadaEvent, duplicate: boolean): ScadaEventPayload {
+  if (row.record_origin !== 'simulation') throw new ScadaError(409, 'EVENT_IDENTITY_CONFLICT', 'This source identity belongs to a different record origin.');
   return {
-    id: String(row.id), assetCode: event.assetCode, eventCode: event.eventCode, title: event.title,
-    subsystem: event.subsystem ?? null, severity: event.severity,
-    occurredAt: new Date((row.occurred_at as string) ?? event.occurredAt).toISOString(),
-    description: event.description ?? null,
-    recordOrigin: 'simulation', source: event.source, externalEventId: event.externalEventId,
+    id: String(row.id), assetCode: String(row.asset_code), eventCode: String(row.event_code), title: String(row.title),
+    subsystem: (row.subsystem as string | null) ?? null, severity: row.severity as ScadaEventPayload['severity'],
+    occurredAt: new Date(row.occurred_at as string).toISOString(),
+    description: (row.description as string | null) ?? null,
+    recordOrigin: 'simulation', source: String(row.event_source), externalEventId: String(row.external_event_id),
     duplicate,
     // Carried on the wire for the feed only. Never stored as evidence, never embedded, never cited.
-    signalSnapshot: event.signalSnapshot,
+    signalSnapshot: duplicate ? [] : event.signalSnapshot,
   };
 }
 
@@ -85,8 +86,8 @@ export function createScadaRoutes(deps: ScadaDeps): Router {
         await client.query('ROLLBACK');
         throw new ScadaError(404, 'ASSET_NOT_FOUND', `No asset "${event.assetCode}" exists. Onboard it before streaming events to it.`);
       }
-      await client.query('COMMIT');
       const payload = toPayload(outcome.event, event, outcome.status === 'duplicate');
+      await client.query('COMMIT');
       deps.hub.publish({ type: 'event', payload: payload as unknown as Record<string, unknown> });
       // A replay must not re-trigger an investigation any more than it re-creates the row.
       if (payload.severity === 'critical' && !payload.duplicate) deps.onCriticalEvent?.(payload);
