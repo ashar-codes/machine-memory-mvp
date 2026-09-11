@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest';
-import { RECENT_CHANGE_WINDOW_DAYS, retrieveEvidence } from '../../backend/src/retrieval.js';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { RECENT_CHANGE_WINDOW_DAYS, retrieveEvidence, type Queryable } from '../../backend/src/retrieval.js';
 import { CURRENT_EVENT, EVENT_CODE, WT03, WT07, createFakeDatabase } from './fakeDatabase.js';
 
 const base = { assetCode: 'WT-07', eventCode: EVENT_CODE, embedding: null };
@@ -173,5 +173,59 @@ describe('TECHNICAL_GUIDANCE retrieval', () => {
     const db = createFakeDatabase({ knowledge: [] });
     const result = await retrieveEvidence(db, { ...base, intent: 'TECHNICAL_GUIDANCE', question: 'Show technical guidance' });
     expect(result?.notes.some((note) => note.includes('No relevant technical reference'))).toBe(true);
+  });
+});
+
+describe('a failing query cannot take down the process', () => {
+  // Retrieval starts its queries together so their round trips overlap. A promise started that way
+  // but never awaited — the technical-context query when the technical search comes back empty, or
+  // anything still in flight when an earlier await throws — rejects with no handler attached, and
+  // Node terminates the process on an unhandled rejection. This crashed a running server.
+  function failingDatabase(fragment: string, options: Parameters<typeof createFakeDatabase>[0] = {}): Queryable {
+    const fake = createFakeDatabase(options);
+    return {
+      async query(sql: string, values: unknown[] = []) {
+        if (sql.includes(fragment)) throw new Error('timeout exceeded when trying to connect');
+        return fake.query(sql, values);
+      },
+    };
+  }
+
+  const unhandled: unknown[] = [];
+  const record = (reason: unknown) => { unhandled.push(reason); };
+  beforeEach(() => { unhandled.length = 0; process.on('unhandledRejection', record); });
+  afterEach(() => { process.off('unhandledRejection', record); });
+
+  const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
+
+  it('answers without an unhandled rejection when a query it never reads fails', async () => {
+    // TECHNICAL_GUIDANCE starts a maintenance-context query it reads only if references were
+    // found. With no references retrieved, that query is started and its result never awaited.
+    const result = await retrieveEvidence(failingDatabase('from public.work_orders', { knowledge: [] }), {
+      intent: 'TECHNICAL_GUIDANCE', assetCode: 'WT-07', eventCode: EVENT_CODE,
+      question: 'What guidance exists for pitch hydraulics?', embedding: null,
+    });
+    expect(result).not.toBeNull();
+    await settle();
+    expect(unhandled).toEqual([]);
+  });
+
+  it('reports a failure it does read, leaving no sibling rejection unhandled', async () => {
+    // Every query fails, so the siblings still in flight when the first await throws would each
+    // reject with no handler of their own.
+    const db: Queryable = {
+      async query(sql: string, values: unknown[] = []) {
+        if (sql.includes('from public.assets') || sql.includes('from public.asset_events where id')) {
+          return createFakeDatabase().query(sql, values);
+        }
+        throw new Error('timeout exceeded when trying to connect');
+      },
+    };
+    await expect(retrieveEvidence(db, {
+      intent: 'HISTORY', assetCode: 'WT-07', eventCode: EVENT_CODE,
+      question: 'Has this happened before?', embedding: null,
+    })).rejects.toThrow();
+    await settle();
+    expect(unhandled).toEqual([]);
   });
 });

@@ -591,21 +591,28 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
   // awaiting them in the original order keeps evidence ordering byte-for-byte identical while the
   // round trips overlap. `run` returns [] for a branch that does not apply, so the awaits below
   // read the same as the sequential version did.
-  const run = <T>(condition: boolean, query: () => Promise<T[]>): Promise<T[]> => (condition ? query() : Promise.resolve([]));
+  //
+  // Every started promise is marked as observed the moment it is created. A promise started here
+  // but never awaited — the technical-context query when the technical search comes back empty,
+  // or anything still in flight when an earlier await throws — would otherwise reject with no
+  // handler attached, and Node terminates the process on an unhandled rejection. The original
+  // promise is returned unchanged, so awaiting it below still surfaces the real error.
+  const observe = <T>(promise: Promise<T>): Promise<T> => { void promise.catch(() => undefined); return promise; };
+  const run = <T>(condition: boolean, query: () => Promise<T[]>): Promise<T[]> => (condition ? observe(query()) : Promise.resolve([]));
   const wantsRecurrence = !assetWide && Boolean(eventCode) && (wantsHistory || options.intent === 'RECENT_CHANGES');
   const wantsSummary = assetWide && wantsHistory;
 
-  const summaryQuery = wantsSummary ? assetEventSummary(db, asset.id) : null;
+  const summaryQuery = wantsSummary ? observe(assetEventSummary(db, asset.id)) : null;
   const assetWideEvents = run(wantsSummary, () => assetWideRecentEvents(db, asset.assetCode, asset.id));
   const recurrenceQuery = wantsRecurrence
-    ? countPreviousOccurrences(db, asset.id, eventCode as string, event?.id ?? null, anchorAt) : null;
+    ? observe(countPreviousOccurrences(db, asset.id, eventCode as string, event?.id ?? null, anchorAt)) : null;
   const historyQuery = run(!assetWide && Boolean(eventCode) && options.intent === 'HISTORY',
     () => sameAssetHistory(db, asset.assetCode, asset.id, eventCode as string, event?.id ?? null, anchorAt));
   const maintenanceQuery = run(
     !assetWide && Boolean(eventCode)
       && (options.intent === 'HISTORY' || options.intent === 'PREVIOUS_RESOLUTION' || generalMachineContext),
     () => assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode as string));
-  const fleetQuery = eventCode && wantsFleet ? fleetMatches(db, asset.id, eventCode) : null;
+  const fleetQuery = eventCode && wantsFleet ? observe(fleetMatches(db, asset.id, eventCode)) : null;
   const narrativeQuery = run(Boolean(eventCode) && wantsFleet,
     () => searchKnowledge(db, NARRATIVE_FILTER(asset), options.question, options.embedding));
   const changesQuery = run(wantsChanges && changeDays !== null, () => {
