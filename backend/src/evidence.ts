@@ -22,12 +22,12 @@ const AUTHORITY_WEIGHT: Record<string, number> = {
 
 /** Roles that carry the substantive answer for each intent. Used for ranking and for onlyDemo. */
 const PRIMARY_ROLES: Record<Intent, EvidenceRole[]> = {
-  HISTORY: ['SAME_ASSET_HISTORY'],
-  PREVIOUS_RESOLUTION: ['SAME_ASSET_HISTORY'],
+  HISTORY: ['SAME_ASSET_HISTORY', 'AGGREGATE_FACT'],
+  PREVIOUS_RESOLUTION: ['SAME_ASSET_HISTORY', 'AGGREGATE_FACT'],
   SIMILAR_INCIDENTS: ['FLEET_EXACT_CODE', 'FLEET_SEMANTIC', 'SAME_ASSET_HISTORY'],
-  RECENT_CHANGES: ['RECENT_CHANGE'],
+  RECENT_CHANGES: ['RECENT_CHANGE', 'AGGREGATE_FACT'],
   TECHNICAL_GUIDANCE: ['TECHNICAL_REFERENCE', 'SAFETY_REFERENCE'],
-  GENERAL: ['SAME_ASSET_HISTORY', 'FLEET_EXACT_CODE', 'RECENT_CHANGE', 'TECHNICAL_REFERENCE', 'SAFETY_REFERENCE'],
+  GENERAL: ['SAME_ASSET_HISTORY', 'FLEET_EXACT_CODE', 'RECENT_CHANGE', 'TECHNICAL_REFERENCE', 'SAFETY_REFERENCE', 'AGGREGATE_FACT'],
   SAFETY: ['SAFETY_REFERENCE'],
 };
 
@@ -86,7 +86,13 @@ export function fuseEvidence(result: RetrievalResult, limit = MAX_EVIDENCE_ITEMS
       best.set(key, item);
     }
   }
-  const unique = [...best.values()];
+  const all = [...best.values()];
+  // A computed aggregate is not a candidate competing with samples — it is the record that proves
+  // an exact total. Ranked normally it scored below the very rows it summarises and was pushed out
+  // by the candidate cap, which left "576 events" with nothing citable behind it. Aggregates are
+  // few, deterministic and tiny, so they are admitted first and the cap applies to the rest.
+  const aggregates = all.filter((item) => item.role === 'AGGREGATE_FACT');
+  const unique = all.filter((item) => item.role !== 'AGGREGATE_FACT');
   const scored = unique
     .map((item, index) => ({ item, index, score: rankScore(item, result.intent, result.asset) }))
     // Stable: equal scores keep retrieval order, which is already deterministic newest-first.
@@ -96,9 +102,10 @@ export function fuseEvidence(result: RetrievalResult, limit = MAX_EVIDENCE_ITEMS
   // Anything held back is reconsidered afterwards, so the cap can never shrink the evidence set.
   const perSource = new Map<string, number>();
   const selected: typeof scored = [];
+  const aggregateSlots = Math.min(aggregates.length, Math.max(0, limit - 1));
   const deferred: typeof scored = [];
   for (const entry of scored) {
-    if (selected.length >= limit) break;
+    if (selected.length >= limit - aggregateSlots) break;
     const key = entry.item.sourceKey;
     if (!key) { selected.push(entry); continue; }
     const used = perSource.get(key) ?? 0;
@@ -110,10 +117,13 @@ export function fuseEvidence(result: RetrievalResult, limit = MAX_EVIDENCE_ITEMS
     if (selected.length >= limit) break;
     selected.push(entry);
   }
-  const ordered = selected
-    .sort((a, b) => (b.score - a.score) || (a.index - b.index))
-    .slice(0, limit)
-    .map((entry) => entry.item);
+  const ordered = [
+    // Aggregates lead: an answer's exact figures should cite the first thing a reader sees.
+    ...aggregates.slice(0, aggregateSlots),
+    ...selected
+      .sort((a, b) => (b.score - a.score) || (a.index - b.index))
+      .map((entry) => entry.item),
+  ].slice(0, limit);
 
   const evidence: Evidence[] = ordered.map((item, index) => ({
     id: `EV-${index + 1}`,

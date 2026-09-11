@@ -211,13 +211,37 @@ export function deterministicAnswer(result: RetrievalResult, evidence: Evidence[
   const findings: Answer['findings'] = [];
   const parts: string[] = [];
 
+  // A total must cite evidence that contains the total. Sample rows are examples, not proof.
+  const aggregateIds = cite((item) => item.role === 'AGGREGATE_FACT');
   const historyIds = cite((item) => item.role === 'SAME_ASSET_HISTORY');
   const fleetIds = cite((item) => item.role === 'FLEET_EXACT_CODE');
   const changeIds = cite((item) => item.role === 'RECENT_CHANGE');
   const referenceIds = cite((item) => item.procedural);
   const resolutionIds = cite((item) => item.kind === 'RESOLUTION' || item.kind === 'WORK_ORDER');
 
-  if (result.occurrences && historyIds.length) {
+  // Asset-wide questions are answered from the asset's own totals, never by counting samples.
+  if (result.assetSummary && result.assetSummary.totalEvents > 0) {
+    const summary = result.assetSummary;
+    const period = summary.firstAt && summary.lastAt
+      ? ` recorded between ${formatDate(summary.firstAt)} and ${formatDate(summary.lastAt)}` : '';
+    parts.push(`${asset} has ${summary.totalEvents} recorded events across ${summary.distinctEventCodes} distinct event codes${period}.`);
+    findings.push({
+      title: 'Recorded event totals for this turbine',
+      detail: `${asset} has ${summary.totalEvents} recorded events across ${summary.distinctEventCodes} distinct event codes${period}. These totals were computed in SQL over stored rows, not counted from the sample listed below.`,
+      citationIds: aggregateIds.slice(0, 2),
+    });
+    if (summary.topCodes.length) {
+      findings.push({
+        title: 'Most frequently recorded codes',
+        detail: summary.topCodes.slice(0, 5)
+          .map((item) => `${item.eventCode}${item.title ? ` (${item.title})` : ''}: ${item.occurrences}`)
+          .join('; ') + '. Counts computed in SQL.',
+        citationIds: aggregateIds.slice(0, 2),
+      });
+    }
+  }
+
+  if (result.occurrences && (historyIds.length || aggregateIds.length)) {
     const { previousCount, totalIncludingSelected, firstAt, lastAt } = result.occurrences;
     parts.push(previousCount > 0
       ? `${code} has ${previousCount} recorded previous occurrence${previousCount === 1 ? '' : 's'} on ${asset} before the selected event.`
@@ -226,7 +250,8 @@ export function deterministicAnswer(result: RetrievalResult, evidence: Evidence[
       findings.push({
         title: 'Recurrence on this asset',
         detail: `The database records ${previousCount} earlier occurrence${previousCount === 1 ? '' : 's'} of ${code} on ${asset}, between ${formatDate(firstAt)} and ${formatDate(lastAt)}; ${totalIncludingSelected} total including the selected occurrence. This count was computed in SQL and excludes the selected occurrence from the previous count.`,
-        citationIds: historyIds.slice(0, 6),
+        // Aggregate first: the cited record has to be the one that carries the figure.
+        citationIds: [...aggregateIds, ...historyIds].slice(0, 6),
       });
     }
   }
