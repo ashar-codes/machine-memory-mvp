@@ -206,6 +206,9 @@ describe('structured import', () => {
     const db = recorder(assets);
     const result = await commitImport(db, { table: eventTable, mapping: eventMapping, importType: 'EVENT_LOG', batchId: 'batch-1', recordOrigin: 'user_import' });
     expect(result.rowsImported).toBe(2);
+    // Description is absent from this valid CSV; canonical events persist empty text, not null.
+    expect(db.calls.filter((call) => call.sql.includes('insert into public.asset_events'))
+      .every((call) => call.values[7] === '')).toBe(true);
     expect(result.rowsRejected).toBe(0);
     expect(result.assetsTouched).toEqual(['WT-10']);
     const insert = db.calls.find((call) => call.sql.includes('insert into public.asset_events'));

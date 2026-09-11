@@ -87,7 +87,8 @@ function prepare(table: Table, mapping: Map<string, string>, importType: ImportT
         if (!timestamp('cleared_at', false)) return;
         values.subsystem = text(read(row, 'subsystem'), 200);
         values.severity = normalizeSeverity(read(row, 'severity') ?? '');
-        values.description = text(read(row, 'description'));
+        // Match recordEvent(): an absent optional description persists as empty text.
+        values.description = text(read(row, 'description')) ?? '';
         break;
       }
       case 'MAINTENANCE_HISTORY': {

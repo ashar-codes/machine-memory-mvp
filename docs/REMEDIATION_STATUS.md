@@ -23,7 +23,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | B / P2-02 | VERIFIED | Abort controllers invalidate old results; keyed asset Copilot resets turns; scope/workspace switches and empty responses clear evidence. |
 | B / P2-06 | VERIFIED | Local components format datetime defaults; preserved default instant across DST fold; real calendar validation rejects impossible dates. |
 | C / P2-03 | VERIFIED | Uses installed PDFParse v2 getText and finally destroy; textless PDFs rejected without indexing synthetic page labels. |
-| C / P2-04 | NOT_STARTED | Optional CSV description inserted as null into NOT NULL field. |
+| C / P2-04 | VERIFIED | Missing event CSV description normalizes to empty text, matching recordEvent; required-only imports pass actual PostgreSQL constraints. |
 | C / P2-05 | NOT_STARTED | Concurrent preview commits have no atomic DB claim. |
 | C / P2-08 | NOT_STARTED | Runtime documents use query task; model-space compatibility unenforced. |
 | D / P2-07 | NOT_STARTED | Candidate cap before relevance; authority creates admission. |
@@ -35,6 +35,20 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### C2 — optional CSV description
+
+- Reproduced null description via strengthened existing test and actual PostgreSQL NOT NULL
+  rejection. Minimal root fix: normalize absent event description to empty string.
+- Files: `backend/src/imports.ts`, `tests/integration/dynamic.test.ts`,
+  `scripts/verify/import-optional.ts`. Other optional import fields checked against schema:
+  maintenance supplies description fallback; work-order nullable fields and note timestamp
+  default already agree with persistence.
+- Live PostgreSQL PASS: all four import types with required-only CSVs, mapping validation,
+  actual inserts and empty-description/null optional-field assertions. Single transaction
+  rolled back, no asset status updates or persistent records. No migrations.
+- Gates: lint/typecheck/build/diff check PASS; **358 tests PASS** (existing test strengthened).
+- C1 checkpoint: `bf38c69`. C2 checkpoint: this commit (`fix: normalize absent CSV event descriptions`).
 
 ### C1 — real PDF ingestion
 
