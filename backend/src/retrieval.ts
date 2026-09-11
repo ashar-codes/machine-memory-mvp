@@ -146,6 +146,17 @@ export async function loadAsset(db: Queryable, assetCode: string): Promise<Asset
 }
 
 /**
+ * Event codes recorded against one asset, used to normalize the spelling of a code named in a
+ * question. Shared by every entry point so a typed code resolves the same way wherever it is asked.
+ */
+export async function knownEventCodes(db: Queryable, assetCode: string): Promise<string[]> {
+  const result = await db.query(
+    `select distinct e.event_code from public.asset_events e
+       join public.assets a on a.id = e.asset_id where a.asset_code = $1 limit 500`, [assetCode]);
+  return result.rows.map((row) => text(row.event_code));
+}
+
+/**
  * Selected event: the newest matching occurrence, preferring one that is still open.
  * With no eventCode the newest uncleared event is used, otherwise the newest event of any kind.
  */

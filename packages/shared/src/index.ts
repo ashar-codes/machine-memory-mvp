@@ -15,7 +15,10 @@ export interface Incident {id:string; assetId:string; eventCode:string|null; sym
 export interface TimelineItem {id:string; kind:'EVENT'|'MAINTENANCE'|'NOTE'|'RESOLUTION'; title:string; description:string; timestamp:string; recordOrigin:RecordOrigin}
 export interface Evidence {id:string; title:string; sourceType:string; authorityClass:string; excerpt:string; assetCode:string|null; timestamp:string|null; recordOrigin:RecordOrigin; sourceUrl:string|null}
 export interface Answer {summary:string; findings:{title:string;detail:string;citationIds:string[]}[]; evidenceStrength:EvidenceStrength; uncertainties:string[]; safetyStatus:SafetyStatus}
-export interface InvestigateRequest {assetCode:string; eventCode?:string; intent:Intent; question:string}
+// v1.5 (additive, loosening): `intent` is optional. Omit it for a free-text question and the
+// backend routes it deterministically — a code named in the question outranks `eventCode`, and an
+// asset-wide question is not narrowed to it. Supplying an intent (the preset probes) is unchanged.
+export interface InvestigateRequest {assetCode:string; eventCode?:string; intent?:Intent; question:string}
 export interface InvestigateResponse {answer:Answer; evidence:Evidence[]}
 export interface ResolutionRequest {assetCode:string; eventCode:string; rootCause:string; resolutionSummary:string; component:string; downtimeMinutes:number; notes:string; validated:boolean}
 export interface Resolution extends ResolutionRequest {id:string; assetId:string; recordOrigin:'user_demo'; createdAt:string}

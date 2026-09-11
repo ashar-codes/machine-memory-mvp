@@ -18,7 +18,8 @@ export function InvestigationPanel({ activeProbe, running, disabled, canLogResol
   running: boolean;
   disabled: boolean;
   canLogResolution: boolean;
-  onRun: (intent: Intent, question: string, probeId: string | null) => void;
+  /** A null intent means free text: the backend routes the question itself. */
+  onRun: (intent: Intent | null, question: string, probeId: string | null) => void;
   onLogResolution: () => void;
 }) {
   const [custom, setCustom] = useState('');
@@ -26,8 +27,10 @@ export function InvestigationPanel({ activeProbe, running, disabled, canLogResol
   const submitCustom = () => {
     const question = custom.trim();
     if (!question || running || disabled) return;
-    // A typed question always goes in as GENERAL: the backend re-checks safety regardless of intent.
-    onRun('GENERAL', question, null);
+    // A typed question carries no intent. Forcing one here also forced the selected event into
+    // the request, so a question that named another event code was answered about the selected
+    // one; the backend routes free text and decides both. Safety is re-checked there regardless.
+    onRun(null, question, null);
   };
 
   return (

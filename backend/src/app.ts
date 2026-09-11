@@ -30,7 +30,7 @@ const eventCode = z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/);
 const integerQuery = z.string().regex(/^[0-9]+$/).transform(Number).pipe(z.number().int());
 const page = z.strictObject({ limit: integerQuery.pipe(z.number().min(1).max(100)).default(25), offset: integerQuery.pipe(z.number().min(0).max(10000)).default(0) });
 const empty = z.strictObject({});
-const investigation = z.strictObject({ assetCode: code, eventCode: eventCode.optional(), intent: z.enum(['HISTORY','PREVIOUS_RESOLUTION','SIMILAR_INCIDENTS','RECENT_CHANGES','TECHNICAL_GUIDANCE','GENERAL','SAFETY']), question: z.string().trim().min(1).max(2000) });
+const investigation = z.strictObject({ assetCode: code, eventCode: eventCode.optional(), intent: z.enum(['HISTORY','PREVIOUS_RESOLUTION','SIMILAR_INCIDENTS','RECENT_CHANGES','TECHNICAL_GUIDANCE','GENERAL','SAFETY']).optional(), question: z.string().trim().min(1).max(2000) });
 const resolution = z.strictObject({ assetCode: code, eventCode, rootCause: z.string().trim().min(1).max(4000), resolutionSummary: z.string().trim().min(1).max(4000), component: z.string().trim().min(1).max(200), downtimeMinutes: z.number().int().min(0).max(525600), notes: z.string().trim().max(4000), validated: z.boolean() });
 class ApiError extends Error { constructor(public status: number, public code: string, message: string) { super(message); } }
 function camelRow(row: Record<string, unknown>): Record<string, unknown> {

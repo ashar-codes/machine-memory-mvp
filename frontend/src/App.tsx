@@ -42,7 +42,7 @@ export default function App() {
   const [running, setRunning] = useState(false);
   const [investigationError, setInvestigationError] = useState('');
   const [activeProbe, setActiveProbe] = useState<string | null>(null);
-  const lastRequest = useRef<{ intent: Intent; question: string; probeId: string | null } | null>(null);
+  const lastRequest = useRef<{ intent: Intent | null; question: string; probeId: string | null } | null>(null);
   const investigationRequest = useRef<AbortController | null>(null);
 
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -138,7 +138,7 @@ export default function App() {
   };
 
   /* ------------------------------------------------------------ investigation */
-  const runInvestigation = useCallback(async (intent: Intent, question: string, probeId: string | null) => {
+  const runInvestigation = useCallback(async (intent: Intent | null, question: string, probeId: string | null) => {
     if (!selected) return;
     investigationRequest.current?.abort();
     const controller = new AbortController();
@@ -154,7 +154,8 @@ export default function App() {
       const response = await post<InvestigateResponse>('/investigate', {
         assetCode: selected,
         ...(event?.eventCode ? { eventCode: event.eventCode } : {}),
-        intent,
+        // A preset probe states its intent; free text omits it so the backend routes the question.
+        ...(intent ? { intent } : {}),
         question,
       }, controller.signal);
       if (controller.signal.aborted) return;
