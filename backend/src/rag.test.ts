@@ -2,7 +2,7 @@ import { describe,it,expect } from 'vitest';
 import { safetyAnswer, scoreEvidence, validateCitations, type EvidenceSignals } from './rag.js';
 import { readConfig } from './config.js';
 import type { Answer } from '@machine-memory/shared';
-const strong: EvidenceSignals = {exactAsset:true,exactEvent:true,priorOccurrences:2,linkedResolution:true,crossAsset:true,authoritativeTechnical:false,authoritativeSafety:false,conflicting:false,onlyDemo:false};
+const strong: EvidenceSignals = {exactAsset:true,exactEvent:true,priorOccurrences:2,linkedResolution:true,crossAsset:true,authoritativeTechnical:false,authoritativeSafety:false,conflicting:false,onlyDemo:false,intent:'HISTORY',substantiveSupport:4};
 describe('pre-synthesis safety boundary', () => {
   it.each(['bypass the relay','disable protection','defeat the interlock','override safety','skip isolation','ignore the trip','run faulted equipment','energized work','protection-setting changes','change protection settings','disable the safety interlock','operate a faulted turbine'])('refuses %s',question => {
     expect(safetyAnswer({assetCode:'WT-07',intent:'GENERAL',question})?.answer.safetyStatus).toBe('REFUSED');

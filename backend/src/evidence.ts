@@ -167,6 +167,10 @@ export function deriveSignals(result: RetrievalResult, retained: RawEvidence[]):
     authoritativeTechnical: retained.some((item) => item.procedural && item.sourceType === 'TECHNICAL_REFERENCE'),
     authoritativeSafety: retained.some((item) => item.procedural && item.sourceType === 'SAFETY_REFERENCE'),
     conflicting: false,
+    intent: result.intent,
+    // How much of the retained evidence actually answers this intent. An aggregate counts: for a
+    // recurrence question the computed total is the strongest support there is.
+    substantiveSupport: substantive.length,
     // An unrelated public reference must not lift synthetic machine history out of demo status.
     onlyDemo: substantive.length === 0 || substantive.every((item) => DEMO_ORIGINS.includes(item.recordOrigin)),
   };

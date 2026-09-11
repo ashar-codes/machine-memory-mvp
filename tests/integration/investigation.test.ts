@@ -163,7 +163,8 @@ describe('evidence strength', () => {
     const signals = deriveSignals(result, retained);
     expect(signals.onlyDemo).toBe(true);
     expect(signals.authoritativeSafety).toBe(true);
-    // 1 + 1 + 1 + 1 + 2 = 6 points, but synthetic-only substantive support caps the label.
+    // The regulator reference answers no part of a history question and now adds nothing;
+    // the four same-asset points stand alone, and synthetic-only support caps the label anyway.
     expect(scoreEvidence(signals)).toBe('MODERATE');
   });
 

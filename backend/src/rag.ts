@@ -1,4 +1,4 @@
-import type { Answer, Evidence, EvidenceStrength, InvestigateRequest, InvestigateResponse } from '@machine-memory/shared';
+import type { Answer, Evidence, EvidenceStrength, Intent, InvestigateRequest, InvestigateResponse } from '@machine-memory/shared';
 
 // Requests to defeat protection or work on energized/faulted equipment. Never answered procedurally.
 const unsafe = /\b(bypass|(?:defeat|disable|override)\s+(?:(?:an?|the|safety)\s+)*(?:interlocks?|protections?|safety)|skip\s+(?:the\s+)?isolation|ignore\s+(?:(?:the|a)\s+)?trip|(?:run|operate|keep)\s+(?:(?:the|a)\s+)?(?:faulted|tripped)\s+(?:equipment|turbine|machine)|energized\s+work|live\s+work|work\s+(?:on\s+)?(?:it\s+)?energized|protection[ -]settings?\s+changes?|(?:change|adjust|modify|raise|lower)\s+(?:the\s+)?(?:protection|trip)[ -]settings?|circumvent\s+(?:the\s+)?safety)\b/i;
@@ -65,14 +65,49 @@ export function safetyAnswer(input: InvestigateRequest): InvestigateResponse | n
   };
 }
 
-export interface EvidenceSignals { exactAsset:boolean; exactEvent:boolean; priorOccurrences:number; linkedResolution:boolean; crossAsset:boolean; authoritativeTechnical:boolean; authoritativeSafety:boolean; conflicting:boolean; onlyDemo:boolean }
-// Deterministic ordinal score. Not a probability, procedure authorization, or model confidence.
+export interface EvidenceSignals {
+  exactAsset:boolean; exactEvent:boolean; priorOccurrences:number; linkedResolution:boolean;
+  crossAsset:boolean; authoritativeTechnical:boolean; authoritativeSafety:boolean;
+  conflicting:boolean; onlyDemo:boolean;
+  /** The question being answered. Strength is support for *this* question, not bundle richness. */
+  intent:Intent;
+  /** Retained evidence in roles that actually answer this intent. */
+  substantiveSupport:number;
+}
+/**
+ * Deterministic ordinal score. Not a probability, procedure authorization, or model confidence.
+ *
+ * The score answers "how strongly does the retrieved evidence support THIS question", not "how
+ * much authoritative material happens to be in the bundle". Scoring every intent with one formula
+ * produced both reported failures: six dated change records scored INSUFFICIENT because none of
+ * them was same-asset *history*, and a research question reached HIGH by adding unrelated machine
+ * history to the references that actually answered it.
+ */
 export function scoreEvidence(s: EvidenceSignals): EvidenceStrength {
   if (!Number.isInteger(s.priorOccurrences) || s.priorOccurrences < 0) throw new Error('Invalid occurrence count');
   if (s.conflicting) return 'INSUFFICIENT';
-  const points = Number(s.exactAsset) + Number(s.exactEvent) + Number(s.priorOccurrences > 0) + Number(s.linkedResolution) + Number(s.crossAsset) + 2 * Number(s.authoritativeTechnical) + 2 * Number(s.authoritativeSafety);
-  if (points < 2) return 'INSUFFICIENT';
-  return points >= 5 && !s.onlyDemo ? 'HIGH' : 'MODERATE';
+  // Nothing retrieved in a role that answers this question.
+  if (s.substantiveSupport <= 0) return 'INSUFFICIENT';
+
+  // A question about published material is supported by published material, and by nothing else.
+  if (s.intent === 'TECHNICAL_GUIDANCE' || s.intent === 'SAFETY') {
+    const authoritative = s.authoritativeTechnical || s.authoritativeSafety;
+    // Unreviewed sources can answer "what does this document say", but never strongly.
+    if (!authoritative) return 'MODERATE';
+    return s.substantiveSupport >= 3 ? 'HIGH' : 'MODERATE';
+  }
+
+  // "What changed" is answered by change records; their count is the support.
+  if (s.intent === 'RECENT_CHANGES') {
+    return s.substantiveSupport >= 5 && !s.onlyDemo ? 'HIGH' : 'MODERATE';
+  }
+
+  const machinePoints = Number(s.exactAsset) + Number(s.exactEvent) + Number(s.priorOccurrences > 0)
+    + Number(s.linkedResolution) + Number(s.crossAsset)
+    // References are context for a machine question, worth a point, not the four they used to add.
+    + (s.intent === 'GENERAL' && (s.authoritativeTechnical || s.authoritativeSafety) ? 1 : 0);
+  if (machinePoints < 2) return 'INSUFFICIENT';
+  return machinePoints >= 5 && !s.onlyDemo ? 'HIGH' : 'MODERATE';
 }
 
 export function validateCitations(answer: Answer, evidence: Evidence[]): void {
