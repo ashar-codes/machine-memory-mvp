@@ -22,6 +22,18 @@ const VIEW_LABELS: Record<View, string> = {
   data: 'Data Hub', knowledge: 'Knowledge Base', scenario: 'Scenario Lab',
 };
 
+/** A record spine: a structured, abstract mark. No sparkle, no robot, no gradient. */
+function Mark() {
+  return (
+    <svg className="wordmark-mark" width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="2" height="14" rx="1" fill="currentColor" />
+      <rect x="6" y="2.5" width="9.5" height="2" rx="1" fill="currentColor" opacity="0.95" />
+      <rect x="6" y="7.5" width="6.5" height="2" rx="1" fill="currentColor" opacity="0.7" />
+      <rect x="6" y="12.5" width="8" height="2" rx="1" fill="currentColor" opacity="0.45" />
+    </svg>
+  );
+}
+
 export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [assets, setAssets] = useState<Asset[]>([]);
@@ -196,20 +208,28 @@ export default function App() {
 
   return (
     <div className="shell">
-      <header className="topbar">
-        <span className="wordmark">Machine Memory<span>Turbine maintenance intelligence</span></span>
-        <span className="topbar-spacer" />
-        <div className="status-strip">
+      <header className="masthead">
+        <span className="wordmark">
+          <Mark />
+          <span className="wordmark-text">
+            <span className="wordmark-name">Machine Memory</span>
+            <span className="wordmark-sub">Turbine maintenance intelligence</span>
+          </span>
+        </span>
+        <span className="masthead-spacer" />
+        <div className="system-status">
           <span className="status-item">
             <span className={`lamp ${lamp}`} aria-hidden="true" />
-            {databaseState === 'connected' ? 'Database connected'
-              : databaseState === 'unavailable' ? 'Database unavailable'
-              : databaseState === 'not_configured' ? 'Database not configured'
-              : 'Checking backend'}
+            <span className="label">
+              {databaseState === 'connected' ? 'Database connected'
+                : databaseState === 'unavailable' ? 'Database unavailable'
+                : databaseState === 'not_configured' ? 'Database not configured'
+                : 'Checking backend'}
+            </span>
           </span>
           <span className="status-item">
             <span className={`lamp ${health?.llm === 'configured_unverified' ? 'live' : ''}`} aria-hidden="true" />
-            {health?.llm === 'configured_unverified' ? 'Model key present' : 'No model key'}
+            <span className="label">{health?.llm === 'configured_unverified' ? 'Model key present' : 'No model key'}</span>
           </span>
         </div>
       </header>
@@ -311,7 +331,7 @@ export default function App() {
                 onRun={(intent, question, probeId) => void runInvestigation(intent, question, probeId)}
                 onLogResolution={() => setDrawerOpen(true)}
               />
-              <div className="investigate" style={{ paddingTop: 0 }}>
+              <div className="answer-region">
                 <AnswerCard
                   answer={result?.answer ?? null}
                   running={running}

@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import type { Answer, CopilotMessage, CopilotResponse, Evidence } from '@machine-memory/shared';
+import type { CopilotMessage, CopilotResponse, Evidence } from '@machine-memory/shared';
 import { failureText, post } from './api';
-import { Empty } from './ui';
+import { Empty, Strength } from './ui';
 
 const ASSET_PROMPTS = [
   'Why could this fault be recurring?',
@@ -91,6 +91,7 @@ export function CopilotView({ assetCode, eventCode, onEvidence }: {
   return (
     <div className="page copilot">
       <div className="page-head">
+        <span className="eyebrow">Engineering investigation</span>
         <h2>AI Copilot</h2>
         <p>
           The copilot answers from retrieved records only. Counts and dates are computed in SQL, every
@@ -119,7 +120,10 @@ export function CopilotView({ assetCode, eventCode, onEvidence }: {
         )}
         {turns.map((turn, index) => (
           <div className="turn" key={index}>
-            <p className="asked">{turn.question}</p>
+            <div className="asked">
+              <span className="q-mark">Query</span>
+              <p className="q-text">{turn.question}</p>
+            </div>
             {turn.error && <p className="turn-error">{turn.error}</p>}
             {!turn.response && !turn.error && <p className="thinking">Retrieving evidence and composing a grounded answer…</p>}
             {turn.response && <CopilotAnswer response={turn.response} />}
@@ -128,32 +132,34 @@ export function CopilotView({ assetCode, eventCode, onEvidence }: {
         <div ref={endRef} />
       </div>
 
-      <div className="prompt-row">
-        {prompts.map((prompt) => (
-          <button key={prompt} type="button" className="probe" disabled={running} onClick={() => void ask(prompt)}>{prompt}</button>
-        ))}
+      <div className="prompt-block">
+        <span className="prompt-label">Common lines of enquiry</span>
+        <div className="prompt-row">
+          {prompts.map((prompt) => (
+            <button key={prompt} type="button" className="probe" disabled={running} onClick={() => void ask(prompt)}>{prompt}</button>
+          ))}
+        </div>
       </div>
 
       <div className="ask">
-        <input
-          type="text"
-          aria-label="Ask the copilot"
-          value={draft}
-          maxLength={2000}
-          disabled={running}
-          placeholder={effectiveScope === 'asset' ? `Ask about ${assetCode ?? 'this turbine'}…` : 'Ask about the fleet…'}
-          onChange={(event) => setDraft(event.target.value)}
-          onKeyDown={(event) => { if (event.key === 'Enter') void ask(draft); }}
-        />
+        <span className="ask-field">
+          <label className="ask-label" htmlFor="copilot-question">Your question</label>
+          <input
+            id="copilot-question"
+            type="text"
+            aria-label="Ask the copilot"
+            value={draft}
+            maxLength={2000}
+            disabled={running}
+            placeholder={effectiveScope === 'asset' ? `Ask about ${assetCode ?? 'this turbine'}…` : 'Ask about the fleet…'}
+            onChange={(event) => setDraft(event.target.value)}
+            onKeyDown={(event) => { if (event.key === 'Enter') void ask(draft); }}
+          />
+        </span>
         <button type="button" className="btn primary" disabled={running || !draft.trim()} onClick={() => void ask(draft)}>Ask</button>
       </div>
     </div>
   );
-}
-
-function strengthLabel(answer: Answer): string {
-  return answer.evidenceStrength === 'HIGH' ? 'Strong evidence'
-    : answer.evidenceStrength === 'MODERATE' ? 'Moderate evidence' : 'Insufficient evidence';
 }
 
 function CopilotAnswer({ response }: { response: CopilotResponse }) {
@@ -162,10 +168,10 @@ function CopilotAnswer({ response }: { response: CopilotResponse }) {
   return (
     <article className={`assessment ${refused ? 'refused' : ''}`}>
       <header>
-        <span className="assessment-title">AI assessment</span>
-        <span className={`badge strength-${answer.evidenceStrength.toLowerCase()}`}>{strengthLabel(answer)}</span>
-        {refused && <span className="badge refused">Refused</span>}
-        {answer.safetyStatus === 'INSUFFICIENT' && <span className="badge insufficient">Insufficient</span>}
+        <span className="assessment-title">Assessment</span>
+        <Strength value={answer.evidenceStrength} />
+        {refused && <span className="verdict REFUSED">Refused</span>}
+        {answer.safetyStatus === 'INSUFFICIENT' && <span className="verdict INSUFFICIENT">Insufficient</span>}
       </header>
 
       {refused && (
@@ -188,10 +194,13 @@ function CopilotAnswer({ response }: { response: CopilotResponse }) {
         <ul className="findings">
           {answer.findings.map((finding, index) => (
             <li key={index}>
-              <strong>{finding.title}</strong>
+              <span className="f-title">{finding.title}</span>
               <p>{finding.detail}</p>
               {finding.citationIds.length > 0 && (
-                <span className="cites">{finding.citationIds.map((id) => <code key={id}>{id}</code>)}</span>
+                <span className="cites">
+                  <span className="cites-label">Cites</span>
+                  {finding.citationIds.map((id) => <code key={id}>{id}</code>)}
+                </span>
               )}
             </li>
           ))}

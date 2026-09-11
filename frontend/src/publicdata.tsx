@@ -40,23 +40,36 @@ export function EventSummaryPanel({ assetCode, reload }: { assetCode: string; re
     : summary.recentEvents;
 
   return (
-    <section className="panel event-summary">
-      <div className="panel-head">
-        <h3>Recorded events</h3>
+    <section className="event-summary">
+      <div className="section-bar">
+        <h2>Recorded events</h2>
         <Origin value={summary.recordOrigin} />
-        {isPublic && source && (
-          <span className="panel-note">
-            Source: <a href={source.href} target="_blank" rel="noreferrer noopener">{source.name}</a>
-            {summary.sourceTurbine && <> · source turbine {summary.sourceTurbine}</>}
-          </span>
-        )}
       </div>
 
-      <div className="tile-grid compact">
-        <div className="tile"><span className="tile-value">{summary.totalEvents}</span><span className="tile-label">Event records</span></div>
-        <div className="tile"><span className="tile-value">{summary.distinctEventCodes}</span><span className="tile-label">Distinct codes</span></div>
-        <div className="tile"><span className="tile-value">{summary.firstEventAt ? day(summary.firstEventAt) : '—'}</span><span className="tile-label">First record</span></div>
-        <div className="tile"><span className="tile-value">{summary.lastEventAt ? day(summary.lastEventAt) : '—'}</span><span className="tile-label">Latest record</span></div>
+      {isPublic && source && (
+        <p className="panel-note source-line">
+          Source: <a href={source.href} target="_blank" rel="noreferrer noopener">{source.name}</a>
+          {summary.sourceTurbine && <> · source turbine {summary.sourceTurbine}</>}
+        </p>
+      )}
+
+      <div className="summary-figures">
+        <div className="figure">
+          <span className="f-value">{summary.totalEvents}</span>
+          <span className="f-label">Event records</span>
+        </div>
+        <div className="figure">
+          <span className="f-value">{summary.distinctEventCodes}</span>
+          <span className="f-label">Distinct codes</span>
+        </div>
+        <div className="figure">
+          <span className="f-value">{summary.firstEventAt ? day(summary.firstEventAt) : '—'}</span>
+          <span className="f-label">First record</span>
+        </div>
+        <div className="figure">
+          <span className="f-value">{summary.lastEventAt ? day(summary.lastEventAt) : '—'}</span>
+          <span className="f-label">Latest record</span>
+        </div>
       </div>
 
       {!summary.hasMaintenanceRecords && (
@@ -67,36 +80,40 @@ export function EventSummaryPanel({ assetCode, reload }: { assetCode: string; re
         </p>
       )}
 
-      <div className="panel-head" style={{ marginTop: 12 }}>
+      <div className="section-head sub">
         <h3>Most frequent codes</h3>
-        <span className="panel-note">Counted in SQL over imported rows. Click one to filter the list below.</span>
+        <span className="note">Counted in SQL over imported rows. Select one to filter the list below.</span>
       </div>
       <ul className="code-chips">
         {summary.topEventCodes.map((item) => (
           <li key={item.eventCode}>
-            <button type="button" className={`chip ${codeFilter === item.eventCode ? 'active' : ''}`}
+            <button type="button" className="chip"
               aria-pressed={codeFilter === item.eventCode}
               onClick={() => setCodeFilter(codeFilter === item.eventCode ? '' : item.eventCode)}>
               <code>{item.eventCode}</code>
-              {item.message && <span>{item.message}</span>}
+              {item.message && <span className="c-msg">{item.message}</span>}
               <em>{item.occurrences}</em>
             </button>
           </li>
         ))}
       </ul>
 
-      <div className="panel-head" style={{ marginTop: 12 }}>
+      <div className="section-head sub">
         <h3>Recent events</h3>
-        <span className="panel-note">
+        <span className="note">
           Newest 25{codeFilter && <> · filtered to <code>{codeFilter}</code></>}
         </span>
-        {codeFilter && <button type="button" className="btn ghost" onClick={() => setCodeFilter('')}>Clear filter</button>}
+        {codeFilter && (
+          <span className="actions">
+            <button type="button" className="btn ghost small" onClick={() => setCodeFilter('')}>Clear filter</button>
+          </span>
+        )}
       </div>
       {rows.length === 0 ? (
         <Empty title="No matching events">No recorded event in the newest 25 uses that code.</Empty>
       ) : (
         <div className="feed">
-          <table className="feed-table">
+          <table className="data-table">
             <thead>
               <tr><th>Timestamp</th><th>Code</th><th>Message</th><th>Source status</th><th>Duration</th><th>Provenance</th></tr>
             </thead>

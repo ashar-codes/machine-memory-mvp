@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import type { Answer, Intent, ResolutionRequest } from '@machine-memory/shared';
-import { Failure } from './ui';
+import { Failure, Strength } from './ui';
 
 export interface Probe { id: string; intent: Intent; label: string; question: string }
 
@@ -64,18 +64,22 @@ export function InvestigationPanel({ activeProbe, running, disabled, canLogResol
       </div>
 
       <div className="ask">
-        <input
-          type="text"
-          aria-label="Ask a question about this asset"
-          value={custom}
-          maxLength={2000}
-          placeholder="Ask about this turbine's history, changes or references"
-          disabled={running || disabled}
-          onChange={(event) => setCustom(event.target.value)}
-          onKeyDown={(event) => { if (event.key === 'Enter') submitCustom(); }}
-        />
+        <span className="ask-field">
+          <label className="ask-label" htmlFor="asset-question">Or ask in your own words</label>
+          <input
+            id="asset-question"
+            type="text"
+            aria-label="Ask a question about this asset"
+            value={custom}
+            maxLength={2000}
+            placeholder="Ask about this turbine's history, changes or references"
+            disabled={running || disabled}
+            onChange={(event) => setCustom(event.target.value)}
+            onKeyDown={(event) => { if (event.key === 'Enter') submitCustom(); }}
+          />
+        </span>
         <button type="button" className="btn primary" disabled={running || disabled || !custom.trim()} onClick={submitCustom}>
-          Ask
+          Investigate
         </button>
       </div>
     </section>
@@ -94,7 +98,11 @@ export function AnswerCard({ answer, running, error, onRetry, onCite }: {
   if (running) {
     return (
       <div className="answer">
-        <div className="answer-body"><span className="working">Retrieving evidence and composing a grounded answer</span></div>
+        <div className="answer-shell">
+          <div className="answer-body">
+            <span className="working">Retrieving evidence and composing a grounded answer</span>
+          </div>
+        </div>
       </div>
     );
   }
@@ -103,38 +111,48 @@ export function AnswerCard({ answer, running, error, onRetry, onCite }: {
 
   return (
     <article className="answer">
-      <div className="answer-head">
-        <h3>Investigation result</h3>
-        <span className={`chip ${answer.safetyStatus}`}>{answer.safetyStatus === 'NORMAL' ? 'Answered' : answer.safetyStatus}</span>
-        <span className={`chip ${answer.evidenceStrength}`}>{answer.evidenceStrength} evidence</span>
-      </div>
-      <div className="answer-body">
-        <p className={`summary${answer.safetyStatus === 'REFUSED' ? ' refused' : ''}`}>{answer.summary}</p>
+      <div className="answer-shell">
+        <div className="answer-head">
+          <h3>Investigation result</h3>
+          <Strength value={answer.evidenceStrength} />
+          <span className={`verdict ${answer.safetyStatus}`}>
+            {answer.safetyStatus === 'NORMAL' ? 'Answered' : answer.safetyStatus}
+          </span>
+        </div>
+        <div className="answer-body">
+          <p className={`summary${answer.safetyStatus === 'REFUSED' ? ' refused' : ''}`}>{answer.summary}</p>
 
-        {answer.findings.length > 0 && (
-          <ol className="findings">
-            {answer.findings.map((finding, index) => (
-              <li className="finding" key={`${finding.title}-${index}`}>
-                <h4>{finding.title}</h4>
-                <p>{finding.detail}</p>
-                <div className="cites">
-                  {finding.citationIds.map((id) => (
-                    <button type="button" className="cite" key={id} onClick={() => onCite(id)}>{id}</button>
-                  ))}
-                </div>
-              </li>
-            ))}
-          </ol>
-        )}
+          {answer.findings.length > 0 && (
+            <>
+              <h4 className="findings-head">Findings</h4>
+              <ol className="findings">
+                {answer.findings.map((finding, index) => (
+                  <li key={`${finding.title}-${index}`}>
+                    <span className="f-title">{finding.title}</span>
+                    <p>{finding.detail}</p>
+                    {finding.citationIds.length > 0 && (
+                      <div className="cites">
+                        <span className="cites-label">Cites</span>
+                        {finding.citationIds.map((id) => (
+                          <button type="button" className="cite" key={id} onClick={() => onCite(id)}>{id}</button>
+                        ))}
+                      </div>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </>
+          )}
 
-        {answer.uncertainties.length > 0 && (
-          <div className="uncertain">
-            <h4>What this answer does not establish</h4>
-            <ul>
-              {answer.uncertainties.map((item, index) => <li key={index}>{item}</li>)}
-            </ul>
-          </div>
-        )}
+          {answer.uncertainties.length > 0 && (
+            <div className="uncertain">
+              <h4>What this answer does not establish</h4>
+              <ul>
+                {answer.uncertainties.map((item, index) => <li key={index}>{item}</li>)}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </article>
   );
@@ -193,10 +211,21 @@ export function ResolutionDrawer({ assetCode, eventCode, onClose, onSave }: {
         <div className="drawer-head">
           <div>
             <h2>Log resolution</h2>
-            <p>{assetCode} · {eventCode} · saved as user demo data</p>
+            <p className="drawer-sub">
+              <code>{assetCode}</code>
+              <span aria-hidden="true">·</span>
+              <code>{eventCode}</code>
+              <span aria-hidden="true">·</span>
+              saved as user demo data
+            </p>
           </div>
           <button type="button" className="btn" onClick={onClose}>Close</button>
         </div>
+
+        <p className="drawer-intro">
+          A structured maintenance outcome added to this asset's machine memory. It becomes
+          retrievable immediately and is cited with its provenance wherever it is used.
+        </p>
 
         <div className="drawer-body">
           <div className="field">
@@ -233,12 +262,12 @@ export function ResolutionDrawer({ assetCode, eventCode, onClose, onSave }: {
           <div className="field check">
             <input id="validated" type="checkbox" checked={form.validated}
               onChange={(event) => set('validated', event.target.checked)} />
-            <span>
+            <label htmlFor="validated">
               <strong>I confirm this outcome was observed.</strong>
               <br />
               This records your assertion only. It grants no engineering authority and does not make the
               record an approved procedure.
-            </span>
+            </label>
           </div>
         </div>
 

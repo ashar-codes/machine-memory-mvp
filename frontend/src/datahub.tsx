@@ -70,6 +70,7 @@ export function DataHub({ onImported }: { onImported: (report: ImportReport) => 
   return (
     <div className="page">
       <div className="page-head">
+        <span className="eyebrow">Data ingestion</span>
         <h2>Data Hub</h2>
         <p>
           Add operational history to Machine Memory from a CSV export. Gemini proposes the column
@@ -78,12 +79,15 @@ export function DataHub({ onImported }: { onImported: (report: ImportReport) => 
         </p>
       </div>
 
-      <section className="panel">
-        <div className="panel-head"><h3>1 · What are you importing?</h3></div>
+      <section className="step done">
+        <div className="step-head">
+          <span className="step-num">1</span>
+          <h3>Choose the data type</h3>
+        </div>
         <div className="choice-grid">
           {IMPORT_CHOICES.map((choice) => (
             <button key={choice.type} type="button"
-              className={`choice ${importType === choice.type ? 'active' : ''}`}
+              className="choice"
               aria-pressed={importType === choice.type}
               onClick={() => { setImportType(choice.type); setPreview(null); setReport(null); }}>
               <strong>{choice.label}</strong>
@@ -93,67 +97,80 @@ export function DataHub({ onImported }: { onImported: (report: ImportReport) => 
         </div>
       </section>
 
-      <section className="panel">
-        <div className="panel-head">
-          <h3>2 · Upload the file</h3>
+      <section className={`step${preview || report ? ' done' : ''}`}>
+        <div className="step-head">
+          <span className="step-num">2</span>
+          <h3>Upload the file</h3>
           <span className="panel-note">CSV or TSV, up to 10 MB and 5,000 rows.</span>
         </div>
         <label className="file-drop">
           <input type="file" accept=".csv,.tsv,.txt" disabled={busy}
             onChange={(event) => { void choose(event.target.files?.[0]); event.target.value = ''; }} />
-          <span>{busy ? 'Reading file…' : 'Choose a CSV file'}</span>
+          <span className="drop-hint">{busy ? 'Reading file…' : 'Choose a CSV file'}</span>
         </label>
         {error && <p className="turn-error">{error}</p>}
       </section>
 
       {preview && (
-        <section className="panel">
-          <div className="panel-head">
-            <h3>3 · Confirm the column mapping</h3>
+        <section className="step">
+          <div className="step-head">
+            <span className="step-num">3</span>
+            <h3>Review the column mapping</h3>
             <span className="panel-note">
               {preview.totalRows} data row{preview.totalRows === 1 ? '' : 's'} in {preview.originalFilename}
               {preview.mappingSource === 'ai' ? ' · Gemini proposed part of this mapping' : ' · matched deterministically'}
             </span>
           </div>
 
+          {preview.mappingSource === 'ai' && (
+            <p className="notice">
+              Proposed mappings are suggestions only. Nothing is imported until you confirm the
+              assignments below.
+            </p>
+          )}
           {preview.notes.map((note) => <p className="notice" key={note}>{note}</p>)}
 
-          <table className="mapping-table">
-            <thead>
-              <tr><th>Uploaded column</th><th>Sample value</th><th>Machine Memory field</th><th>Status</th></tr>
-            </thead>
-            <tbody>
-              {preview.mapping.map((entry) => {
-                const sample = preview.sampleRows.map((row) => row[entry.column]).find(Boolean) ?? '—';
-                const current = mapping[entry.column] ?? '';
-                return (
-                  <tr key={entry.column}>
-                    <td><code>{entry.column}</code></td>
-                    <td className="sample">{sample.slice(0, 48)}</td>
-                    <td>
-                      <select value={current} onChange={(event) => {
-                        const next = { ...mapping };
-                        if (event.target.value) next[entry.column] = event.target.value;
-                        else delete next[entry.column];
-                        setMapping(next);
-                      }}>
-                        <option value="">— ignore this column —</option>
-                        {preview.targetFields.map((field) => (
-                          <option key={field.field} value={field.field}
-                            disabled={assigned.has(field.field) && current !== field.field}>
-                            {field.label}{field.required ? ' *' : ''}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <span className={`map-status ${entry.status.toLowerCase()}`}>{STATUS_LABEL[entry.status]}</span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
+          <div className="table-wrap">
+            <table className="mapping-table">
+              <thead>
+                <tr><th>Uploaded column</th><th>Sample value</th><th>Machine Memory field</th><th>Status</th></tr>
+              </thead>
+              <tbody>
+                {preview.mapping.map((entry) => {
+                  const sample = preview.sampleRows.map((row) => row[entry.column]).find(Boolean) ?? '—';
+                  const current = mapping[entry.column] ?? '';
+                  return (
+                    <tr key={entry.column}>
+                      <td><code>{entry.column}</code></td>
+                      <td className="sample">{sample.slice(0, 48)}</td>
+                      <td>
+                        <select
+                          aria-label={`Machine Memory field for column ${entry.column}`}
+                          value={current}
+                          onChange={(event) => {
+                            const next = { ...mapping };
+                            if (event.target.value) next[entry.column] = event.target.value;
+                            else delete next[entry.column];
+                            setMapping(next);
+                          }}>
+                          <option value="">— ignore this column —</option>
+                          {preview.targetFields.map((field) => (
+                            <option key={field.field} value={field.field}
+                              disabled={assigned.has(field.field) && current !== field.field}>
+                              {field.label}{field.required ? ' *' : ''}
+                            </option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <span className={`map-status ${entry.status.toLowerCase()}`}>{STATUS_LABEL[entry.status]}</span>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
 
           {missingRequired.length > 0 && (
             <p className="blocking">
@@ -161,6 +178,11 @@ export function DataHub({ onImported }: { onImported: (report: ImportReport) => 
               Assign {missingRequired.length === 1 ? 'it' : 'them'} before importing.
             </p>
           )}
+
+          <div className="step-head" style={{ marginTop: 24 }}>
+            <span className="step-num">4</span>
+            <h3>Confirm and import</h3>
+          </div>
 
           <label className="check-row">
             <input type="checkbox" checked={simulation} onChange={(event) => setSimulation(event.target.checked)} />
@@ -195,8 +217,11 @@ export function DataHub({ onImported }: { onImported: (report: ImportReport) => 
         </section>
       )}
 
-      <section className="panel muted">
-        <div className="panel-head"><h3>Not supported in this MVP</h3></div>
+      <section className="section">
+        <div className="section-head">
+          <h3>Not supported in this MVP</h3>
+          <span className="note">Named honestly rather than silently failing.</span>
+        </div>
         <ul className="record-list">
           {UNSUPPORTED.map((item) => (
             <li key={item.label}>
