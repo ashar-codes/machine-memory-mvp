@@ -15,8 +15,10 @@ const llm = createFailoverLlm({
     if (provider !== 'gemini' || detail) console.warn(`Generation provider: ${provider}${detail ? ` (${detail})` : ''}.`);
   },
 });
-const server = createApp({pool,llmConfigured:config.llmConfigured,llm,embeddingModel:config.embeddingModel}).listen(config.port,config.host,() => {
+const server = createApp({pool,llmConfigured:config.llmConfigured,llm,embeddingModel:config.embeddingModel,demo:config.demo}).listen(config.port,config.host,() => {
   console.log(`Machine Memory listening on http://${config.host}:${config.port}`);
+  // The public origin is not a secret; the shared credential is, and is never printed.
+  if (config.demo) console.log(`Temporary demo deployment · public origin ${config.demo.publicOrigin} · shared demo credential required · this is not authentication`);
   console.log(`Database ${pool ? 'configured' : 'not configured'} · generation ${[gemini && 'gemini', groq && 'groq'].filter(Boolean).join(' → ') || 'deterministic only'}${config.generationProviderMode === 'auto' ? '' : ` · forced: ${config.generationProviderMode}`} · embeddings ${gemini ? 'gemini' : 'unavailable'}`);
   // Open the pool before anyone asks a question. A hosted Postgres connection costs a TCP round
   // trip plus a TLS handshake, and paying for several of them inside the first request is what

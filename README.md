@@ -38,7 +38,10 @@ for exactly which live checks ran and which remain open.
 ## Local limits and remaining boundaries
 
 The server has no login and stays on loopback, rejects unapproved Host/Origin headers,
-and refuses production startup. Keep Internet access blocked. At most two expensive jobs
+and refuses production startup unless the temporary demo deployment is explicitly requested
+(see [Render deployment](docs/DEPLOYMENT_RENDER.md); its HTTP Basic gate is one shared
+credential for a teacher or hackathon demonstration and is **not** authentication — no user
+identity, no session, no authorization). Otherwise keep Internet access blocked. At most two expensive jobs
 run per app instance, with no queue; overload returns 503. A shared allowance of 500 logical
 model operations lasts until app restart. It is not a dollar or per-user billing cap.
 

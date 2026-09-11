@@ -1,11 +1,13 @@
 import express, { type ErrorRequestHandler } from 'express';
 import helmet from 'helmet';
 import { rateLimit } from 'express-rate-limit';
-import { randomUUID } from 'node:crypto';
+import { createHash, randomUUID, timingSafeEqual } from 'node:crypto';
+import { fileURLToPath } from 'node:url';
+import { join } from 'node:path';
 import { z } from 'zod';
 import type pg from 'pg';
 import type { HealthResponse, InvestigateRequest, ResolutionResponse } from '@machine-memory/shared';
-import { DEFAULT_EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from './config.js';
+import { DEFAULT_EMBEDDING_MODEL, EMBEDDING_DIMENSIONS, type DemoDeployment } from './config.js';
 import { investigate } from './investigate.js';
 import type { LlmClient } from './llm.js';
 import { indexResolution } from './memoryIndex.js';
@@ -45,28 +47,112 @@ export interface AppOptions {
   /** Injected so tests and offline runs exercise the whole pipeline without network access. */
   llm?: LlmClient | null;
   embeddingModel?: string;
+  /**
+   * Temporary demo-deployment settings. Null (the default) keeps the loopback-only foundation
+   * exactly as it is: no public host, no shared credential, no static frontend.
+   */
+  demo?: DemoDeployment | null;
+  /** The compiled frontend to serve in demo mode. Overridable so tests need no build. */
+  staticDir?: string;
 }
 
-export function createApp({ pool, llmConfigured = false, llm = null, embeddingModel = DEFAULT_EMBEDDING_MODEL }: AppOptions = {}) {
+/** Render calls this without credentials; nothing else is exempt from the demo gate. */
+export const HEALTH_PATH = '/api/health';
+
+/**
+ * The compiled frontend, relative to this module.
+ *
+ * Both backend/src/app.ts and backend/dist/app.js sit two levels below the repository root, the
+ * same relationship config.ts relies on for the .env path, so one expression is correct before
+ * and after compilation. No __dirname, which does not exist in an ES module.
+ */
+export const DEFAULT_STATIC_DIR = fileURLToPath(new URL('../../frontend/dist/', import.meta.url));
+
+const digest = (value: string) => createHash('sha256').update(value, 'utf8').digest();
+/**
+ * Constant-time comparison over fixed-length digests, so neither the length nor the content of a
+ * guess is readable from how long the comparison took.
+ */
+const matchesDigest = (candidate: string, expected: Buffer) => {
+  const actual = digest(candidate);
+  return actual.length === expected.length && timingSafeEqual(actual, expected);
+};
+
+export function createApp({ pool, llmConfigured = false, llm = null, embeddingModel = DEFAULT_EMBEDDING_MODEL,
+  demo = null, staticDir = DEFAULT_STATIC_DIR }: AppOptions = {}) {
   const app = express();
   const work = createWorkGate();
   llm = budgetLlm(llm);
   app.disable('x-powered-by');
-  app.set('trust proxy', false);
+  // Render terminates TLS at its own proxy and forwards the client address, so rate limiting and
+  // the Host check must read the forwarded values there — and only there.
+  app.set('trust proxy', demo ? 1 : false);
   app.use((_req,res,next) => { res.locals.requestId = randomUUID(); res.set('X-Request-ID', res.locals.requestId as string); next(); });
   app.use(helmet());
+  // Host and Origin restrictions are not removed for the demo deployment; the permitted values
+  // widen to exactly one configured public origin. There is no wildcard and no allowlist of
+  // convenience origins: the frontend and the API share this origin, so normal application
+  // traffic needs no cross-origin permission at all.
+  const LOCAL_HOSTS = ['localhost','127.0.0.1','[::1]','::1'];
+  // Loopback stays permitted in demo mode for Render's own health probe and for a local
+  // production smoke test. It grants nothing: every path but the health check still needs the
+  // shared credential.
+  const allowedHosts = demo ? [demo.publicHost, ...LOCAL_HOSTS] : LOCAL_HOSTS;
   app.use((req,_res,next) => {
     const host = req.hostname;
-    if (!['localhost','127.0.0.1','[::1]','::1'].includes(host)) return next(new ApiError(403,'LOCAL_ONLY','This unauthenticated foundation accepts loopback hosts only.'));
+    if (!allowedHosts.includes(host)) {
+      return next(demo
+        ? new ApiError(403,'HOST_REJECTED','Host is not the configured public origin.')
+        : new ApiError(403,'LOCAL_ONLY','This unauthenticated foundation accepts loopback hosts only.'));
+    }
     if (req.headers.origin) {
       try {
         const origin = new URL(req.headers.origin);
-        if (origin.protocol !== 'http:' || !['localhost','127.0.0.1','[::1]'].includes(origin.hostname) || !['5173','3001'].includes(origin.port)) throw new Error();
+        // Compared as a parsed origin, never as a substring: `origin` is scheme, host and port
+        // and nothing else, so no path or lookalike suffix can be read as a match.
+        if (demo) { if (origin.origin !== demo.publicOrigin) throw new Error(); }
+        else if (origin.protocol !== 'http:' || !['localhost','127.0.0.1','[::1]'].includes(origin.hostname) || !['5173','3001'].includes(origin.port)) throw new Error();
       } catch { return next(new ApiError(403,'ORIGIN_REJECTED','Origin is not permitted.')); }
     }
     if (req.headers['sec-fetch-site'] === 'cross-site') return next(new ApiError(403,'ORIGIN_REJECTED','Cross-site access is not permitted.'));
     next();
   });
+
+  // Temporary demonstration access. NOT authentication: one shared credential, no identity, no
+  // session, no authorization, no per-user audit. It exists so a teacher or judge can open one
+  // URL without the deployment being open to the Internet, and it is documented as such.
+  //
+  // Placed ahead of body parsing, rate limiting and every route, so an unauthenticated request
+  // costs a hash comparison and never reaches the database or a model provider. The credential is
+  // read from the Authorization header, which is never logged, and never appears in a response.
+  if (demo) {
+    const expectedUser = digest(demo.basicAuthUser);
+    const expectedPassword = digest(demo.basicAuthPassword);
+    app.use((req,res,next) => {
+      if (req.path === HEALTH_PATH) return next();
+      const unauthorized = () => {
+        // The browser prompts on this header and then sends the same credential automatically for
+        // page loads, API fetches and the SSE stream, because all three are this one origin.
+        res.set('WWW-Authenticate', 'Basic realm="Machine Memory Demo", charset="UTF-8"');
+        res.status(401).json({ error: { code: 'DEMO_AUTH_REQUIRED', message: 'This demonstration deployment requires the shared demo credentials.', requestId: res.locals.requestId } });
+      };
+      const header = req.headers.authorization;
+      if (!header) return unauthorized();
+      const separatorIndex = header.indexOf(' ');
+      const scheme = separatorIndex < 0 ? header : header.slice(0, separatorIndex);
+      const encoded = separatorIndex < 0 ? '' : header.slice(separatorIndex + 1).trim();
+      if (scheme.toLowerCase() !== 'basic' || !encoded) return unauthorized();
+      const decoded = Buffer.from(encoded, 'base64').toString('utf8');
+      const colon = decoded.indexOf(':');
+      if (colon < 0) return unauthorized();
+      // Both comparisons always run: short-circuiting on the username would make a wrong username
+      // measurably faster to reject than a wrong password.
+      const userMatches = matchesDigest(decoded.slice(0, colon), expectedUser);
+      const passwordMatches = matchesDigest(decoded.slice(colon + 1), expectedPassword);
+      if (!userMatches || !passwordMatches) return unauthorized();
+      next();
+    });
+  }
   app.post('/api/admin/ingest', (_req,_res,next) => next(new ApiError(404,'INGEST_DISABLED','HTTP ingestion is disabled. Use the trusted CLI workflow.')));
   app.use(['/api/investigate','/api/resolutions','/api/copilot','/api/assets','/api/events','/api/import/commit'], (req,_res,next) => {
     if (req.method === 'POST' && !req.is('application/json')) return next(new ApiError(415,'UNSUPPORTED_MEDIA_TYPE','POST requests must use application/json.'));
@@ -250,6 +336,26 @@ export function createApp({ pool, llmConfigured = false, llm = null, embeddingMo
   });
   app.use(dynamicRoutes);
   app.use(scadaRoutes);
+
+  // The compiled frontend, served from the same origin as the API so the browser authenticates
+  // once and then reuses that credential for assets, fetches and the event stream alike.
+  //
+  // Only frontend/dist is exposed. express.static resolves within its root, so no traversal
+  // reaches .env, the repository, backend source, docs or node_modules, and index serving is
+  // disabled here so that exactly one handler below decides what a browser route returns.
+  if (demo) {
+    app.use(express.static(staticDir, { index: false, dotfiles: 'deny', redirect: false, fallthrough: true }));
+    const indexHtml = join(staticDir, 'index.html');
+    app.use((req,res,next) => {
+      // The single-page fallback must never answer for the API: an unknown /api path stays an API
+      // 404 with an API error body, not a page that looks like it worked.
+      if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+      if (req.path === '/api' || req.path.startsWith('/api/')) return next();
+      if (!req.accepts('html')) return next();
+      res.sendFile(indexHtml, (error) => { if (error) next(); });
+    });
+  }
+
   app.use((_req,_res,next) => next(new ApiError(404,'NOT_FOUND','Route not found.')));
   const errorHandler: ErrorRequestHandler = (error,_req,res,_next) => {
     let status = 500, code = 'INTERNAL_ERROR', message = 'The request could not be completed.';
