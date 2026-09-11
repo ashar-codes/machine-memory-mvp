@@ -22,7 +22,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | B / P2-01 | VERIFIED | Specific change intent precedes HISTORY; explicit 7/30/90-day windows honored, unsupported duration requests clarified without provider calls. |
 | B / P2-02 | VERIFIED | Abort controllers invalidate old results; keyed asset Copilot resets turns; scope/workspace switches and empty responses clear evidence. |
 | B / P2-06 | VERIFIED | Local components format datetime defaults; preserved default instant across DST fold; real calendar validation rejects impossible dates. |
-| C / P2-03 | NOT_STARTED | pdf-parse v1 call against installed v2. |
+| C / P2-03 | VERIFIED | Uses installed PDFParse v2 getText and finally destroy; textless PDFs rejected without indexing synthetic page labels. |
 | C / P2-04 | NOT_STARTED | Optional CSV description inserted as null into NOT NULL field. |
 | C / P2-05 | NOT_STARTED | Concurrent preview commits have no atomic DB claim. |
 | C / P2-08 | NOT_STARTED | Runtime documents use query task; model-space compatibility unenforced. |
@@ -35,6 +35,21 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### C1 — real PDF ingestion
+
+- Reproduced valid PDF rejection against real installed library before correction.
+- Files: `backend/src/routes.ts`, `tests/integration/{pdfFixture,remediation-pdf.test}.ts`,
+  `scripts/verify/pdf.ts`. Fixture is text source producing a real byte-correct PDF, not a
+  mocked parser or committed binary. Four real-library/upload-boundary tests added.
+- Live HTTP + Gemini + PostgreSQL PASS: valid PDF created one chunk with one real embedding;
+  source remained user_import / UNVERIFIED. Fake, corrupt and textless PDFs returned 400.
+  Textless message explicitly says OCR unsupported. PDF worker cleanup runs in finally.
+- `node --import tsx scripts/verify/pdf.ts` requires an idle demo with no user data and refuses
+  reset when other user records appear. Existing `demo-reset --include-imports` cleaned test
+  records; all 13 protected-table fingerprints unchanged. No migrations applied.
+- Gates: lint/typecheck/build/diff check PASS; **358 tests PASS**.
+- B3 checkpoint: `bf9585d`. C1 checkpoint: this commit (`fix: use PDFParse v2 for real text ingestion`).
 
 ### B3 — timezone/calendar correctness
 

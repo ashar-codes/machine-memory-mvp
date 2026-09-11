@@ -83,12 +83,19 @@ const PREVIEW_TTL_MS = 30 * 60 * 1000;
 const MAX_PREVIEWS = 25;
 
 /** Extracts text from a PDF. Loaded lazily so the dependency never runs at server startup. */
-async function extractPdfText(bytes: Buffer): Promise<string> {
+export async function extractPdfText(bytes: Buffer): Promise<string> {
   try {
-    const { default: parse } = await import('pdf-parse') as unknown as { default: (data: Buffer) => Promise<{ text: string }> };
-    const result = await parse(bytes);
-    return result.text ?? '';
-  } catch {
+    const { PDFParse } = await import('pdf-parse');
+    const parser = new PDFParse({ data: bytes });
+    try {
+      const result = await parser.getText();
+      // Page text excludes the library's synthetic page-number separators.
+      const text = result.pages.map((page) => page.text).join('\n\n').trim();
+      if (!text) throw new RouteError(400, 'PDF_NO_TEXT', 'The PDF contains no extractable text. Scanned PDFs require OCR, which is not supported. Upload a text PDF or .txt file.');
+      return text;
+    } finally { await parser.destroy(); }
+  } catch (error) {
+    if (error instanceof RouteError) throw error;
     throw new RouteError(400, 'PDF_UNREADABLE', 'The PDF could not be read as text. It may be a scanned image; upload a text PDF or a .txt file.');
   }
 }
