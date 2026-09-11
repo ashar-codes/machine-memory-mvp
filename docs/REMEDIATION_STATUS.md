@@ -21,7 +21,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | A / P1-03 | VERIFIED | ID membership previously admitted invented facts. Summaries/exact facts now deterministic; typed recorded outcomes copied from retrieval; generated evidence-context text conservatively constrained. |
 | B / P2-01 | VERIFIED | Specific change intent precedes HISTORY; explicit 7/30/90-day windows honored, unsupported duration requests clarified without provider calls. |
 | B / P2-02 | VERIFIED | Abort controllers invalidate old results; keyed asset Copilot resets turns; scope/workspace switches and empty responses clear evidence. |
-| B / P2-06 | NOT_STARTED | UTC text interpreted as local datetime; regex calendar validation. |
+| B / P2-06 | VERIFIED | Local components format datetime defaults; preserved default instant across DST fold; real calendar validation rejects impossible dates. |
 | C / P2-03 | NOT_STARTED | pdf-parse v1 call against installed v2. |
 | C / P2-04 | NOT_STARTED | Optional CSV description inserted as null into NOT NULL field. |
 | C / P2-05 | NOT_STARTED | Concurrent preview commits have no atomic DB claim. |
@@ -35,6 +35,20 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### B3 — timezone/calendar correctness
+
+- Reproduced Asia/Karachi five-hour shift in Chrome, and impossible commissioning dates
+  reaching database handling instead of HTTP 400.
+- Files: `frontend/src/{scenario.tsx,localTime.ts}`, `backend/src/routes.ts`, new
+  `tests/integration/remediation-time.test.ts`, HTTP tests, extended browser verification.
+- 13 additional unit/HTTP regressions: UTC, Karachi, negative offset, DST timezone,
+  invalid calendars, leap day, DST gap rejection and untouched default during repeated hour.
+- Browser PASS: actual intercepted default POST within one minute of now; manual Karachi
+  `2024-02-29T12:00` submits `2024-02-29T07:00:00.000Z`. No database writes/provider calls.
+  Manually entered ambiguous DST times use first occurrence, explicitly stated in UI.
+- Gates: lint/typecheck/build/diff check PASS; **354 tests PASS** plus browser checks.
+- B2 checkpoint: `6996237`. B3 checkpoint: this commit (`fix: preserve local scenario instants and validate calendar dates`).
 
 ### B2 — cross-context response race
 

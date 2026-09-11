@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { localDateTime, localDateTimeToIso } from './localTime';
 import type { Asset, AssetEvent } from '@machine-memory/shared';
 import { failureText, post } from './api';
 
@@ -90,7 +91,8 @@ function AddEvent({ assets, onCreated }: { assets: Asset[]; onCreated: (assetCod
   const [title, setTitle] = useState('');
   const [subsystem, setSubsystem] = useState('');
   const [severity, setSeverity] = useState<'critical' | 'warning' | 'info'>('warning');
-  const [occurredAt, setOccurredAt] = useState(() => new Date().toISOString().slice(0, 16));
+  const [defaultInstant] = useState(() => new Date());
+  const [occurredAt, setOccurredAt] = useState(() => localDateTime(defaultInstant));
   const [description, setDescription] = useState('');
   const [simulation, setSimulation] = useState(true);
   const [busy, setBusy] = useState(false);
@@ -103,7 +105,7 @@ function AddEvent({ assets, onCreated }: { assets: Asset[]; onCreated: (assetCod
     try {
       const body: Record<string, unknown> = {
         assetCode, eventCode: eventCode.trim(), title: title.trim(), severity,
-        occurredAt: new Date(occurredAt).toISOString(), simulation,
+        occurredAt: localDateTimeToIso(occurredAt, defaultInstant), simulation,
       };
       if (subsystem.trim()) body.subsystem = subsystem.trim();
       if (description.trim()) body.description = description.trim();
@@ -137,7 +139,8 @@ function AddEvent({ assets, onCreated }: { assets: Asset[]; onCreated: (assetCod
             <option value="critical">critical</option><option value="warning">warning</option><option value="info">info</option>
           </select>
         </label>
-        <label>Occurred at<input type="datetime-local" value={occurredAt} onChange={(event) => setOccurredAt(event.target.value)} /></label>
+        <label>Occurred at (browser local time)<input type="datetime-local" value={occurredAt} onChange={(event) => setOccurredAt(event.target.value)} /></label>
+        <span className="panel-note">Times use {Intl.DateTimeFormat().resolvedOptions().timeZone}. A manually entered repeated daylight-saving hour uses its first occurrence.</span>
         <label className="wide">Observed symptoms<input value={description} maxLength={4000} onChange={(event) => setDescription(event.target.value)} /></label>
       </div>
       <label className="check-row">

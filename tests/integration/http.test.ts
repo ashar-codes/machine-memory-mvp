@@ -36,6 +36,15 @@ describe('foundation HTTP boundary (real loopback server, no external services)'
   beforeEach(() => start());
   afterEach(() => stop());
 
+  it.each(['2026-02-29', '2026-02-30'])('rejects impossible commissioned calendar date %s before database access', async (commissionedOn) => {
+    const response = await post('/api/assets', { assetCode: 'DATE-TEST', siteName: 'Test', commissionedOn });
+    expect(response.status).toBe(400);
+  });
+  it('accepts a real leap day through validation', async () => {
+    await expectError(await post('/api/assets', { assetCode: 'DATE-TEST', siteName: 'Test', commissionedOn: '2024-02-29' }),
+      503, 'DATABASE_NOT_CONFIGURED');
+  });
+
   it('reports absent services honestly instead of fabricating a RAG result', async () => {
     const response = await fetch(base + '/api/health');
     expect(response.status).toBe(200);

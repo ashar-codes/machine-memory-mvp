@@ -87,4 +87,34 @@ try {
   await evaluate(`window.finishAnswer(6,'STALE_WORKSPACE')`); await sleep(200);
   assert.equal(await evaluate(`document.body.innerText.includes('STALE_WORKSPACE')`), false);
   console.log('PASS: asset/scope/workspace switches, transcript reset, rapid double activation, empty evidence');
+  await send('Emulation.setTimezoneOverride', { timezoneId: 'Asia/Karachi' });
+  await click('nav button', 'Scenario Lab');
+  const time = await evaluate(`({now:Date.now(),submitted:new Date(document.querySelector('input[type=datetime-local]').value).getTime()})`);
+  assert.ok(Math.abs(time.now - time.submitted) < 60_000, 'Scenario default shifted from browser now');
+  await evaluate(`window.fetch=(url,init)=>{
+    if(String(url)==='/api/events') {window.submittedEvent=JSON.parse(init.body);
+      return Promise.resolve(new Response(JSON.stringify({error:{code:'VERIFICATION_ONLY',message:'Intercepted; no database write'}}),{status:400}));}
+    return window.originalFetch(url,init);
+  };
+  {const panel=[...document.querySelectorAll('section')].find(s=>s.querySelector('h3')?.textContent==='Add event / fault');
+    const select=panel.querySelector('select');
+    Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype,'value').set.call(select,'WT-07');
+    select.dispatchEvent(new Event('change',{bubbles:true}));
+    for(const [placeholder,value] of [['GEAR-TMP-402','TIME-VERIFY'],['Gearbox oil temperature high','Verification only']]){
+      const input=panel.querySelector('input[placeholder="'+placeholder+'"]');
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,value);
+      input.dispatchEvent(new Event('input',{bubbles:true}));
+    }
+  }`);
+  await click('button', 'Record event');
+  await wait('!!window.submittedEvent');
+  const submitted = await evaluate('window.submittedEvent.occurredAt');
+  assert.ok(Math.abs(time.now - Date.parse(submitted)) < 60_000, 'Actual default POST shifted');
+  await evaluate(`{const input=document.querySelector('input[type=datetime-local]');
+    Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'2024-02-29T12:00');
+    input.dispatchEvent(new Event('input',{bubbles:true})); window.submittedEvent=null;}`);
+  await click('button', 'Record event');
+  await wait('!!window.submittedEvent');
+  assert.equal(await evaluate('window.submittedEvent.occurredAt'), '2024-02-29T07:00:00.000Z');
+  console.log('PASS: Asia/Karachi untouched Scenario datetime round-trip');
 } finally { ws.close(); }

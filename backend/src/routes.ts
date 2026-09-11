@@ -35,7 +35,7 @@ const createAsset = z.strictObject({
   assetCode, siteName: label, assetType: label.default('wind_turbine'),
   manufacturer: label.optional(), model: label.optional(), serialNumber: label.optional(),
   ratedPowerKw: z.number().int().min(0).max(100_000).optional(),
-  commissionedOn: z.string().trim().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  commissionedOn: z.string().trim().date().optional(),
   description: z.string().trim().max(2000).optional(),
 });
 const createEvent = z.strictObject({
