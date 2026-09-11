@@ -86,7 +86,7 @@ export async function ingestDocument(
   for (const chunk of chunks) {
     if (!llm) { vectors.push(null); continue; }
     try {
-      const vector = await llm.embed(chunk.content);
+      const vector = await llm.embed(chunk.content, 'RETRIEVAL_DOCUMENT');
       vectors.push(isFiniteVector(vector, options.embeddingDimensions) ? vector : null);
     } catch {
       vectors.push(null);

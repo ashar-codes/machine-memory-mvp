@@ -20,6 +20,8 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
   if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid PORT');
   const dimensions = Number(env.EMBEDDING_DIMENSIONS ?? EMBEDDING_DIMENSIONS);
   if (dimensions !== EMBEDDING_DIMENSIONS) throw new Error('EMBEDDING_DIMENSIONS must match the migrated vector size.');
+  const embeddingModel = env.GEMINI_EMBEDDING_MODEL?.trim() || DEFAULT_EMBEDDING_MODEL;
+  if (embeddingModel !== DEFAULT_EMBEDDING_MODEL) throw new Error('GEMINI_EMBEDDING_MODEL must match the supported corpus model.');
   return {
     host, port,
     databaseUrl: env.DATABASE_URL,
@@ -27,7 +29,7 @@ export function readConfig(env: NodeJS.ProcessEnv = process.env) {
     // Secrets stay in this object and never reach the browser or an error response.
     geminiApiKey: env.GEMINI_API_KEY,
     model: env.GEMINI_MODEL?.trim() || DEFAULT_MODEL,
-    embeddingModel: env.GEMINI_EMBEDDING_MODEL?.trim() || DEFAULT_EMBEDDING_MODEL,
+    embeddingModel,
     embeddingDimensions: EMBEDDING_DIMENSIONS,
     groqApiKey: env.GROQ_API_KEY,
     groqModel: env.GROQ_MODEL?.trim() || DEFAULT_GROQ_MODEL,

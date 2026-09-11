@@ -1,6 +1,7 @@
 // Structured and semantic retrieval. Every statement here is repository-owned, parameterized SQL.
 // The language model never sees this file's queries, never supplies SQL and never reaches the database.
 import { RECORD_ORIGINS, type AuthorityClass, type Intent, type RecordOrigin } from '@machine-memory/shared';
+import { DEFAULT_EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from './config.js';
 
 /** Minimal database surface. `pg.Pool` is adapted to this in app.ts so tests can supply a fake. */
 export interface Queryable {
@@ -376,7 +377,10 @@ export async function searchKnowledge(
   const result = await db.query(
     `select c.id, c.content, c.page_number, c.section, c.metadata, c.record_origin, c.event_code,
             d.title, d.organization, d.source_url, d.source_type, d.authority_class,
-            case when $5::text is null or c.embedding is null then null
+            case when $5::text is null or c.embedding is null
+                   or coalesce(c.metadata->>'embeddingModel','') <> $7::text
+                   or coalesce(c.metadata->>'embeddingDimensions','') <> $8::text
+                   or coalesce(c.metadata->>'ingestionFormatVersion','') <> '1' then null
                  else 1 - (c.embedding operator(extensions.<=>) $5::extensions.vector) end as similarity,
             ts_rank(to_tsvector('english', c.content), plainto_tsquery('english', $6::text)) as keyword_rank
        from public.document_chunks c
@@ -387,7 +391,8 @@ export async function searchKnowledge(
         and ($4::text is null or coalesce(c.metadata->>'assetType', $4::text) = $4::text)
       order by c.chunk_index asc, c.id asc
       limit ${MAX_KNOWLEDGE_CANDIDATES}`,
-    [filter.authorityClasses, filter.sourceTypes, filter.recordOrigins, filter.assetType, vector, question]);
+    [filter.authorityClasses, filter.sourceTypes, filter.recordOrigins, filter.assetType, vector, question,
+      DEFAULT_EMBEDDING_MODEL, String(EMBEDDING_DIMENSIONS)]);
 
   return result.rows.map((row) => {
     const metadata = (row.metadata ?? {}) as Record<string, unknown>;

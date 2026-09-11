@@ -25,7 +25,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | C / P2-03 | VERIFIED | Uses installed PDFParse v2 getText and finally destroy; textless PDFs rejected without indexing synthetic page labels. |
 | C / P2-04 | VERIFIED | Missing event CSV description normalizes to empty text, matching recordEvent; required-only imports pass actual PostgreSQL constraints. |
 | C / P2-05 | VERIFIED | Transactional data-source UPDATE claims preview atomically; competing commit and response-loss retry return 409 without duplicate rows. |
-| C / P2-08 | NOT_STARTED | Runtime documents use query task; model-space compatibility unenforced. |
+| C / P2-08 | VERIFIED | Explicit document embedding role propagates through Gemini-only wrapper; fixed model/dimensions enforced; incompatible chunk metadata gets no cosine comparison. |
 | D / P2-07 | NOT_STARTED | Candidate cap before relevance; authority creates admission. |
 | D / P2-09 | NOT_STARTED | Replay payload combines stored ID with incoming fields. |
 | D / P2-11 | NOT_STARTED | Detached pool acquisition outside catch. |
@@ -35,6 +35,25 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### C4 — embedding roles/model compatibility
+
+- Reproduced all three initial regressions: document task sent as query, runtime indexing
+  omitted role, and different same-dimension model accepted.
+- Files: `backend/src/{config,llm,provider,knowledge,memoryIndex,retrieval}.ts`, updated Gemini
+  configuration test, new `tests/integration/remediation-embedding.test.ts`,
+  `scripts/verify/embedding-space.ts`.
+- Explicit `embed(text, 'RETRIEVAL_DOCUMENT')` for uploads/memory; search defaults to
+  RETRIEVAL_QUERY. Gemini wrapper retains role even when generation mode is Groq. Four payload,
+  normalization, indexing and model-contract regressions; no quota in unit tests.
+- Configuration now rejects incompatible embedding-model overrides, rather than pretending
+  equal dimensions imply equal space. Corpus remains gemini-embedding-001 / 1536, untouched.
+- Live pgvector PASS: 21 public chunks compatible; temporary wrong-model/dimension/format-version
+  chunks never get cosine similarity, remain keyword evidence. All fixture inserts rolled back.
+- Real PDF upload reverified after task correction: one actual embedding, UNVERIFIED provenance;
+  existing safe reset cleanup, protected fingerprints unchanged.
+- Gates: lint/typecheck/build/diff check PASS; **362 tests PASS**.
+- C3 checkpoint: `ad1fecd`. C4 checkpoint: this commit (`fix: distinguish embedding roles and enforce corpus compatibility`).
 
 ### C3 — concurrent CSV commit
 

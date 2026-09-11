@@ -23,13 +23,13 @@ describe('gemini environment configuration', () => {
     expect(config.embeddingDimensions).toBe(1536);
   });
 
-  it('honours explicit model overrides without touching the migrated vector size', () => {
+  it('honours generation overrides while keeping the corpus embedding contract', () => {
     const config = readConfig({
       ...BASE_ENV, GEMINI_API_KEY: 'k', GEMINI_MODEL: ' gemini-3.7-flash ',
-      GEMINI_EMBEDDING_MODEL: ' gemini-embedding-2-preview ',
+      GEMINI_EMBEDDING_MODEL: ' gemini-embedding-001 ',
     } as NodeJS.ProcessEnv);
     expect(config.model).toBe('gemini-3.7-flash');
-    expect(config.embeddingModel).toBe('gemini-embedding-2-preview');
+    expect(config.embeddingModel).toBe('gemini-embedding-001');
     expect(config.embeddingDimensions).toBe(EMBEDDING_DIMENSIONS);
   });
 

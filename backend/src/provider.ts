@@ -103,9 +103,9 @@ export function createFailoverLlm(config: FailoverConfig): LlmClient | null {
 
   return {
     // Gemini only, always. See the note at the top of this file.
-    async embed(input) {
+    async embed(input, taskType) {
       if (!gemini) return null;
-      return gemini.embed(input);
+      return taskType ? gemini.embed(input, taskType) : gemini.embed(input);
     },
 
     async synthesize(bundle: EvidenceBundle, trace?: GenerationTrace) {

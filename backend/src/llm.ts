@@ -4,12 +4,13 @@
 // Gemini is the primary generation provider and the *sole* embedding provider. Generation failover
 // to a secondary provider lives in provider.ts; embeddings deliberately have no failover.
 import { GoogleGenAI } from '@google/genai';
+import { DEFAULT_EMBEDDING_MODEL, EMBEDDING_DIMENSIONS } from './config.js';
 import type { GenerationTrace } from './provider.js';
 import { SYSTEM_INSTRUCTIONS, type EvidenceBundle } from './synthesis.js';
 
 export interface LlmClient {
-  /** Question embedding for semantic retrieval, or null when embedding is unavailable. */
-  embed(input: string): Promise<number[] | null>;
+  /** Explicit document role for indexing; search callers default to query role. Gemini only. */
+  embed(input: string, taskType?: 'RETRIEVAL_QUERY' | 'RETRIEVAL_DOCUMENT'): Promise<number[] | null>;
   /**
    * Raw model output for the supplied bundle, or null when synthesis is unavailable.
    * `trace` is an optional per-call sink recording which provider answered; it is diagnostics
@@ -115,17 +116,18 @@ function readOutputText(response: unknown): string {
 }
 
 export function createLlm(config: LlmConfig): LlmClient | null {
+  if (config.embeddingModel !== DEFAULT_EMBEDDING_MODEL || config.embeddingDimensions !== EMBEDDING_DIMENSIONS) {
+    throw new Error('Embedding configuration must match the supported corpus model and dimensions.');
+  }
   if (!config.apiKey) return null;
   const client = new GoogleGenAI({ apiKey: config.apiKey, httpOptions: { timeout: 45_000 } });
 
   return {
-    async embed(input) {
+    async embed(input, taskType = 'RETRIEVAL_QUERY') {
       const response = await withRetry(() => client.models.embedContent({
         model: config.embeddingModel,
         contents: [input],
-        // Query-side task type. Documents are embedded as RETRIEVAL_DOCUMENT by the ingester;
-        // the pair is designed by Google to be compared directly.
-        config: { taskType: 'RETRIEVAL_QUERY', outputDimensionality: config.embeddingDimensions },
+        config: { taskType, outputDimensionality: config.embeddingDimensions },
       }));
       const vector = response.embeddings?.[0]?.values;
       if (!isFiniteVector(vector, config.embeddingDimensions)) return null;
