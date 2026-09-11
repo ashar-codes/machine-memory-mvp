@@ -26,7 +26,7 @@ Archive-only commit left a clean tree before creating remediation branch.
 | C / P2-04 | VERIFIED | Missing event CSV description normalizes to empty text, matching recordEvent; required-only imports pass actual PostgreSQL constraints. |
 | C / P2-05 | VERIFIED | Transactional data-source UPDATE claims preview atomically; competing commit and response-loss retry return 409 without duplicate rows. |
 | C / P2-08 | VERIFIED | Explicit document embedding role propagates through Gemini-only wrapper; fixed model/dimensions enforced; incompatible chunk metadata gets no cosine comparison. |
-| D / P2-07 | NOT_STARTED | Candidate cap before relevance; authority creates admission. |
+| D / P2-07 | VERIFIED | Relevance admission and ordering precede candidate cap; authority remains provenance, not topical relevance. |
 | D / P2-09 | NOT_STARTED | Replay payload combines stored ID with incoming fields. |
 | D / P2-11 | NOT_STARTED | Detached pool acquisition outside catch. |
 | D / P2-10 | NOT_STARTED | Parent not rechecked after embedding; reset leaves derived status. Only fix if small/safe. |
@@ -35,6 +35,27 @@ Archive-only commit left a clean tree before creating remediation branch.
 | P1-01 | DEFERRED | Explicitly out of scope: keep production, loopback and Host/Origin safeguards. |
 
 ## Checkpoints / verification
+
+### D1 — relevance before authority and candidate cap
+
+- Resumed the uncommitted retrieval/fusion changes from C4. SQL now admits semantic
+  similarity >= 0.60 or keyword rank >= 0.01, and sorts relevant candidates before LIMIT 200.
+  Reference authority is a small ranking tie-break; it does not admit unrelated content.
+  General questions without machine context no longer substitute selected-asset history.
+- Live Gemini + PostgreSQL PASS: five technical/safety questions including paraphrases
+  ranked the expected NREL/OSHA source first; unrelated sourdough question admitted zero
+  evidence in TECHNICAL_GUIDANCE and GENERAL (INSUFFICIENT, no synthesis call).
+- Live PostgreSQL candidate regression PASS: relevant chunk at index 250 survives 251
+  candidates, unrelated text excluded, low-authority upload remains non-procedural.
+  All candidate fixtures rolled back; relevance probes make no persistent writes.
+- Scripts: `scripts/verify/{relevance,relevance-candidates}.ts`. PDF verification now checks
+  uploaded-document keyword retrieval and reports its failure stage; HTTP PDF check was
+  not rerun for this checkpoint. Previous C4 PDF gate is historical evidence only.
+- Limits: threshold calibrated for this demo corpus, not universal relevance; English
+  machine-context matching is finite. Query scans/ranks filtered chunks; no large-corpus
+  performance or approximate-vector-index claim. API/schema/provenance unchanged.
+- Gates: 364 tests, lint/typecheck/build/diff check PASS.
+- C4 checkpoint: `d66578e`. D1 checkpoint: this commit.
 
 ### C4 — embedding roles/model compatibility
 
@@ -195,25 +216,10 @@ public_data, public_reference and synthetic_demo. Do not run broad reset over us
 
 ## Continuation
 
-Phase A is complete. **Next exact finding: B1 / P2-01** (recent-change intent/window).
-Start with `backend/src/copilot.ts` (`classifyIntent`), `backend/src/retrieval.ts`
-(`RECENT_CHANGE_WINDOW_DAYS`, `retrieveEvidence`, `recentChanges`) and
-`tests/integration/{retrieval,dynamic}.test.ts`, `tests/integration/fakeDatabase.ts`.
-Reproduce "What changed recently before this event?" selecting HISTORY before editing.
-Use the September 7 inspection and explicit 7/30/90-day windows; do not silently use 30 days
-for an unsupported requested window. Do not claim the intent fix already follows from A2.
-Then continue B2/P2-02 → B3/P2-06 → C → D → E → F in ledger order.
-Run lint/typecheck/relevant tests/diff check for each coherent checkpoint; full gates before final.
-Do not open Internet access or claim local readiness until outstanding correctness gates pass.
-
-### Handoff state
-
-- Completed: P1-02, P1-03; archived audit unchanged. Latest code checkpoint `fcda34a`.
-- Remaining: every B/C/D/E/F ledger item; P1-01 intentionally DEFERRED.
-- No migrations added or applied; no live data created/deleted/updated during Phase A.
-- Last full gates: 13 files / 326 tests, lint/typecheck/build/diff check PASS; npm audit zero.
-- Remaining known defects are described by the immutable audit and NOT_STARTED ledger rows.
-- Local full hackathon demo: NOT READY. Internet: KEEP BLOCKED.
-- Verification commands: `node --import tsx scripts/verify/safety.ts` (requires loopback app;
-  seven requests count against existing rate limit), `node --import tsx scripts/verify/grounding.ts`
-  (configured PostgreSQL; BEGIN READ ONLY; injected provider, no paid calls).
+Phases A–C and D1/P2-07 are complete. Next: D2/P2-09 (conflicting SCADA replay),
+then P2-11 detached indexing failure, P2-10 reset coordination if small/safe,
+E/P1-04 resource admission, and F demonstrated documentation overclaims.
+Use the ledger and checkpoint entries above; older checkpoints describe historical gates.
+Keep the archived audit unchanged and commit each verified section.
+Local full demo readiness remains unestablished until remaining gates pass.
+Internet exposure remains blocked; P1-01 is deliberately deferred.

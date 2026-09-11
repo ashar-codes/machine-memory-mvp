@@ -21,6 +21,10 @@ export function recentChangeDays(question: string): number | null {
 }
 const MAX_STRUCTURED_ROWS = 20;
 const MAX_KNOWLEDGE_CANDIDATES = 200;
+// Calibrated on this Gemini corpus: unrelated queries ~0.49, relevant paraphrases >0.60.
+// This is a demo retrieval threshold, not a universal semantic relevance guarantee.
+export const MIN_SEMANTIC_SIMILARITY = 0.60;
+export const MIN_KEYWORD_RANK = 0.01;
 
 export type EvidenceRole =
   | 'SAME_ASSET_HISTORY' | 'FLEET_EXACT_CODE' | 'FLEET_SEMANTIC'
@@ -368,14 +372,14 @@ export interface KnowledgeFilter {
 
 /**
  * Candidate knowledge chunks. Cosine similarity is computed in SQL when a question embedding is
- * available; final ranking happens in evidence.ts so similarity alone can never outrank authority.
+ * available. Relevance admits candidates before the global cap; authority never creates relevance.
  */
 export async function searchKnowledge(
   db: Queryable, filter: KnowledgeFilter, question: string, embedding: number[] | null,
 ): Promise<RawEvidence[]> {
   const vector = embedding ? JSON.stringify(embedding) : null;
   const result = await db.query(
-    `select c.id, c.content, c.page_number, c.section, c.metadata, c.record_origin, c.event_code,
+    `select * from (select c.id, c.content, c.page_number, c.section, c.metadata, c.record_origin, c.event_code,
             d.title, d.organization, d.source_url, d.source_type, d.authority_class,
             case when $5::text is null or c.embedding is null
                    or coalesce(c.metadata->>'embeddingModel','') <> $7::text
@@ -389,7 +393,9 @@ export async function searchKnowledge(
         and d.source_type = any($2::text[])
         and c.record_origin = any($3::text[])
         and ($4::text is null or coalesce(c.metadata->>'assetType', $4::text) = $4::text)
-      order by c.chunk_index asc, c.id asc
+     ) candidates
+      where similarity >= ${MIN_SEMANTIC_SIMILARITY} or keyword_rank >= ${MIN_KEYWORD_RANK}
+      order by (coalesce(similarity,0)*3 + least(keyword_rank,1)*0.5) desc, id asc
       limit ${MAX_KNOWLEDGE_CANDIDATES}`,
     [filter.authorityClasses, filter.sourceTypes, filter.recordOrigins, filter.assetType, vector, question,
       DEFAULT_EMBEDDING_MODEL, String(EMBEDDING_DIMENSIONS)]);
@@ -468,9 +474,12 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
   let recentWindow: RetrievalResult['recentWindow'] = null;
   let fleetAssetCodes: string[] = [];
 
-  const wantsHistory = ['HISTORY', 'PREVIOUS_RESOLUTION', 'SIMILAR_INCIDENTS', 'GENERAL'].includes(options.intent);
-  const wantsFleet = ['SIMILAR_INCIDENTS', 'GENERAL'].includes(options.intent);
-  const wantsChanges = ['RECENT_CHANGES', 'GENERAL'].includes(options.intent);
+  // An unspecified/general intent is not permission to answer an unrelated question with
+  // the selected turbine's entire history. Reference retrieval can still match new terminology.
+  const generalMachineContext = options.intent === 'GENERAL' && /\b(turbines?|assets?|machines?|faults?|events?|incidents?|maintenance|repairs?|history|pressure|gearbox|drivetrain|pitch|hydraulic|WT-\d+|PEN-T\d+)\b/i.test(options.question);
+  const wantsHistory = ['HISTORY', 'PREVIOUS_RESOLUTION', 'SIMILAR_INCIDENTS'].includes(options.intent) || generalMachineContext;
+  const wantsFleet = options.intent === 'SIMILAR_INCIDENTS' || generalMachineContext;
+  const wantsChanges = options.intent === 'RECENT_CHANGES' || generalMachineContext;
   const wantsTechnical = ['TECHNICAL_GUIDANCE', 'GENERAL'].includes(options.intent);
   const wantsSafety = ['SAFETY', 'TECHNICAL_GUIDANCE', 'GENERAL'].includes(options.intent);
 
@@ -480,7 +489,7 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
   if (eventCode && options.intent === 'HISTORY') {
     evidence.push(...await sameAssetHistory(db, asset.assetCode, asset.id, eventCode, event?.id ?? null, anchorAt));
   }
-  if (eventCode && (options.intent === 'HISTORY' || options.intent === 'PREVIOUS_RESOLUTION' || options.intent === 'GENERAL')) {
+  if (eventCode && (options.intent === 'HISTORY' || options.intent === 'PREVIOUS_RESOLUTION' || generalMachineContext)) {
     evidence.push(...await assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode));
   }
   if (eventCode && wantsFleet) {
@@ -503,9 +512,9 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
   if (wantsTechnical) {
     const technical = await searchKnowledge(db, TECHNICAL_FILTER(asset), options.question, options.embedding);
     evidence.push(...technical);
-    if (!technical.length) notes.push('No reviewed public technical reference is currently ingested for this asset type.');
+    if (!technical.length) notes.push('No relevant technical reference was retrieved for this question and asset type.');
     // Historical work orders may accompany guidance as context, never as procedural authority.
-    if (eventCode && options.intent === 'TECHNICAL_GUIDANCE') {
+    if (eventCode && options.intent === 'TECHNICAL_GUIDANCE' && technical.length) {
       const context = await assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode);
       evidence.push(...context.map((item) => ({ ...item, role: 'CONTEXT' as const })));
     }
@@ -514,7 +523,7 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
     const safety = await searchKnowledge(db, SAFETY_FILTER(asset), options.question, options.embedding);
     evidence.push(...safety);
     if (!safety.length && options.intent === 'SAFETY') {
-      notes.push('No reviewed public safety reference is currently ingested.');
+      notes.push('No relevant reviewed public safety reference was retrieved for this question.');
     }
   }
   if (options.embedding === null && (wantsTechnical || wantsSafety || wantsFleet)) {

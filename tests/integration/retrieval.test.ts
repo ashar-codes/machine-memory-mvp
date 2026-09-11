@@ -172,6 +172,6 @@ describe('TECHNICAL_GUIDANCE retrieval', () => {
   it('states plainly when no reviewed public reference is ingested', async () => {
     const db = createFakeDatabase({ knowledge: [] });
     const result = await retrieveEvidence(db, { ...base, intent: 'TECHNICAL_GUIDANCE', question: 'Show technical guidance' });
-    expect(result?.notes.some((note) => note.includes('No reviewed public technical reference'))).toBe(true);
+    expect(result?.notes.some((note) => note.includes('No relevant technical reference'))).toBe(true);
   });
 });

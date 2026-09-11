@@ -11,7 +11,7 @@ export const MAX_EVIDENCE_ITEMS = 12;
  * Without this, a large reviewed corpus fills every slot with near-duplicate passages from the
  * same two or three documents, and a smaller but highly relevant source — a manual a technician
  * uploaded for this exact model — is never seen even when it is the top vector hit. The cap
- * changes nothing about authority: ordering still puts authority above similarity, and
+ * changes nothing about authority: relevance orders admitted reference passages, and
  * `procedural` still decides what may be quoted as guidance.
  */
 export const MAX_PER_SOURCE = 3;
@@ -36,14 +36,13 @@ function fingerprint(item: RawEvidence): string {
 }
 
 /**
- * Composite ordinal score. Authority and role dominate; similarity and keyword rank only
- * reorder items that are already admissible for the intent.
+ * Role and relevance order evidence; authority is a small reference tie-break, never admission.
  */
 export function rankScore(item: RawEvidence, intent: Intent, selected: RetrievalResult['asset']): number {
-  let score = AUTHORITY_WEIGHT[item.authorityClass] ?? 0.5;
+  let score = (AUTHORITY_WEIGHT[item.authorityClass] ?? 0.5) * (item.kind === 'KNOWLEDGE' ? 0.05 : 1);
   if (PRIMARY_ROLES[intent].includes(item.role)) score += 2;
   if (item.role === 'CONTEXT') score -= 1;
-  if (item.similarity != null) score += Math.max(0, Math.min(1, item.similarity)) * 1.5;
+  if (item.similarity != null) score += Math.max(0, Math.min(1, item.similarity)) * 3;
   if (item.keywordRank != null) score += Math.max(0, Math.min(1, item.keywordRank)) * 0.5;
 
   const { manufacturer, model } = item.applicability;
