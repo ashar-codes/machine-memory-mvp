@@ -36,6 +36,14 @@ export interface InvestigateDeps {
   onGeneration?: (provider: GenerationProvider) => void;
   /** Routing decisions made upstream by routeQuery. */
   routing?: InvestigateOverrides;
+  /** Wall-clock milliseconds per pipeline stage. Non-secret: stage names and durations only. */
+  onStage?: (stage: 'embedding' | 'retrieval' | 'generation', ms: number) => void;
+}
+
+/** Times one stage without changing what it returns or how it fails. */
+async function timed<T>(deps: InvestigateDeps, stage: 'embedding' | 'retrieval' | 'generation', run: () => Promise<T>): Promise<T> {
+  const started = Date.now();
+  try { return await run(); } finally { deps.onStage?.(stage, Date.now() - started); }
 }
 
 export type InvestigateOutcome =
@@ -87,14 +95,14 @@ export async function investigate(input: InvestigateRequest, deps: InvestigateDe
 
   let embedding: number[] | null = null;
   if (deps.llm) {
-    try { embedding = await deps.llm.embed(input.question); }
+    try { embedding = await timed(deps, 'embedding', () => deps.llm!.embed(input.question)); }
     catch { deps.onDegraded?.('embedding'); embedding = null; }
   }
 
-  const result = await retrieveEvidence(deps.db, {
+  const result = await timed(deps, 'retrieval', () => retrieveEvidence(deps.db, {
     intent: input.intent, assetCode: input.assetCode, eventCode: input.eventCode,
     question: input.question, embedding, now: deps.now, scope: deps.routing?.scope,
-  });
+  }));
   if (!result) return { status: 'asset_not_found' };
 
   const { evidence, raw } = fuseEvidence(result);
@@ -107,7 +115,7 @@ export async function investigate(input: InvestigateRequest, deps: InvestigateDe
   const authoritative = hasAuthoritativeReference(raw);
   const safetyStatus: Answer['safetyStatus'] = needsVerified && !authoritative ? 'INSUFFICIENT' : 'NORMAL';
 
-  const drafted = await draft(result, evidence, raw, input.question, deps);
+  const drafted = await timed(deps, 'generation', () => draft(result, evidence, raw, input.question, deps));
   const uncertainties = [...drafted.uncertainties];
   if (safetyStatus === 'INSUFFICIENT' && !uncertainties.includes(NO_PROCEDURE_UNCERTAINTY)) {
     uncertainties.unshift(NO_PROCEDURE_UNCERTAINTY);

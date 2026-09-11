@@ -583,10 +583,51 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
   // An asset-wide question is about the turbine, not the selected event. Answer it from the
   // asset's own totals rather than narrowing to one code.
   const assetWide = options.scope === 'ASSET_WIDE';
-  if (assetWide && wantsHistory) {
-    assetSummary = await assetEventSummary(db, asset.id);
-    evidence.push(...await assetWideRecentEvents(db, asset.assetCode, asset.id));
-    if (assetSummary.totalEvents > 0) {
+  const changeDays = recentChangeDays(options.question);
+
+  // Every query below depends only on the asset and the resolved event code, never on another
+  // query's result, but they were awaited one at a time — a dozen sequential round trips to a
+  // hosted database, which is where most of a slow answer was spent. Starting them together and
+  // awaiting them in the original order keeps evidence ordering byte-for-byte identical while the
+  // round trips overlap. `run` returns [] for a branch that does not apply, so the awaits below
+  // read the same as the sequential version did.
+  const run = <T>(condition: boolean, query: () => Promise<T[]>): Promise<T[]> => (condition ? query() : Promise.resolve([]));
+  const wantsRecurrence = !assetWide && Boolean(eventCode) && (wantsHistory || options.intent === 'RECENT_CHANGES');
+  const wantsSummary = assetWide && wantsHistory;
+
+  const summaryQuery = wantsSummary ? assetEventSummary(db, asset.id) : null;
+  const assetWideEvents = run(wantsSummary, () => assetWideRecentEvents(db, asset.assetCode, asset.id));
+  const recurrenceQuery = wantsRecurrence
+    ? countPreviousOccurrences(db, asset.id, eventCode as string, event?.id ?? null, anchorAt) : null;
+  const historyQuery = run(!assetWide && Boolean(eventCode) && options.intent === 'HISTORY',
+    () => sameAssetHistory(db, asset.assetCode, asset.id, eventCode as string, event?.id ?? null, anchorAt));
+  const maintenanceQuery = run(
+    !assetWide && Boolean(eventCode)
+      && (options.intent === 'HISTORY' || options.intent === 'PREVIOUS_RESOLUTION' || generalMachineContext),
+    () => assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode as string));
+  const fleetQuery = eventCode && wantsFleet ? fleetMatches(db, asset.id, eventCode) : null;
+  const narrativeQuery = run(Boolean(eventCode) && wantsFleet,
+    () => searchKnowledge(db, NARRATIVE_FILTER(asset), options.question, options.embedding));
+  const changesQuery = run(wantsChanges && changeDays !== null, () => {
+    const end = new Date(anchorAt);
+    const start = new Date(end.getTime() - (changeDays as number) * 86_400_000);
+    recentWindow = { startIso: start.toISOString(), endIso: end.toISOString() };
+    return recentChanges(db, asset.assetCode, asset.id, recentWindow.startIso, recentWindow.endIso);
+  });
+  const technicalQuery = run(wantsTechnical,
+    () => searchKnowledge(db, TECHNICAL_FILTER(asset), options.question, options.embedding));
+  // Started unconditionally alongside the technical search because it is only *used* when that
+  // search returns something; awaiting it first to decide would put the round trips back in series.
+  const safetyQuery = run(wantsSafety,
+    () => searchKnowledge(db, SAFETY_FILTER(asset), options.question, options.embedding));
+  const technicalContextQuery = run(
+    Boolean(eventCode) && options.intent === 'TECHNICAL_GUIDANCE',
+    () => assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode as string));
+
+  if (wantsSummary) {
+    assetSummary = await summaryQuery;
+    evidence.push(...await assetWideEvents);
+    if (assetSummary && assetSummary.totalEvents > 0) {
       const period = assetSummary.firstAt && assetSummary.lastAt
         ? ` between ${assetSummary.firstAt.slice(0, 10)} and ${assetSummary.lastAt.slice(0, 10)}`
         : '';
@@ -602,8 +643,8 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
     }
   }
 
-  if (!assetWide && eventCode && (wantsHistory || options.intent === 'RECENT_CHANGES')) {
-    occurrences = await countPreviousOccurrences(db, asset.id, eventCode, event?.id ?? null, anchorAt);
+  if (recurrenceQuery) {
+    occurrences = await recurrenceQuery;
     if (occurrences.previousCount > 0 || event) {
       const span = occurrences.firstAt && occurrences.lastAt
         ? ` The earliest was ${occurrences.firstAt.slice(0, 10)} and the latest ${occurrences.lastAt.slice(0, 10)}.`
@@ -617,41 +658,29 @@ export async function retrieveEvidence(db: Queryable, options: RetrieveOptions):
       }));
     }
   }
-  if (!assetWide && eventCode && options.intent === 'HISTORY') {
-    evidence.push(...await sameAssetHistory(db, asset.assetCode, asset.id, eventCode, event?.id ?? null, anchorAt));
-  }
-  if (!assetWide && eventCode && (options.intent === 'HISTORY' || options.intent === 'PREVIOUS_RESOLUTION' || generalMachineContext)) {
-    evidence.push(...await assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode));
-  }
-  if (eventCode && wantsFleet) {
-    const fleet = await fleetMatches(db, asset.id, eventCode);
+  evidence.push(...await historyQuery);
+  evidence.push(...await maintenanceQuery);
+  if (fleetQuery) {
+    const fleet = await fleetQuery;
     fleetAssetCodes = fleet.assetCodes;
     evidence.push(...fleet.evidence);
     // Semantically similar narratives are additive and always labelled separately from code matches.
-    const narratives = await searchKnowledge(db, NARRATIVE_FILTER(asset), options.question, options.embedding);
-    evidence.push(...narratives);
+    evidence.push(...await narrativeQuery);
     if (!fleet.evidence.length) notes.push('No other asset in this database has recorded the same event code.');
   }
-  const changeDays = recentChangeDays(options.question);
   if (wantsChanges && changeDays === null) notes.push('Choose a recent-change window of 7, 30 or 90 days.');
-  if (wantsChanges && changeDays !== null) {
-    const end = new Date(anchorAt);
-    const start = new Date(end.getTime() - changeDays * 86_400_000);
-    recentWindow = { startIso: start.toISOString(), endIso: end.toISOString() };
-    evidence.push(...await recentChanges(db, asset.assetCode, asset.id, recentWindow.startIso, recentWindow.endIso));
-  }
+  evidence.push(...await changesQuery);
   if (wantsTechnical) {
-    const technical = await searchKnowledge(db, TECHNICAL_FILTER(asset), options.question, options.embedding);
+    const technical = await technicalQuery;
     evidence.push(...technical);
     if (!technical.length) notes.push('No relevant technical reference was retrieved for this question and asset type.');
     // Historical work orders may accompany guidance as context, never as procedural authority.
-    if (eventCode && options.intent === 'TECHNICAL_GUIDANCE' && technical.length) {
-      const context = await assetMaintenanceHistory(db, asset.assetCode, asset.id, eventCode);
-      evidence.push(...context.map((item) => ({ ...item, role: 'CONTEXT' as const })));
+    if (technical.length) {
+      evidence.push(...(await technicalContextQuery).map((item) => ({ ...item, role: 'CONTEXT' as const })));
     }
   }
   if (wantsSafety) {
-    const safety = await searchKnowledge(db, SAFETY_FILTER(asset), options.question, options.embedding);
+    const safety = await safetyQuery;
     evidence.push(...safety);
     if (!safety.length && options.intent === 'SAFETY') {
       notes.push('No relevant reviewed public safety reference was retrieved for this question.');

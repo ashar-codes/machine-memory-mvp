@@ -20,7 +20,11 @@ export function createPool(connectionString?: string, caPath = process.env.DATAB
     catch { throw new Error('DATABASE_CA_PATH could not be read.'); }
     if (!ca.includes('-----BEGIN CERTIFICATE-----')) throw new Error('DATABASE_CA_PATH must contain a PEM certificate.');
   }
-  const pool = new pg.Pool({ connectionString: url.toString(), ssl: local ? false : { rejectUnauthorized: true, ...(ca ? { ca } : {}) }, max: 5, connectionTimeoutMillis: 5000, idleTimeoutMillis: 30000, statement_timeout: 10000 });
+  // One investigation issues most of its queries concurrently, so the pool must be wider than a
+  // single request's fan-out or those queries simply queue and the concurrency buys nothing. At
+  // max 5 with a 5s acquire timeout, a busy round of retrieval returned HTTP 500 on a pool
+  // acquisition timeout rather than a slow answer.
+  const pool = new pg.Pool({ connectionString: url.toString(), ssl: local ? false : { rejectUnauthorized: true, ...(ca ? { ca } : {}) }, max: 12, connectionTimeoutMillis: 15000, idleTimeoutMillis: 30000, statement_timeout: 10000 });
   // pg emits idle-client errors outside requests; handle without exposing connection details.
   pool.on('error', () => console.error('Idle database connection failed.'));
   // A client that is *checked out* emits 'error' on itself, not on the pool. With no listener,

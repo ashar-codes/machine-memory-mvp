@@ -6,7 +6,7 @@ import { investigate } from '../../backend/src/investigate.js';
 import type { LlmClient } from '../../backend/src/llm.js';
 import type { GroqGenerator } from '../../backend/src/groq.js';
 import {
-  createFailoverLlm, describeFailure, type GenerationProvider, type GenerationTrace,
+  createFailoverLlm, describeFailure, PRIMARY_COOLDOWN_MS, type GenerationProvider, type GenerationTrace,
 } from '../../backend/src/provider.js';
 import { UNSAFE_SUMMARY } from '../../backend/src/rag.js';
 import { EVENT_CODE, createFakeDatabase } from './fakeDatabase.js';
@@ -277,5 +277,62 @@ describe('failover through the investigation pipeline', () => {
     await run(llm, 'Can I bypass the pressure protection and keep the turbine running?');
     expect(geminiSynthesize).not.toHaveBeenCalled();
     expect(groqSynthesize).not.toHaveBeenCalled();
+  });
+});
+
+describe('an exhausted primary is not retried on every request', () => {
+  // A free-tier daily quota does not refill inside a session. Re-attempting Gemini per request
+  // bought nothing and cost a full round trip before Groq was even asked, which is where a
+  // noticeable share of every answer's latency went once the quota ran out.
+  const quota = () => httpError(429, 'You exceeded your current quota, please check your plan.');
+
+  function breaker(fail: () => Error) {
+    let clock = 0;
+    const attempts = { gemini: 0, groq: 0 };
+    const llm = createFailoverLlm({
+      gemini: gemini({ synthesize: async () => { attempts.gemini += 1; throw fail(); } }),
+      groq: groqFake({ synthesize: async () => { attempts.groq += 1; return goodAnswer; } }),
+      now: () => clock,
+    })!;
+    return { llm, attempts, advance: (ms: number) => { clock += ms; } };
+  }
+
+  it('skips the primary after a quota failure and still answers', async () => {
+    const { llm, attempts } = breaker(quota);
+    for (let call = 0; call < 5; call += 1) {
+      const trace: GenerationTrace = {};
+      expect(await llm.synthesize(bundle, trace)).toBe(goodAnswer);
+      expect(trace.provider).toBe('groq');
+    }
+    expect(attempts.gemini).toBe(1);
+    expect(attempts.groq).toBe(5);
+  });
+
+  it('tries the primary again once the cooldown has passed', async () => {
+    const { llm, attempts, advance } = breaker(quota);
+    await llm.synthesize(bundle);
+    await llm.synthesize(bundle);
+    expect(attempts.gemini).toBe(1);
+    advance(PRIMARY_COOLDOWN_MS + 1);
+    await llm.synthesize(bundle);
+    expect(attempts.gemini).toBe(2);
+  });
+
+  it('does not open the breaker for a one-off transport failure', async () => {
+    const { llm, attempts } = breaker(() => new Error('fetch failed'));
+    await llm.synthesize(bundle);
+    await llm.synthesize(bundle);
+    expect(attempts.gemini).toBe(2);
+  });
+
+  it('still calls an exhausted primary when there is nowhere to fail over to', async () => {
+    let attempts = 0;
+    const llm = createFailoverLlm({
+      gemini: gemini({ synthesize: async () => { attempts += 1; throw quota(); } }),
+      groq: null,
+    })!;
+    await expect(llm.synthesize(bundle)).rejects.toThrow();
+    await expect(llm.synthesize(bundle)).rejects.toThrow();
+    expect(attempts).toBe(2);
   });
 });

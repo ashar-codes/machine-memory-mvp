@@ -26,6 +26,8 @@ export interface FailoverConfig {
   mode?: ProviderMode;
   /** Non-secret diagnostics: which provider was used, and why the primary was abandoned. */
   onGeneration?: (provider: GenerationProvider, detail?: string) => void;
+  /** Clock injection, so the primary-cooldown breaker is testable without waiting ten minutes. */
+  now?: () => number;
 }
 
 /**
@@ -47,6 +49,19 @@ export function describeFailure(error: unknown): string {
 }
 
 /**
+ * How long a quota-exhausted primary is skipped entirely.
+ *
+ * A free-tier daily quota does not refill within a session. Re-attempting Gemini on every request
+ * bought nothing and cost a full round trip — and, when the failure arrived as a timeout rather
+ * than a 429, tens of seconds — before Groq was even asked. The breaker is time-boxed rather than
+ * permanent so a per-minute limit, or a quota that resets while the process is up, recovers on its
+ * own without a restart.
+ */
+export const PRIMARY_COOLDOWN_MS = 10 * 60 * 1000;
+/** Failures worth skipping the primary for. A one-off transport blip is not one of them. */
+const COOLDOWN_REASONS = ['quota exhausted', 'rate limited', 'not authorized', 'model unavailable'];
+
+/**
  * Wraps the primary and secondary generators.
  *
  * Failover is triggered only by the primary *failing* — an exception, or a null/empty result
@@ -56,6 +71,9 @@ export function describeFailure(error: unknown): string {
  */
 export function createFailoverLlm(config: FailoverConfig): LlmClient | null {
   const { gemini, groq, mode = 'auto', onGeneration } = config;
+  // Per-client, not module state: two clients in one process must not share a breaker.
+  let primarySkippedUntil = 0;
+  const now = () => config.now?.() ?? Date.now();
   // 'groq' mode still needs Gemini for embeddings; it only redirects generation.
   const useGemini = mode !== 'groq' && gemini !== null;
   const useGroq = mode !== 'gemini' && groq !== null;
@@ -66,6 +84,12 @@ export function createFailoverLlm(config: FailoverConfig): LlmClient | null {
     secondary: (() => Promise<T | null>) | null,
     trace?: GenerationTrace,
   ): Promise<T | null> {
+    // Only skip when there is somewhere to fail over to: with no secondary, a possibly recovered
+    // primary is still better than no answer at all.
+    if (primary && secondary && now() < primarySkippedUntil) {
+      onGeneration?.('groq', 'gemini skipped: recent quota or authorization failure');
+      primary = null;
+    }
     if (primary) {
       try {
         const output = await primary();
@@ -79,6 +103,7 @@ export function createFailoverLlm(config: FailoverConfig): LlmClient | null {
         onGeneration?.('groq', 'gemini returned no output');
       } catch (error) {
         const reason = describeFailure(error);
+        if (COOLDOWN_REASONS.includes(reason)) primarySkippedUntil = now() + PRIMARY_COOLDOWN_MS;
         if (!secondary) { onGeneration?.('deterministic', `gemini ${reason}`); throw error; }
         onGeneration?.('groq', `gemini ${reason}`);
       }

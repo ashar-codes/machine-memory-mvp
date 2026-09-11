@@ -216,6 +216,8 @@ export async function runFleetCopilot(question: string, deps: CopilotDeps): Prom
 export async function runAssetCopilot(
   input: { assetCode: string; eventCode?: string; question: string; history?: CopilotMessage[] }, deps: CopilotDeps,
 ): Promise<CopilotResponse | { status: 'asset_not_found' }> {
+  // Timed from entry, not from the investigation: routing and its lookups are part of the wait.
+  const startedAt = Date.now();
   const history = boundHistory(input.history);
   const question = resolveFollowUp(input.question, history);
   // Routing happens after the rewrite, so a follow-up is graded on its resolved meaning.
@@ -272,6 +274,8 @@ export async function runAssetCopilot(
   }
 
   const generation: { provider: GenerationProvider } = { provider: 'deterministic' };
+  // Stage timings, so a slow answer can be attributed instead of guessed at.
+  const stageMs: Record<string, number> = { routing: Date.now() - startedAt };
   const outcome = await investigate(
     // The code named in the question wins over the selected one.
     { assetCode: input.assetCode, eventCode: routed.eventCode ?? undefined, intent, question },
@@ -279,6 +283,7 @@ export async function runAssetCopilot(
       db: deps.db, llm: deps.llm, now: deps.now, onDegraded: deps.onDegraded,
       routing: { scope: routed.scope, aggregate: routed.aggregate },
       onGeneration: (provider) => { generation.provider = provider; deps.onGeneration?.(provider); },
+      onStage: (stage, ms) => { stageMs[stage] = ms; },
     },
   );
   if (outcome.status === 'asset_not_found') return { status: 'asset_not_found' };
@@ -297,6 +302,7 @@ export async function runAssetCopilot(
       resolvedScope: routed.scope, resolvedEventCode: routed.eventCode,
       aggregateRequested: routed.aggregate, routingReason: routed.reason,
       generationProvider: generation.provider, generationDegraded: generation.provider !== 'gemini',
+      timings: { ...stageMs, total: Date.now() - startedAt },
     },
   };
 }
