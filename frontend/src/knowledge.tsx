@@ -1,7 +1,10 @@
 import { useEffect, useState } from 'react';
 import type { KnowledgeDetail, KnowledgeSource, KnowledgeUploadReport, ListResponse } from '@machine-memory/shared';
 import { del, failureText, get, upload } from './api';
-import { Empty, Loading, Origin } from './ui';
+import { Authority, Empty, Loading, Origin } from './ui';
+
+/** A reviewed reference and an unverified upload must never be mistaken for each other. */
+const isReviewed = (source: KnowledgeSource) => source.authorityClass !== 'UNVERIFIED';
 
 export function KnowledgeBase({ onIndexed }: { onIndexed: () => void }) {
   const [sources, setSources] = useState<KnowledgeSource[]>([]);
@@ -68,6 +71,7 @@ export function KnowledgeBase({ onIndexed }: { onIndexed: () => void }) {
   return (
     <div className="page">
       <div className="page-head">
+        <span className="eyebrow">Retrieval library</span>
         <h2>Knowledge Base</h2>
         <p>
           Everything Machine Memory can retrieve semantically. Reviewed public references carry
@@ -76,10 +80,10 @@ export function KnowledgeBase({ onIndexed }: { onIndexed: () => void }) {
         </p>
       </div>
 
-      <section className="panel">
-        <div className="panel-head">
+      <section className="section">
+        <div className="section-head">
           <h3>Index a technical document</h3>
-          <span className="panel-note">TXT, Markdown or a text PDF, up to 15 MB. Chunked, embedded with Gemini and searchable immediately.</span>
+          <span className="note">TXT, Markdown or a text PDF, up to 15 MB. Chunked, embedded with Gemini and searchable immediately.</span>
         </div>
         <div className="form-grid">
           <label>Title<input value={title} maxLength={400} onChange={(event) => setTitle(event.target.value)} placeholder="Gearbox thermal management reference" /></label>
@@ -95,36 +99,50 @@ export function KnowledgeBase({ onIndexed }: { onIndexed: () => void }) {
         <label className="file-drop">
           <input type="file" accept=".txt,.md,.pdf" disabled={busy}
             onChange={(event) => { void submit(event.target.files?.[0]); event.target.value = ''; }} />
-          <span>{busy ? 'Chunking and embedding…' : 'Choose a document'}</span>
+          <span className="drop-hint">{busy ? 'Chunking and embedding…' : 'Choose a document'}</span>
         </label>
+        <p className="panel-note" style={{ marginTop: 10 }}>
+          An uploaded document is indexed as an unverified source. It can be retrieved and cited, but
+          it never carries the authority of a reviewed public reference.
+        </p>
         {notice && <p className="notice success-note">{notice}</p>}
         {error && <p className="turn-error">{error}</p>}
       </section>
 
-      <section className="panel">
-        <div className="panel-head">
+      <section className="section">
+        <div className="section-head">
           <h3>Indexed sources</h3>
-          <span className="panel-note">{sources.length} source{sources.length === 1 ? '' : 's'}</span>
+          <span className="note">{sources.length} source{sources.length === 1 ? '' : 's'} · a solid rule marks a reviewed reference, a broken rule an unverified upload</span>
         </div>
         {loading && <Loading label="Loading knowledge base" />}
         {!loading && !sources.length && <Empty title="No sources indexed">Upload a technical document, or run the reviewed public corpus ingestion.</Empty>}
         {!loading && sources.length > 0 && (
-          <ul className="record-list">
+          <ul className="library">
             {sources.map((source) => (
               <li key={source.id}>
-                <button type="button" className="record" onClick={() => void open(source.id)}>
-                  <span className="record-main">
-                    <strong>{source.title}</strong>
-                    <span className={`badge auth-${source.authorityClass.toLowerCase()}`}>{source.authorityClass}</span>
+                <button
+                  type="button"
+                  className={`source-row ${isReviewed(source) ? 'reviewed' : 'unverified'}`}
+                  onClick={() => void open(source.id)}
+                >
+                  <span className="s-mark" aria-hidden="true" />
+                  <span className="s-body">
+                    <span className="s-title">
+                      <strong>{source.title}</strong>
+                      <Authority value={source.authorityClass} />
+                    </span>
+                    <span className="s-meta">
+                      <span>{source.organization}</span>
+                      <span>{source.sourceType.replace(/_/g, ' ').toLowerCase()}</span>
+                      <span>{new Date(source.createdAt).toISOString().slice(0, 10)}</span>
+                      <Origin value={source.recordOrigin} />
+                    </span>
+                  </span>
+                  <span className="s-index">
                     <span className="count-pill">{source.chunks} chunk{source.chunks === 1 ? '' : 's'}</span>
                     <span className={`count-pill ${source.indexed ? 'ok' : 'warn'}`}>
                       {source.indexed ? 'Indexed' : `${source.embeddedChunks}/${source.chunks} embedded`}
                     </span>
-                  </span>
-                  <span className="record-meta">
-                    {source.organization} · {source.sourceType.replace(/_/g, ' ').toLowerCase()}
-                    · {new Date(source.createdAt).toISOString().slice(0, 10)}
-                    <Origin value={source.recordOrigin} />
                   </span>
                 </button>
               </li>
@@ -137,11 +155,12 @@ export function KnowledgeBase({ onIndexed }: { onIndexed: () => void }) {
         <section className="panel">
           <div className="panel-head">
             <h3>{detail.source.title}</h3>
-            <button type="button" className="btn ghost" onClick={() => setDetail(null)}>Close</button>
+            <Authority value={detail.source.authorityClass} />
+            <button type="button" className="btn ghost small" onClick={() => setDetail(null)}>Close</button>
           </div>
           <dl className="meta-grid">
             <div><dt>Organization</dt><dd>{detail.source.organization}</dd></div>
-            <div><dt>Authority</dt><dd>{detail.source.authorityClass}</dd></div>
+            <div><dt>Authority</dt><dd><Authority value={detail.source.authorityClass} /></dd></div>
             <div><dt>Provenance</dt><dd><Origin value={detail.source.recordOrigin} /></dd></div>
             <div><dt>Applies to</dt><dd>{detail.source.model ?? detail.source.assetType ?? 'Not stated'}</dd></div>
             <div><dt>Passages</dt><dd>{detail.source.chunks} ({detail.source.embeddedChunks} embedded)</dd></div>
@@ -153,7 +172,7 @@ export function KnowledgeBase({ onIndexed }: { onIndexed: () => void }) {
             {detail.chunkPreviews.map((chunk) => (
               <li key={chunk.chunkIndex}>
                 <span className="chunk-head">
-                  #{chunk.chunkIndex}{chunk.section ? ` · ${chunk.section}` : ''}
+                  <span>#{chunk.chunkIndex}{chunk.section ? ` · ${chunk.section}` : ''}</span>
                   {!chunk.embedded && <span className="count-pill warn">not embedded</span>}
                 </span>
                 <p>{chunk.excerpt}</p>

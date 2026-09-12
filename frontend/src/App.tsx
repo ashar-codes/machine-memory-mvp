@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type {
   Asset, AssetEvent, AssetResponse, CurrentEventResponse, Evidence, HealthResponse,
   Intent, InvestigateResponse, ListResponse, ResolutionRequest, ResolutionResponse, TimelineItem,
@@ -21,6 +21,18 @@ const VIEW_LABELS: Record<View, string> = {
   fleet: 'Fleet', memory: 'Machine Memory', copilot: 'AI Copilot', scada: 'SCADA Simulator',
   data: 'Data Hub', knowledge: 'Knowledge Base', scenario: 'Scenario Lab',
 };
+
+/** A record spine: a structured, abstract mark. No sparkle, no robot, no gradient. */
+function Mark() {
+  return (
+    <svg className="wordmark-mark" width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true">
+      <rect x="1.5" y="1.5" width="2" height="14" rx="1" fill="currentColor" />
+      <rect x="6" y="2.5" width="9.5" height="2" rx="1" fill="currentColor" opacity="0.95" />
+      <rect x="6" y="7.5" width="6.5" height="2" rx="1" fill="currentColor" opacity="0.7" />
+      <rect x="6" y="12.5" width="8" height="2" rx="1" fill="currentColor" opacity="0.45" />
+    </svg>
+  );
+}
 
 export default function App() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
@@ -49,6 +61,7 @@ export default function App() {
   const [savedNotice, setSavedNotice] = useState<{ id: string; summary: string } | null>(null);
 
   const [view, setView] = useState<View>('memory');
+  const centreRef = useRef<HTMLElement>(null);
   const [highlighted, setHighlighted] = useState<string | null>(null);
   const evidenceRefs = useRef(new Map<string, HTMLLIElement>());
   const registerRef = useCallback((id: string, node: HTMLLIElement | null) => {
@@ -137,6 +150,23 @@ export default function App() {
     setView(next);
   };
 
+  /**
+   * A new section starts at the top. The workspace column is one persistent element across views,
+   * so without this its scroll offset carries into whatever is selected next.
+   *
+   * Depends on `view` alone: choosing a different asset must not move the reader.
+   * Runs before paint so the new view is never shown at the old offset, and sets the offset
+   * directly rather than animating, so there is nothing for reduced-motion to suppress.
+   */
+  useLayoutEffect(() => {
+    const centre = centreRef.current;
+    if (!centre) return;
+    // The column is the scroller on the wide layout. Below the breakpoint it is `overflow: visible`
+    // and the document scrolls instead, so there is nothing to reset on the element itself.
+    if (centre.scrollHeight > centre.clientHeight) centre.scrollTop = 0;
+    else window.scrollTo(0, 0);
+  }, [view]);
+
   /* ------------------------------------------------------------ investigation */
   const runInvestigation = useCallback(async (intent: Intent | null, question: string, probeId: string | null) => {
     if (!selected) return;
@@ -196,20 +226,28 @@ export default function App() {
 
   return (
     <div className="shell">
-      <header className="topbar">
-        <span className="wordmark">Machine Memory<span>Turbine maintenance intelligence</span></span>
-        <span className="topbar-spacer" />
-        <div className="status-strip">
+      <header className="masthead">
+        <span className="wordmark">
+          <Mark />
+          <span className="wordmark-text">
+            <span className="wordmark-name">Machine Memory</span>
+            <span className="wordmark-sub">Turbine maintenance intelligence</span>
+          </span>
+        </span>
+        <span className="masthead-spacer" />
+        <div className="system-status">
           <span className="status-item">
             <span className={`lamp ${lamp}`} aria-hidden="true" />
-            {databaseState === 'connected' ? 'Database connected'
-              : databaseState === 'unavailable' ? 'Database unavailable'
-              : databaseState === 'not_configured' ? 'Database not configured'
-              : 'Checking backend'}
+            <span className="label">
+              {databaseState === 'connected' ? 'Database connected'
+                : databaseState === 'unavailable' ? 'Database unavailable'
+                : databaseState === 'not_configured' ? 'Database not configured'
+                : 'Checking backend'}
+            </span>
           </span>
           <span className="status-item">
             <span className={`lamp ${health?.llm === 'configured_unverified' ? 'live' : ''}`} aria-hidden="true" />
-            {health?.llm === 'configured_unverified' ? 'Model key present' : 'No model key'}
+            <span className="label">{health?.llm === 'configured_unverified' ? 'Model key present' : 'No model key'}</span>
           </span>
         </div>
       </header>
@@ -237,7 +275,7 @@ export default function App() {
           />
         )}
 
-        <main className="column centre">
+        <main className="column centre" ref={centreRef}>
           {view === 'fleet' && (
             <FleetDashboard onOpenAsset={(assetCode) => { chooseAsset(assetCode); setView('memory'); }} />
           )}
@@ -311,7 +349,7 @@ export default function App() {
                 onRun={(intent, question, probeId) => void runInvestigation(intent, question, probeId)}
                 onLogResolution={() => setDrawerOpen(true)}
               />
-              <div className="investigate" style={{ paddingTop: 0 }}>
+              <div className="answer-region">
                 <AnswerCard
                   answer={result?.answer ?? null}
                   running={running}

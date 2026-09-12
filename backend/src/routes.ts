@@ -31,6 +31,18 @@ const eventCode = z.string().trim().min(1).max(100).regex(/^[A-Za-z0-9_-]+$/);
 const label = z.string().trim().min(1).max(200);
 const importType = z.enum(['EVENT_LOG', 'MAINTENANCE_HISTORY', 'WORK_ORDERS', 'TECHNICIAN_NOTES']);
 const uuid = z.string().uuid();
+/**
+ * A `documents.id` is not always an RFC-4122 UUID. Uploaded documents get one from
+ * `gen_random_uuid()`, but a reviewed public corpus document takes its id from the first 128 bits
+ * of the SHA-256 of its normalized manifest (`documentIdentity` in scripts/rag/manifest.ts), so
+ * re-ingesting identical content is idempotent. That leaves the version and variant nibbles
+ * arbitrary, which `z.uuid()` rejects even though Postgres stores it happily.
+ *
+ * The real contract is therefore the `uuid` column's own lexical form — 8-4-4-4-12 hex — which is
+ * what `z.guid()` checks. This still admits nothing but 32 hex digits and four hyphens, so no
+ * unsafe identifier reaches the (parameterized) query.
+ */
+const documentId = z.guid();
 
 const createAsset = z.strictObject({
   assetCode, siteName: label, assetType: label.default('wind_turbine'),
@@ -305,13 +317,13 @@ export function createDynamicRoutes(deps: RouteDeps): Router {
   });
 
   router.get('/api/knowledge/:id', async (req, res) => {
-    const detail = await getSource(q(), uuid.parse(req.params.id));
+    const detail = await getSource(q(), documentId.parse(req.params.id));
     if (!detail) throw new RouteError(404, 'SOURCE_NOT_FOUND', 'Knowledge source not found.');
     res.json(detail);
   });
 
   router.delete('/api/knowledge/:id', async (req, res) => {
-    const outcome = await deleteSource(q(), uuid.parse(req.params.id));
+    const outcome = await deleteSource(q(), documentId.parse(req.params.id));
     if (outcome === 'not_found') throw new RouteError(404, 'SOURCE_NOT_FOUND', 'Knowledge source not found.');
     if (outcome === 'protected') throw new RouteError(403, 'SOURCE_PROTECTED', 'Reviewed public and foundation sources cannot be deleted from the interface.');
     res.json({ status: 'deleted' });

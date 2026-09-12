@@ -4,7 +4,7 @@ import type {
   StartSimulationResponse,
 } from '@machine-memory/shared';
 import { failureText, get, post } from './api';
-import { Empty, Failure, Loading, Origin, Severity } from './ui';
+import { Authority, Empty, Failure, Loading, Origin, Severity, Strength } from './ui';
 
 interface FeedRow {
   key: string;
@@ -130,14 +130,21 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
     setRunning(false);
   };
 
-  if (loading) return <Loading label="Connecting to simulator" />;
-  if (error && !status) return <Failure title="Simulator unavailable" detail={error} onRetry={() => window.location.reload()} />;
+  if (loading) return <div className="page"><Loading label="Connecting to simulator" /></div>;
+  if (error && !status) {
+    return (
+      <div className="page">
+        <Failure title="Simulator unavailable" detail={error} onRetry={() => window.location.reload()} />
+      </div>
+    );
+  }
 
   const scenario = status?.scenarios.find((item) => item.id === scenarioId);
 
   return (
     <div className="page">
       <div className="page-head">
+        <span className="eyebrow">Read-only event console</span>
         <h2>SCADA Simulator</h2>
         <p>
           Machine Memory is <strong>not connected to live industrial SCADA</strong>. This feed is
@@ -146,14 +153,25 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
         </p>
       </div>
 
-      <section className="panel">
-        <div className="panel-head">
+      {/* What this page actually does, in four steps. */}
+      <div className="workflow">
+        <span className="wf-step"><b>1</b> Simulator</span>
+        <span className="arrow" aria-hidden="true">→</span>
+        <span className="wf-step"><b>2</b> Event stream</span>
+        <span className="arrow" aria-hidden="true">→</span>
+        <span className="wf-step"><b>3</b> Recorded fault</span>
+        <span className="arrow" aria-hidden="true">→</span>
+        <span className="wf-step"><b>4</b> Machine Memory investigation</span>
+      </div>
+
+      <section className="section">
+        <div className="section-head">
           <h3>
             <span className={`lamp ${streamLive ? 'live' : ''}`} aria-hidden="true" />
             {streamLive ? 'Simulation connected' : 'Stream disconnected'}
           </h3>
-          <span className="sim-badge">SIMULATION</span>
-          <span className="panel-note">source: {status?.source} · read-only · no control channel</span>
+          <span className="sim-badge">Simulation</span>
+          <span className="note">source: {status?.source} · read-only · no control channel</span>
         </div>
 
         <div className="form-grid">
@@ -173,8 +191,8 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
               <option value="fast">Fast demo</option>
             </select>
           </label>
+          {scenario && <span className="panel-note field-note">{scenario.summary}</span>}
         </div>
-        {scenario && <p className="panel-note">{scenario.summary}</p>}
 
         <div className="button-row">
           <button type="button" className="btn primary" disabled={running || !assetCode} onClick={() => void start()}>
@@ -192,25 +210,31 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
         <section className="panel fault-banner">
           <div className="panel-head">
             <h3>New fault detected</h3>
-            <span className="sim-badge">SIMULATION</span>
+            <span className="sim-badge">Simulation</span>
           </div>
           <div className="fault-grid">
-            <div><span>Asset</span><strong>{latestFault.assetCode}</strong></div>
-            <div><span>Event</span><code>{latestFault.eventCode}</code></div>
-            <div><span>Subsystem</span><strong>{latestFault.subsystem ?? '—'}</strong></div>
-            <div><span>Severity</span><Severity value={latestFault.severity} /></div>
+            <div><span className="f-label">Asset</span><strong>{latestFault.assetCode}</strong></div>
+            <div><span className="f-label">Event</span><code>{latestFault.eventCode}</code></div>
+            <div><span className="f-label">Subsystem</span><strong>{latestFault.subsystem ?? '—'}</strong></div>
+            <div><span className="f-label">Severity</span><span className="f-sev"><Severity value={latestFault.severity} /></span></div>
           </div>
           {latestFault.signalSnapshot.length > 0 && (
             <>
-              <p className="panel-note">Simulated signals — illustrative demonstration values, not OEM thresholds. They are not evidence and are never cited.</p>
+              <p className="panel-note">
+                Simulated signals — illustrative demonstration values, not OEM thresholds. They are
+                not evidence and are never cited.
+              </p>
               <ul className="signal-list">
                 {latestFault.signalSnapshot.map((signal) => (
-                  <li key={signal.label}><span>{signal.label}</span><strong>{signal.value} {signal.unit}</strong></li>
+                  <li key={signal.label}>
+                    <span className="s-label">{signal.label}</span>
+                    <strong>{signal.value} {signal.unit}</strong>
+                  </li>
                 ))}
               </ul>
             </>
           )}
-          <div className="button-row">
+          <div className="button-row" style={{ marginTop: 16 }}>
             <button type="button" className="btn primary" onClick={() => onInvestigate(latestFault.assetCode, latestFault.eventCode)}>
               Open in Machine Memory
             </button>
@@ -219,30 +243,32 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
       )}
 
       {(investigating || investigation) && (
-        <section className="panel">
-          <div className="panel-head">
+        <section className="section">
+          <div className="section-head">
             <h3>Machine Memory investigation</h3>
-            <span className="panel-note">Automatic · same pipeline as a manual investigation</span>
+            <span className="note">Automatic · same pipeline as a manual investigation</span>
           </div>
           {investigating && !investigation && <p className="thinking">Investigating Machine Memory…</p>}
           {investigation && (
             <>
               <article className={`assessment ${investigation.answer.safetyStatus === 'REFUSED' ? 'refused' : ''}`}>
                 <header>
-                  <span className="assessment-title">AI assessment</span>
-                  <span className={`badge strength-${investigation.answer.evidenceStrength.toLowerCase()}`}>
-                    {investigation.answer.evidenceStrength === 'HIGH' ? 'Strong evidence'
-                      : investigation.answer.evidenceStrength === 'MODERATE' ? 'Moderate evidence' : 'Insufficient evidence'}
-                  </span>
+                  <span className="assessment-title">Assessment</span>
+                  <Strength value={investigation.answer.evidenceStrength} />
                 </header>
                 <p className="assessment-summary">{investigation.answer.summary}</p>
                 {investigation.answer.findings.length > 0 && (
                   <ul className="findings">
                     {investigation.answer.findings.map((finding, index) => (
                       <li key={index}>
-                        <strong>{finding.title}</strong>
+                        <span className="f-title">{finding.title}</span>
                         <p>{finding.detail}</p>
-                        <span className="cites">{finding.citationIds.map((id) => <code key={id}>{id}</code>)}</span>
+                        {finding.citationIds.length > 0 && (
+                          <span className="cites">
+                            <span className="cites-label">Cites</span>
+                            {finding.citationIds.map((id) => <code key={id}>{id}</code>)}
+                          </span>
+                        )}
                       </li>
                     ))}
                   </ul>
@@ -254,20 +280,26 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
                   </div>
                 )}
               </article>
-              <div className="panel-head" style={{ marginTop: 14 }}>
+
+              <div className="section-head sub">
                 <h3>Sources</h3>
-                <span className="panel-note">{investigation.evidence.length} retrieved record(s), with provenance</span>
+                <span className="note">{investigation.evidence.length} retrieved record(s), with provenance</span>
               </div>
-              <ul className="record-list">
+              <ul className="library">
                 {investigation.evidence.slice(0, 8).map((item) => (
                   <li key={item.id}>
-                    <div className="record static">
-                      <span className="record-main">
-                        <code>{item.id}</code>
-                        <strong>{item.title}</strong>
-                        <span className={`badge auth-${item.authorityClass.toLowerCase()}`}>{item.authorityClass}</span>
+                    <div className="source-row static">
+                      <span className="s-mark" aria-hidden="true" />
+                      <span className="s-body">
+                        <span className="s-title">
+                          <code>{item.id}</code>
+                          <strong>{item.title}</strong>
+                        </span>
                       </span>
-                      <span className="record-meta"><Origin value={item.recordOrigin} /></span>
+                      <span className="s-index">
+                        <Authority value={item.authorityClass} />
+                        <Origin value={item.recordOrigin} />
+                      </span>
                     </div>
                   </li>
                 ))}
@@ -277,16 +309,18 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
         </section>
       )}
 
-      <section className="panel">
-        <div className="panel-head">
+      <section className="section">
+        <div className="section-head">
           <h3>Incoming events</h3>
-          <span className="panel-note">Informational rows stay in this feed. Warnings and faults become machine history.</span>
+          <span className="note">Informational rows stay in this feed. Warnings and faults become machine history.</span>
         </div>
         <div className="feed" ref={feedRef}>
           {rows.length === 0 ? (
-            <Empty title="No events yet">Choose an asset and a scenario, then start the simulated feed.</Empty>
+            <div style={{ padding: '0 16px' }}>
+              <Empty title="No events yet">Choose an asset and a scenario, then start the simulated feed.</Empty>
+            </div>
           ) : (
-            <table className="feed-table">
+            <table className="data-table live">
               <thead>
                 <tr><th>Time</th><th>Asset</th><th>Event</th><th>Subsystem</th><th>Severity</th><th>Status</th></tr>
               </thead>
@@ -297,7 +331,7 @@ export function ScadaSimulator({ assets, onFault, onInvestigate }: {
                     <td className="mono">{row.assetCode}</td>
                     <td>{row.eventCode ? <code>{row.eventCode}</code> : <span className="muted">—</span>}</td>
                     <td>{row.subsystem ?? <span className="muted">—</span>}</td>
-                    <td>{row.kind === 'event' ? <Severity value={row.severity} /> : <span className="muted">NORMAL</span>}</td>
+                    <td>{row.kind === 'event' ? <Severity value={row.severity} /> : <span className="muted">Normal</span>}</td>
                     <td>{row.kind === 'event'
                       ? (row.duplicate ? <span className="count-pill">replay ignored</span> : <span className="count-pill ok">recorded</span>)
                       : <span className="muted">feed only</span>}</td>

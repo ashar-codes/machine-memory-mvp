@@ -15,12 +15,22 @@ export function ScenarioLab({ assets, onAssetCreated, onEventCreated }: {
   return (
     <div className="page">
       <div className="page-head">
+        <span className="eyebrow">Controlled sandbox</span>
         <h2>Scenario Lab</h2>
         <p>
           Onboard a turbine, then give it a fault. A new asset starts with an empty machine memory —
           that is the point: you can watch it learn.
         </p>
       </div>
+
+      <div className="workflow">
+        <span className="wf-step"><b>1</b> Create a turbine with no history</span>
+        <span className="arrow" aria-hidden="true">→</span>
+        <span className="wf-step"><b>2</b> Record an event against it</span>
+        <span className="arrow" aria-hidden="true">→</span>
+        <span className="wf-step"><b>3</b> That history is immediately retrievable</span>
+      </div>
+
       <AddTurbine onCreated={onAssetCreated} />
       <AddEvent assets={assets} onCreated={onEventCreated} />
     </div>
@@ -61,10 +71,10 @@ function AddTurbine({ onCreated }: { onCreated: (asset: Asset) => void }) {
   };
 
   return (
-    <section className="panel">
-      <div className="panel-head">
-        <h3>Add turbine</h3>
-        <span className="panel-note">Created through the backend and stored as user import provenance.</span>
+    <section className="section">
+      <div className="section-head">
+        <h3>Create turbine</h3>
+        <span className="note">Created through the backend and stored as user import provenance.</span>
       </div>
       <div className="form-grid">
         <label>Asset code *<input value={assetCode} maxLength={64} placeholder="WT-10" onChange={(event) => setAssetCode(event.target.value)} /></label>
@@ -78,9 +88,11 @@ function AddTurbine({ onCreated }: { onCreated: (asset: Asset) => void }) {
       </div>
       {error && <p className="turn-error">{error}</p>}
       {done && <p className="notice success-note">{done}</p>}
-      <button type="button" className="btn primary" disabled={busy} onClick={() => void submit()}>
-        {busy ? 'Creating…' : 'Add turbine'}
-      </button>
+      <div className="button-row">
+        <button type="button" className="btn primary" disabled={busy} onClick={() => void submit()}>
+          {busy ? 'Creating…' : 'Create turbine'}
+        </button>
+      </div>
     </section>
   );
 }
@@ -119,10 +131,11 @@ function AddEvent({ assets, onCreated }: { assets: Asset[]; onCreated: (assetCod
   };
 
   return (
-    <section className="panel">
-      <div className="panel-head">
-        <h3>Add event / fault</h3>
-        <span className="panel-note">A simulated fault is stored as simulation provenance and labelled everywhere it appears.</span>
+    <section className="section">
+      <div className="section-head">
+        <h3>Record event / fault</h3>
+        {simulation && <span className="sim-badge">Simulation</span>}
+        <span className="note">A simulated fault is stored as simulation provenance and labelled everywhere it appears.</span>
       </div>
       <div className="form-grid">
         <label>Asset *
@@ -140,7 +153,7 @@ function AddEvent({ assets, onCreated }: { assets: Asset[]; onCreated: (assetCod
           </select>
         </label>
         <label>Occurred at (browser local time)<input type="datetime-local" value={occurredAt} onChange={(event) => setOccurredAt(event.target.value)} /></label>
-        <span className="panel-note">Times use {Intl.DateTimeFormat().resolvedOptions().timeZone}. A manually entered repeated daylight-saving hour uses its first occurrence.</span>
+        <span className="panel-note field-note">Times use {Intl.DateTimeFormat().resolvedOptions().timeZone}. A manually entered repeated daylight-saving hour uses its first occurrence.</span>
         <label className="wide">Observed symptoms<input value={description} maxLength={4000} onChange={(event) => setDescription(event.target.value)} /></label>
       </div>
       <label className="check-row">
@@ -155,9 +168,11 @@ function AddEvent({ assets, onCreated }: { assets: Asset[]; onCreated: (assetCod
       )}
       {error && <p className="turn-error">{error}</p>}
       {done && <p className="notice success-note">{done}</p>}
-      <button type="button" className="btn primary" disabled={busy} onClick={() => void submit()}>
-        {busy ? 'Recording…' : 'Record event'}
-      </button>
+      <div className="button-row">
+        <button type="button" className="btn primary" disabled={busy} onClick={() => void submit()}>
+          {busy ? 'Recording…' : 'Record event'}
+        </button>
+      </div>
     </section>
   );
 }

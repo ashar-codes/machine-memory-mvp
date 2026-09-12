@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { Evidence, RecordOrigin } from '@machine-memory/shared';
+import type { Evidence, EvidenceStrength, RecordOrigin } from '@machine-memory/shared';
 
 const ORIGIN_LABEL: Record<RecordOrigin, string> = {
   public_data: 'Public data',
@@ -15,9 +15,34 @@ export function Origin({ value }: { value: RecordOrigin }) {
   return <span className={`origin ${value}`}>{ORIGIN_LABEL[value] ?? 'Unknown provenance'}</span>;
 }
 
+/**
+ * Authority is a different axis from provenance and is drawn differently: an outline rather than a
+ * tint, so the two are never read as the same fact. An unverified source is visibly distinct from a
+ * reviewed one without being styled as an error.
+ */
+export function Authority({ value }: { value: string }) {
+  return <span className={`authority ${value.toLowerCase()}`}>{value}</span>;
+}
+
 export function Severity({ value }: { value: string }) {
   const level = ['critical', 'warning', 'info'].includes(value) ? value : 'info';
   return <span className={`severity ${level}`}>{value}</span>;
+}
+
+export const STRENGTH_LABEL: Record<EvidenceStrength, string> = {
+  HIGH: 'Strong evidence',
+  MODERATE: 'Moderate evidence',
+  INSUFFICIENT: 'Insufficient evidence',
+};
+
+/** Evidence strength reads as a measured scale of three, not as a large coloured badge. */
+export function Strength({ value }: { value: EvidenceStrength }) {
+  return (
+    <span className={`strength ${value.toLowerCase()}`}>
+      <span className="strength-marks" aria-hidden="true"><i /><i /><i /></span>
+      {STRENGTH_LABEL[value]}
+    </span>
+  );
 }
 
 export function stamp(value: string | null | undefined): string {
